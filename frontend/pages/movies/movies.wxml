@@ -1,0 +1,40 @@
+<view class="container">
+  <view class="filter-section">
+    <scroll-view class="type-tabs" scroll-x="true">
+      <view class="type-tab {{currentType === item.value ? 'active' : ''}}" 
+            wx:for="{{movieTypes}}" 
+            wx:key="value"
+            bindtap="selectType"
+            data-type="{{item.value}}">
+        {{item.label}}
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="movie-list">
+    <view class="movie-item" wx:for="{{movies}}" wx:key="id" bindtap="viewMovie" data-id="{{item.id}}">
+      <view class="movie-poster">{{item.image_url || '🎬'}}</view>
+      <view class="movie-detail">
+        <view class="movie-title">{{item.title}}</view>
+        <view class="movie-meta">
+          <text class="movie-genre">{{item.genre}}</text>
+          <text class="movie-year" wx:if="{{item.release_year}}">{{item.release_year}}</text>
+        </view>
+        <view class="movie-rating">
+          <text class="rating-star">⭐</text>
+          <text class="rating-value">{{item.rating}}</text>
+        </view>
+        <view class="movie-platform">{{item.platform}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{movies.length === 0 && !loading}}">
+    <text class="empty-icon">🎬</text>
+    <text class="empty-text">暂无影视内容</text>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>

@@ -1,0 +1,5 @@
+{
+  "navigationBarTitleText": "影视",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50
+}

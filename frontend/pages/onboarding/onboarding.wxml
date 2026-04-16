@@ -1,0 +1,47 @@
+<view class="container">
+  <view class="header">
+    <text class="title">欢迎来到智慧三餐</text>
+    <text class="subtitle">让我们快速了解您的口味偏好</text>
+    <view class="progress-bar">
+      <view class="progress-fill" style="width: {{progress}}%"></view>
+    </view>
+    <text class="progress-text">{{currentStep + 1}}/{{totalSteps}}</text>
+  </view>
+
+  <view class="question-section" wx:if="{{currentQuestion}}">
+    <text class="question-text">{{currentQuestion.question}}</text>
+    
+    <view class="options-list" wx:if="{{currentQuestion.type === 'single_choice'}}">
+      <view class="option-item {{selectedAnswer === option.value ? 'selected' : ''}}" 
+            wx:for="{{currentQuestion.options}}" 
+            wx:key="value"
+            bindtap="selectSingleOption"
+            data-value="{{option.value}}">
+        <view class="option-radio">
+          <view class="radio-dot" wx:if="{{selectedAnswer === option.value}}"></view>
+        </view>
+        <text class="option-label">{{option.label}}</text>
+      </view>
+    </view>
+    
+    <view class="options-list" wx:if="{{currentQuestion.type === 'multi_choice'}}">
+      <view class="option-item {{selectedAnswers.includes(option.value) ? 'selected' : ''}}" 
+            wx:for="{{currentQuestion.options}}" 
+            wx:key="value"
+            bindtap="toggleMultiOption"
+            data-value="{{option.value}}">
+        <view class="option-checkbox">
+          <text class="check-mark" wx:if="{{selectedAnswers.includes(option.value)}}">✓</text>
+        </view>
+        <text class="option-label">{{option.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <button class="secondary-btn" wx:if="{{currentStep > 0}}" bindtap="prevStep">上一步</button>
+    <button class="primary-btn" bindtap="{{currentStep === totalSteps - 1 ? 'submit' : 'nextStep'}}" disabled="{{!canProceed}}">
+      {{currentStep === totalSteps - 1 ? '完成' : '下一步'}}
+    </button>
+  </view>
+</view>

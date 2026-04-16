@@ -1,0 +1,52 @@
+{
+  "pages": [
+    "pages/onboarding/onboarding",
+    "pages/index/index",
+    "pages/menu/menu",
+    "pages/recipe-detail/recipe-detail",
+    "pages/movies/movies",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FF6B35",
+    "navigationBarTitleText": "智慧三餐·悦享观影",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F5F5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#FF6B35",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/menu/menu",
+        "text": "菜单",
+        "iconPath": "images/menu.png",
+        "selectedIconPath": "images/menu-active.png"
+      },
+      {
+        "pagePath": "pages/movies/movies",
+        "text": "影视",
+        "iconPath": "images/movie.png",
+        "selectedIconPath": "images/movie-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/profile.png",
+        "selectedIconPath": "images/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

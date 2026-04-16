@@ -1,0 +1,182 @@
+.container {
+  padding-bottom: 120rpx;
+}
+
+.date-selector {
+  background: white;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-btn {
+  font-size: 40rpx;
+  color: #FF6B35;
+  padding: 10rpx 20rpx;
+}
+
+.week-display {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.week-tabs {
+  display: flex;
+  background: white;
+  padding: 16rpx 0;
+  margin-bottom: 20rpx;
+  overflow-x: auto;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16rpx 8rpx;
+  min-width: 100rpx;
+}
+
+.tab-item.active {
+  background: #fff5f0;
+  border-radius: 12rpx;
+}
+
+.tab-weekday {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 6rpx;
+}
+
+.tab-item.active .tab-weekday {
+  color: #FF6B35;
+}
+
+.tab-date {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.tab-item.active .tab-date {
+  color: #FF6B35;
+}
+
+.menu-list {
+  padding: 0 20rpx;
+}
+
+.meal-section {
+  margin-bottom: 24rpx;
+}
+
+.meal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.meal-type-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.meal-icon {
+  font-size: 28rpx;
+}
+
+.meal-card, .empty-meal {
+  background: white;
+  border-radius: 16rpx;
+  padding: 24rpx;
+}
+
+.recipe-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.recipe-meta {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.cuisine-type {
+  font-size: 24rpx;
+  color: #FF6B35;
+  background: #fff5f0;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.nutrition-info {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.eating-out {
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+  padding: 40rpx 0;
+}
+
+.meal-actions {
+  display: flex;
+  gap: 16rpx;
+  justify-content: flex-end;
+}
+
+.action-btn {
+  border-radius: 50rpx;
+  font-size: 24rpx;
+  padding: 12rpx 28rpx;
+}
+
+.action-btn.small {
+  font-size: 22rpx;
+  padding: 10rpx 24rpx;
+}
+
+.action-btn.outline {
+  background: transparent;
+  border: 1rpx solid #FF6B35;
+  color: #FF6B35;
+}
+
+.empty-meal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.empty-text {
+  color: #999;
+  font-size: 26rpx;
+}
+
+.generate-btn-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 20rpx;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.generate-btn {
+  width: 100%;
+}

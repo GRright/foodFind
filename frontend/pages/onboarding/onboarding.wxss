@@ -1,0 +1,160 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+  padding: 40rpx 30rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  margin-bottom: 60rpx;
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: white;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.9);
+  display: block;
+  margin-bottom: 40rpx;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4rpx;
+  margin-bottom: 12rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: white;
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.question-section {
+  flex: 1;
+  background: white;
+  border-radius: 24rpx;
+  padding: 50rpx 40rpx;
+  margin-bottom: 30rpx;
+}
+
+.question-text {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 40rpx;
+  line-height: 1.5;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx 24rpx;
+  background: #f9f9f9;
+  border-radius: 16rpx;
+  border: 3rpx solid transparent;
+  transition: all 0.2s ease;
+}
+
+.option-item.selected {
+  background: #fff5f0;
+  border-color: #FF6B35;
+}
+
+.option-radio, .option-checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border: 3rpx solid #ddd;
+  border-radius: 50%;
+  margin-right: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.option-checkbox {
+  border-radius: 8rpx;
+}
+
+.option-item.selected .option-radio,
+.option-item.selected .option-checkbox {
+  border-color: #FF6B35;
+  background: #FF6B35;
+}
+
+.radio-dot {
+  width: 16rpx;
+  height: 16rpx;
+  background: white;
+  border-radius: 50%;
+}
+
+.check-mark {
+  color: white;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.option-label {
+  flex: 1;
+  font-size: 30rpx;
+  color: #333;
+}
+
+.option-item.selected .option-label {
+  color: #FF6B35;
+  font-weight: 500;
+}
+
+.footer {
+  display: flex;
+  gap: 20rpx;
+}
+
+.primary-btn, .secondary-btn {
+  flex: 1;
+  padding: 28rpx;
+  border-radius: 50rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  border: none;
+}
+
+.primary-btn {
+  background: white;
+  color: #FF6B35;
+}
+
+.primary-btn[disabled] {
+  background: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 107, 53, 0.5);
+}
+
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
