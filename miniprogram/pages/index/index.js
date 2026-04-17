@@ -8,6 +8,7 @@ Page({
     currentDate: '',
     userCount: 2,
     userCountOptions: [1, 2, 3, 4, 5, 6],
+    showCountPicker: false,
     allRecipes: {
       breakfast: [
         { id: 101, name: '番茄炒蛋', image: '🍳', calories: 120, time: 10, type: 'mixed' },
@@ -175,5 +176,12 @@ Page({
     wx.navigateTo({ url: '/pages/onboarding/onboarding' }); 
   },
   closeOnboardingModal() { this.setData({ showOnboardingModal: false }); },
-  stopPropagation() {}
+  stopPropagation() {},
+  showCountPicker() { this.setData({ showCountPicker: true }); },
+  hideCountPicker() { this.setData({ showCountPicker: false }); },
+  selectCount(e) {
+    const count = e.currentTarget.dataset.count;
+    this.setData({ userCount: count });
+    this.generateDailyRecipes();
+  }
 });

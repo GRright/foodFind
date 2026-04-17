@@ -3,58 +3,50 @@
     <text class="title">让我们了解你</text>
     <text class="subtitle">这样推荐会更符合你的口味</text>
     
-    <van-steps current="{{currentStep}}" active-color="#07c160" active="{{currentStep}}" class="custom-steps">
-      <van-step>步骤1</van-step>
-      <van-step>步骤2</van-step>
-      <van-step>步骤3</van-step>
-      <van-step>步骤4</van-step>
-      <van-step>步骤5</van-step>
-      <van-step>步骤6</van-step>
-    </van-steps>
-    
+    <view class="progress-bar">
+      <view class="progress-fill" style="width: {{progress}}%"></view>
+    </view>
     <text class="step-text">{{currentStep + 1}} / {{totalSteps}}</text>
   </view>
 
   <view class="question-card" wx:if="{{currentQuestion}}">
     <text class="question-text">{{currentQuestion.question}}</text>
     
-    <van-radio-group value="{{selectedAnswer}}" bind:change="onRadioChange" wx:if="{{currentQuestion.type === 'single_choice'}}">
-      <van-cell-group>
-        <van-cell 
-          wx:for="{{currentQuestion.options}}" 
-          wx:key="value"
-          title="{{item.label}}"
-          clickable
-          data-value="{{item.value}}"
-          bindtap="onRadioTap">
-          <van-radio slot="right-icon" name="{{item.value}}" />
-        </van-cell>
-      </van-cell-group>
-    </van-radio-group>
+    <view class="options" wx:if="{{currentQuestion.type === 'single_choice'}}">
+      <view class="option {{selectedAnswer === option.value ? 'active' : ''}}" 
+            wx:for="{{currentQuestion.options}}" 
+            wx:key="value"
+            bindtap="selectSingleOption"
+            data-value="{{option.value}}">
+        <view class="option-dot">
+          <view class="dot-inner" wx:if="{{selectedAnswer === option.value}}"></view>
+        </view>
+        <text class="option-label">{{option.label}}</text>
+      </view>
+    </view>
     
-    <van-checkbox-group value="{{selectedAnswers}}" bind:change="onCheckboxChange" wx:if="{{currentQuestion.type === 'multi_choice'}}">
-      <van-cell-group>
-        <van-cell 
-          wx:for="{{currentQuestion.options}}" 
-          wx:key="value"
-          title="{{item.label}}"
-          clickable
-          data-value="{{item.value}}"
-          bindtap="onCheckboxTap">
-          <van-checkbox slot="right-icon" name="{{item.value}}" />
-        </van-cell>
-      </van-cell-group>
-    </van-checkbox-group>
+    <view class="options" wx:if="{{currentQuestion.type === 'multi_choice'}}">
+      <view class="option {{selectedAnswers.includes(option.value) ? 'active' : ''}}" 
+            wx:for="{{currentQuestion.options}}" 
+            wx:key="value"
+            bindtap="toggleMultiOption"
+            data-value="{{option.value}}">
+        <view class="option-box">
+          <text class="check-icon" wx:if="{{selectedAnswers.includes(option.value)}}">✓</text>
+        </view>
+        <text class="option-label">{{option.label}}</text>
+      </view>
+    </view>
   </view>
 
   <view class="footer">
     <view class="btn-wrap" wx:if="{{currentStep > 0}}">
-      <van-button type="default" size="large" bindtap="prevStep">上一步</van-button>
+      <view class="btn btn-secondary" bindtap="prevStep">上一步</view>
     </view>
     <view class="btn-wrap">
-      <van-button type="primary" size="large" bindtap="handleNext" disabled="{{!canProceed}}">
+      <view class="btn btn-primary {{!canProceed ? 'disabled' : ''}}" bindtap="handleNext">
         {{currentStep === totalSteps - 1 ? '完成' : '下一步'}}
-      </van-button>
+      </view>
     </view>
   </view>
 </view>

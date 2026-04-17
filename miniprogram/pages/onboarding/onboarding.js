@@ -1,6 +1,3 @@
-const api = require('../../utils/api.js');
-const app = getApp();
-
 Page({
   data: {
     questions: [
@@ -115,13 +112,13 @@ Page({
     this.setData({ canProceed });
   },
 
-  onRadioTap(e) {
+  selectSingleOption(e) {
     const value = e.currentTarget.dataset.value;
     this.setData({ selectedAnswer: value });
     this.checkCanProceed();
   },
 
-  onCheckboxTap(e) {
+  toggleMultiOption(e) {
     const value = e.currentTarget.dataset.value;
     let selectedAnswers = [...this.data.selectedAnswers];
     
@@ -194,6 +191,7 @@ Page({
   },
 
   handleNext() {
+    if (!this.data.canProceed) return;
     if (this.data.currentStep === this.data.totalSteps - 1) {
       this.submit();
     } else {
@@ -202,7 +200,6 @@ Page({
   },
 
   submit() {
-    if (!this.data.canProceed) return;
     this.saveCurrentAnswer();
     
     wx.showLoading({ title: '保存中...' });

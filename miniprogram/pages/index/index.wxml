@@ -11,12 +11,13 @@
 
   <view class="greeting-section">
     <text class="greeting">{{greeting}}</text>
-    <van-button type="primary" size="small" round bindtap="showCountPicker">
-      {{userCount}}人份
-    </van-button>
+    <view class="count-picker" bindtap="showCountPicker">
+      <text class="count-text">{{userCount}}人份</text>
+      <text class="arrow">▼</text>
+    </view>
   </view>
 
-  <view class="section daily-meals-section">
+  <view class="section">
     <view class="section-header">
       <text class="section-title">今日食谱</text>
       <text class="section-more" bindtap="goToMenu">查看全部</text>
@@ -28,19 +29,22 @@
         <text class="meal-name">{{item.title}}</text>
       </view>
       
-      <van-grid column-num="2" border="{{false}}" gutter="16">
-        <van-grid-item wx:for="{{item.recipes}}" wx:for-item="recipe" wx:key="id" use-slot bindtap="viewMealRecipe" data-recipe="{{recipe}}">
-          <view class="recipe-item">
-            <view class="recipe-image-box">
-              <text class="recipe-emoji">{{recipe.image || '🍽️'}}</text>
-            </view>
-            <view class="recipe-content">
-              <text class="recipe-title">{{recipe.name}}</text>
-              <van-tag type="primary" size="mini">{{recipe.calories * userCount}}kcal</van-tag>
-            </view>
+      <view class="recipe-grid">
+        <view class="recipe-item" 
+              wx:for="{{item.recipes}}" 
+              wx:for-item="recipe" 
+              wx:key="id"
+              bindtap="viewMealRecipe"
+              data-recipe="{{recipe}}">
+          <view class="recipe-image-box">
+            <text class="recipe-emoji">{{recipe.image || '🍽️'}}</text>
           </view>
-        </van-grid-item>
-      </van-grid>
+          <view class="recipe-content">
+            <text class="recipe-title">{{recipe.name}}</text>
+            <text class="recipe-calories">{{recipe.calories * userCount}}kcal</text>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 
@@ -48,47 +52,49 @@
     <view class="section-header">
       <text class="section-title">快捷功能</text>
     </view>
-    <van-grid column-num="3" border="{{false}}" gutter="20">
-      <van-grid-item use-slot bindtap="goToMenu">
-        <view class="quick-item">
-          <van-icon name="notes-o" size="48" />
-          <text class="quick-text">全部菜单</text>
-        </view>
-      </van-grid-item>
-      <van-grid-item use-slot bindtap="goToMovies">
-        <view class="quick-item">
-          <van-icon name="video-o" size="48" />
-          <text class="quick-text">下饭影视</text>
-        </view>
-      </van-grid-item>
-      <van-grid-item use-slot bindtap="goToProfile">
-        <view class="quick-item">
-          <van-icon name="setting-o" size="48" />
-          <text class="quick-text">偏好设置</text>
-        </view>
-      </van-grid-item>
-    </van-grid>
-  </view>
-
-  <van-action-sheet show="{{showCountPicker}}" bind:close="onClosePicker" title="选择用餐人数">
-    <view class="picker-options">
-      <view class="picker-option {{userCount === item ? 'active' : ''}}" 
-            wx:for="{{userCountOptions}}" 
-            wx:key="*this"
-            bindtap="selectCount"
-            data-count="{{item}}">
-        {{item}}人份
+    <view class="quick-grid">
+      <view class="quick-item" bindtap="goToMenu">
+        <text class="quick-icon">📋</text>
+        <text class="quick-text">全部菜单</text>
+      </view>
+      <view class="quick-item" bindtap="goToMovies">
+        <text class="quick-icon">🎬</text>
+        <text class="quick-text">下饭影视</text>
+      </view>
+      <view class="quick-item" bindtap="goToProfile">
+        <text class="quick-icon">⚙️</text>
+        <text class="quick-text">偏好设置</text>
       </view>
     </view>
-  </van-action-sheet>
+  </view>
+
+  <view class="picker-mask" wx:if="{{showCountPicker}}" bindtap="hideCountPicker">
+    <view class="picker-sheet" catchtap="stopPropagation">
+      <view class="picker-header">
+        <text class="picker-title">选择用餐人数</text>
+      </view>
+      <view class="picker-options">
+        <view class="picker-option {{userCount === item ? 'active' : ''}}" 
+              wx:for="{{userCountOptions}}" 
+              wx:key="*this"
+              bindtap="selectCount"
+              data-count="{{item}}">
+          {{item}}人份
+        </view>
+      </view>
+      <view class="picker-footer">
+        <view class="picker-btn" bindtap="hideCountPicker">确定</view>
+      </view>
+    </view>
+  </view>
 
   <view class="modal-overlay" wx:if="{{showOnboardingModal}}" bindtap="closeOnboardingModal">
     <view class="modal-box" catchtap="stopPropagation">
       <text class="modal-title">让推荐更懂你</text>
       <text class="modal-desc">花10秒设置口味偏好，获得更精准的推荐</text>
       <view class="modal-actions">
-        <van-button type="default" bindtap="closeOnboardingModal">稍后再说</van-button>
-        <van-button type="primary" bindtap="openOnboarding">立即设置</van-button>
+        <view class="modal-btn modal-btn-secondary" bindtap="closeOnboardingModal">稍后再说</view>
+        <view class="modal-btn modal-btn-primary" bindtap="openOnboarding">立即设置</view>
       </view>
     </view>
   </view>

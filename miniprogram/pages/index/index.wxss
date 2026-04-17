@@ -1,5 +1,5 @@
 page {
-  background: #f7f8fa;
+  background: #f5f5f5;
 }
 
 .container {
@@ -23,13 +23,13 @@ page {
 .app-title {
   font-size: 44rpx;
   font-weight: 700;
-  color: #191919;
+  color: #333333;
   margin-bottom: 8rpx;
 }
 
 .date {
   font-size: 28rpx;
-  color: #969799;
+  color: #999999;
 }
 
 .user-info {
@@ -57,7 +57,27 @@ page {
 
 .greeting {
   font-size: 32rpx;
-  color: #323233;
+  color: #333333;
+}
+
+.count-picker {
+  background: #07c160;
+  padding: 12rpx 24rpx;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.count-text {
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.arrow {
+  color: #ffffff;
+  font-size: 20rpx;
 }
 
 .section {
@@ -74,12 +94,12 @@ page {
 .section-title {
   font-size: 32rpx;
   font-weight: 600;
-  color: #191919;
+  color: #333333;
 }
 
 .section-more {
   font-size: 28rpx;
-  color: #969799;
+  color: #999999;
 }
 
 .meal-card {
@@ -87,7 +107,6 @@ page {
   margin: 0 32rpx 24rpx;
   border-radius: 24rpx;
   padding: 32rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
 .meal-label {
@@ -104,13 +123,19 @@ page {
 .meal-name {
   font-size: 32rpx;
   font-weight: 600;
-  color: #191919;
+  color: #333333;
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
 }
 
 .recipe-item {
   display: flex;
   align-items: center;
-  background: #f7f8fa;
+  background: #f5f5f5;
   border-radius: 16rpx;
   padding: 20rpx;
 }
@@ -140,14 +165,26 @@ page {
 .recipe-title {
   font-size: 28rpx;
   font-weight: 500;
-  color: #191919;
+  color: #333333;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.recipe-calories {
+  font-size: 24rpx;
+  color: #07c160;
+  font-weight: 500;
+}
+
 .quick-section {
   padding: 0 32rpx;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20rpx;
 }
 
 .quick-item {
@@ -155,27 +192,85 @@ page {
   flex-direction: column;
   align-items: center;
   gap: 16rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 32rpx 20rpx;
+}
+
+.quick-icon {
+  font-size: 48rpx;
 }
 
 .quick-text {
   font-size: 24rpx;
-  color: #323233;
+  color: #333333;
+}
+
+.picker-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  z-index: 1000;
+}
+
+.picker-sheet {
+  background: #ffffff;
+  width: 100%;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 32rpx;
+}
+
+.picker-header {
+  text-align: center;
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  margin-bottom: 24rpx;
+}
+
+.picker-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
 }
 
 .picker-options {
-  padding: 16rpx 0;
+  max-height: 500rpx;
+  overflow-y: auto;
 }
 
 .picker-option {
   padding: 32rpx;
   text-align: center;
   font-size: 32rpx;
-  color: #323233;
+  color: #333333;
+  border-radius: 16rpx;
+  margin-bottom: 8rpx;
 }
 
 .picker-option.active {
-  background: #f7f8fa;
+  background: #e8f7ef;
   color: #07c160;
+  font-weight: 600;
+}
+
+.picker-footer {
+  padding-top: 32rpx;
+  border-top: 1rpx solid #f0f0f0;
+  margin-top: 24rpx;
+}
+
+.picker-btn {
+  background: #07c160;
+  color: #ffffff;
+  text-align: center;
+  padding: 28rpx;
+  border-radius: 48rpx;
+  font-size: 32rpx;
   font-weight: 600;
 }
 
@@ -205,7 +300,7 @@ page {
   display: block;
   font-size: 36rpx;
   font-weight: 600;
-  color: #191919;
+  color: #333333;
   text-align: center;
   margin-bottom: 16rpx;
 }
@@ -213,7 +308,7 @@ page {
 .modal-desc {
   display: block;
   font-size: 28rpx;
-  color: #969799;
+  color: #999999;
   text-align: center;
   margin-bottom: 48rpx;
 }
@@ -223,8 +318,23 @@ page {
   gap: 24rpx;
 }
 
-.modal-actions .van-button {
+.modal-btn {
   flex: 1;
+  text-align: center;
+  padding: 28rpx;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.modal-btn-secondary {
+  background: #f5f5f5;
+  color: #333333;
+}
+
+.modal-btn-primary {
+  background: #07c160;
+  color: #ffffff;
 }
 
 .footer-space {
