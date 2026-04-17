@@ -1,11 +1,14 @@
-.container {
-  padding-bottom: 120rpx;
+page {
+  background: #FFFFFF;
 }
 
-.date-selector {
-  background: white;
-  padding: 20rpx;
-  margin-bottom: 20rpx;
+.container {
+  min-height: 100vh;
+  padding-bottom: 160rpx;
+}
+
+.date-header {
+  padding: 32rpx 32rpx 16rpx;
 }
 
 .date-nav {
@@ -15,23 +18,22 @@
 }
 
 .nav-btn {
-  font-size: 40rpx;
-  color: #FF6B35;
-  padding: 10rpx 20rpx;
+  font-size: 44rpx;
+  font-weight: 300;
+  color: #007AFF;
+  padding: 8rpx 16rpx;
 }
 
 .week-display {
   font-size: 28rpx;
-  color: #333;
+  color: #1A1A1A;
   font-weight: 500;
 }
 
 .week-tabs {
   display: flex;
-  background: white;
-  padding: 16rpx 0;
-  margin-bottom: 20rpx;
-  overflow-x: auto;
+  padding: 16rpx 24rpx;
+  gap: 8rpx;
 }
 
 .tab-item {
@@ -40,143 +42,174 @@
   flex-direction: column;
   align-items: center;
   padding: 16rpx 8rpx;
-  min-width: 100rpx;
+  border-radius: 16rpx;
+  transition: all 0.2s ease;
 }
 
 .tab-item.active {
-  background: #fff5f0;
-  border-radius: 12rpx;
+  background: #F5F5F7;
 }
 
 .tab-weekday {
-  font-size: 24rpx;
-  color: #999;
+  font-size: 22rpx;
+  color: #8E8E93;
   margin-bottom: 6rpx;
 }
 
 .tab-item.active .tab-weekday {
-  color: #FF6B35;
+  color: #007AFF;
 }
 
 .tab-date {
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 600;
-  color: #333;
+  color: #1A1A1A;
 }
 
 .tab-item.active .tab-date {
-  color: #FF6B35;
+  color: #007AFF;
 }
 
-.menu-list {
-  padding: 0 20rpx;
+.menu-section {
+  padding: 0 32rpx;
 }
 
-.meal-section {
+.meal-item {
   margin-bottom: 24rpx;
 }
 
-.meal-header {
+.meal-label {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16rpx;
-}
-
-.meal-type-name {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #333;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
 }
 
 .meal-icon {
-  font-size: 28rpx;
+  font-size: 32rpx;
 }
 
-.meal-card, .empty-meal {
-  background: white;
-  border-radius: 16rpx;
-  padding: 24rpx;
+.meal-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.meal-card,
+.empty-card {
+  background: #F5F5F7;
+  border-radius: 20rpx;
+  padding: 28rpx;
+}
+
+.recipe-content {
+  margin-bottom: 20rpx;
 }
 
 .recipe-name {
+  display: block;
   font-size: 32rpx;
   font-weight: 600;
-  color: #333;
+  color: #1A1A1A;
   margin-bottom: 12rpx;
 }
 
 .recipe-meta {
   display: flex;
-  gap: 16rpx;
-  margin-bottom: 20rpx;
+  gap: 12rpx;
+  align-items: center;
 }
 
-.cuisine-type {
+.meta-tag {
   font-size: 24rpx;
-  color: #FF6B35;
-  background: #fff5f0;
+  color: #007AFF;
+  background: rgba(0, 122, 255, 0.1);
   padding: 6rpx 16rpx;
   border-radius: 20rpx;
+  font-weight: 500;
 }
 
-.nutrition-info {
+.meta-cal {
   font-size: 24rpx;
-  color: #999;
+  color: #8E8E93;
 }
 
 .eating-out {
-  text-align: center;
-  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 0;
+  margin-bottom: 20rpx;
+}
+
+.eating-out-text {
   font-size: 28rpx;
-  padding: 40rpx 0;
+  color: #8E8E93;
 }
 
 .meal-actions {
   display: flex;
-  gap: 16rpx;
-  justify-content: flex-end;
+  gap: 12rpx;
 }
 
 .action-btn {
-  border-radius: 50rpx;
-  font-size: 24rpx;
-  padding: 12rpx 28rpx;
+  flex: 1;
+  height: 72rpx;
+  background: #FFFFFF;
+  border: none;
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+  line-height: 72rpx;
+  padding: 0;
 }
 
-.action-btn.small {
-  font-size: 22rpx;
-  padding: 10rpx 24rpx;
+.action-btn::after {
+  border: none;
 }
 
 .action-btn.outline {
   background: transparent;
-  border: 1rpx solid #FF6B35;
-  color: #FF6B35;
+  border: 1rpx solid #D1D1D6;
+  color: #007AFF;
 }
 
-.empty-meal {
+.empty-card {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 16rpx;
+  justify-content: center;
 }
 
 .empty-text {
-  color: #999;
-  font-size: 26rpx;
+  font-size: 28rpx;
+  color: #8E8E93;
 }
 
-.generate-btn-container {
+.bottom-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: white;
-  padding: 20rpx;
-  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.08);
+  background: #FFFFFF;
+  padding: 20rpx 32rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  border-top: 1rpx solid #F5F5F7;
 }
 
 .generate-btn {
   width: 100%;
+  height: 92rpx;
+  background: #007AFF;
+  border: none;
+  border-radius: 20rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+  line-height: 92rpx;
+  padding: 0;
+}
+
+.generate-btn::after {
+  border: none;
 }

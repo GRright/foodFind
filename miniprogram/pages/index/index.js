@@ -6,72 +6,63 @@ Page({
     userInfo: {},
     greeting: '',
     currentDate: '',
-    weather: null,
-    context: null,
-    userTier: null,
-    // 一日三餐数据 - 每餐5道菜，共15道
-    dailyMeals: {
-      breakfast: {
-        title: '早餐',
-        icon: '🌅',
-        recipes: [
-          { id: 101, name: '番茄炒蛋', image: '🍳', calories: 120, time: 10 },
-          { id: 102, name: '豆浆油条', image: '🥖', calories: 280, time: 5 },
-          { id: 103, name: '皮蛋瘦肉粥', image: '🥣', calories: 180, time: 20 },
-          { id: 104, name: '煎饺', image: '🥟', calories: 220, time: 15 },
-          { id: 105, name: '三明治', image: '🥪', calories: 150, time: 5 }
-        ]
-      },
-      lunch: {
-        title: '午餐',
-        icon: '☀️',
-        recipes: [
-          { id: 201, name: '红烧肉', image: '🍖', calories: 450, time: 60 },
-          { id: 202, name: '宫保鸡丁', image: '🍗', calories: 320, time: 25 },
-          { id: 203, name: '麻婆豆腐', image: '🥘', calories: 280, time: 20 },
-          { id: 204, name: '糖醋排骨', image: '🍖', calories: 380, time: 45 },
-          { id: 205, name: '清蒸鲈鱼', image: '🐟', calories: 180, time: 20 }
-        ]
-      },
-      dinner: {
-        title: '晚餐',
-        icon: '🌙',
-        recipes: [
-          { id: 301, name: '日式咖喱饭', image: '🍛', calories: 380, time: 40 },
-          { id: 302, name: '番茄牛肉汤', image: '🍲', calories: 280, time: 45 },
-          { id: 303, name: '蒜蓉西兰花', image: '🥦', calories: 80, time: 10 },
-          { id: 304, name: '蛋炒饭', image: '🍚', calories: 320, time: 10 },
-          { id: 305, name: '韩式拌饭', image: '🍚', calories: 420, time: 25 }
-        ]
-      }
+    userCount: 2,
+    userCountOptions: [1, 2, 3, 4, 5, 6],
+    allRecipes: {
+      breakfast: [
+        { id: 101, name: '番茄炒蛋', image: '🍳', calories: 120, time: 10, type: 'mixed' },
+        { id: 102, name: '豆浆油条', image: '🥖', calories: 280, time: 5, type: 'vegetarian' },
+        { id: 103, name: '皮蛋瘦肉粥', image: '🥣', calories: 180, time: 20, type: 'mixed' },
+        { id: 104, name: '煎饺', image: '🥟', calories: 220, time: 15, type: 'mixed' },
+        { id: 105, name: '三明治', image: '🥪', calories: 150, time: 5, type: 'mixed' },
+        { id: 106, name: '包子', image: '🥡', calories: 200, time: 10, type: 'mixed' },
+        { id: 107, name: '牛奶燕麦', image: '🥛', calories: 180, time: 5, type: 'vegetarian' }
+      ],
+      lunch: [
+        { id: 201, name: '红烧肉', image: '🍖', calories: 450, time: 60, type: 'meat' },
+        { id: 202, name: '宫保鸡丁', image: '🍗', calories: 320, time: 25, type: 'meat' },
+        { id: 203, name: '麻婆豆腐', image: '🥘', calories: 280, time: 20, type: 'mixed' },
+        { id: 204, name: '糖醋排骨', image: '🍖', calories: 380, time: 45, type: 'meat' },
+        { id: 205, name: '清蒸鲈鱼', image: '🐟', calories: 180, time: 20, type: 'meat' },
+        { id: 206, name: '回锅肉', image: '🥓', calories: 420, time: 30, type: 'meat' },
+        { id: 207, name: '水煮鱼', image: '🐟', calories: 380, time: 35, type: 'meat' },
+        { id: 208, name: '干煸四季豆', image: '🫛', calories: 150, time: 15, type: 'vegetarian' },
+        { id: 209, name: '蒜蓉西兰花', image: '🥦', calories: 80, time: 10, type: 'vegetarian' },
+        { id: 210, name: '地三鲜', image: '🍆', calories: 200, time: 20, type: 'vegetarian' },
+        { id: 211, name: '土豆丝', image: '🥔', calories: 120, time: 10, type: 'vegetarian' },
+        { id: 212, name: '红烧茄子', image: '🍆', calories: 180, time: 25, type: 'vegetarian' }
+      ],
+      dinner: [
+        { id: 301, name: '日式咖喱饭', image: '🍛', calories: 380, time: 40, type: 'mixed' },
+        { id: 302, name: '番茄牛肉汤', image: '🍲', calories: 280, time: 45, type: 'mixed' },
+        { id: 303, name: '蒜蓉西兰花', image: '🥦', calories: 80, time: 10, type: 'vegetarian' },
+        { id: 304, name: '蛋炒饭', image: '🍚', calories: 320, time: 10, type: 'mixed' },
+        { id: 305, name: '韩式拌饭', image: '🍚', calories: 420, time: 25, type: 'mixed' },
+        { id: 306, name: '青菜豆腐汤', image: '🥬', calories: 60, time: 10, type: 'vegetarian' },
+        { id: 307, name: '可乐鸡翅', image: '🍗', calories: 350, time: 30, type: 'meat' },
+        { id: 308, name: '蒸蛋羹', image: '🥚', calories: 100, time: 15, type: 'vegetarian' },
+        { id: 309, name: '红烧排骨', image: '🍖', calories: 400, time: 50, type: 'meat' },
+        { id: 310, name: '清炒时蔬', image: '🥗', calories: 50, time: 8, type: 'vegetarian' },
+        { id: 311, name: '香煎豆腐', image: '🧈', calories: 150, time: 15, type: 'vegetarian' },
+        { id: 312, name: '糖醋里脊', image: '🍖', calories: 380, time: 30, type: 'meat' }
+      ]
     },
-    recommendedMovies: [],
-    personalizedRecipes: [],
-    showExplanation: false,
-    showOnboardingModal: false,
-    showPreferenceToast: false,
-    preferenceToastMessage: '',
-    explorationStats: {}
+    dailyMeals: {
+      breakfast: { title: '早餐', icon: '🌅', recipes: [] },
+      lunch: { title: '午餐', icon: '☀️', recipes: [] },
+      dinner: { title: '晚餐', icon: '🌙', recipes: [] }
+    },
+    showOnboardingModal: false
   },
 
   onLoad() {
     this.updateGreeting();
-    const { RecommendEngine, MetricsTracker } = app.globalData;
-    
-    MetricsTracker.recordSession();
-    
     this.setData({
       userInfo: app.globalData.userInfo || {},
-      currentDate: this.formatDate(new Date()),
-      context: RecommendEngine.getContext(),
-      userTier: RecommendEngine.getUserTier(),
-      metrics: MetricsTracker.getMetrics()
+      currentDate: this.formatDate(new Date())
     });
-    
+    this.generateDailyRecipes();
     this.checkAndShowOnboarding();
-    this.loadMovies();
-    this.loadRecommendations();
-    this.updateExplorationStats();
   },
 
   onShow() {
@@ -79,7 +70,6 @@ Page({
     this.updateGreeting();
   },
 
-  // 更新问候语
   updateGreeting() {
     const hour = new Date().getHours();
     let greeting = '你好';
@@ -89,7 +79,74 @@ Page({
     this.setData({ greeting });
   },
 
-  // 检查并显示引导
+  formatDate(date) {
+    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    return `${date.getMonth() + 1}月${date.getDate()}日 ${weekdays[date.getDay()]}`;
+  },
+
+  getRecipeCount() {
+    const count = this.data.userCount;
+    if (count === 1) return 2;
+    if (count === 2) return 3;
+    if (count <= 4) return 4;
+    return 5;
+  },
+
+  generateDailyRecipes() {
+    const recipeCount = this.getRecipeCount();
+    
+    const dailyMeals = {
+      breakfast: {
+        title: '早餐',
+        icon: '🌅',
+        recipes: this.getRandomRecipes(this.data.allRecipes.breakfast, recipeCount)
+      },
+      lunch: {
+        title: '午餐',
+        icon: '☀️',
+        recipes: this.getBalancedRecipes(this.data.allRecipes.lunch, recipeCount)
+      },
+      dinner: {
+        title: '晚餐',
+        icon: '🌙',
+        recipes: this.getBalancedRecipes(this.data.allRecipes.dinner, recipeCount)
+      }
+    };
+    
+    this.setData({ dailyMeals });
+  },
+
+  getRandomRecipes(recipes, count) {
+    const shuffled = [...recipes].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+  },
+
+  getBalancedRecipes(recipes, count) {
+    const meatRecipes = recipes.filter(r => r.type === 'meat' || r.type === 'mixed');
+    const vegRecipes = recipes.filter(r => r.type === 'vegetarian');
+    
+    const meatCount = Math.ceil(count / 2);
+    const vegCount = count - meatCount;
+    
+    const selectedMeat = this.getRandomRecipes(meatRecipes, Math.min(meatCount, meatRecipes.length));
+    const selectedVeg = this.getRandomRecipes(vegRecipes, Math.min(vegCount, vegRecipes.length));
+    
+    const result = [...selectedMeat, ...selectedVeg];
+    
+    if (result.length < count) {
+      const remaining = count - result.length;
+      const allRecipes = [...recipes].filter(r => !result.find(s => s.id === r.id));
+      result.push(...this.getRandomRecipes(allRecipes, remaining));
+    }
+    
+    return result.sort(() => Math.random() - 0.5);
+  },
+
+  onUserCountChange(e) {
+    this.setData({ userCount: this.data.userCountOptions[e.detail.value] });
+    this.generateDailyRecipes();
+  },
+
   async checkAndShowOnboarding() {
     const userId = app.globalData.userId;
     if (!userId) return;
@@ -104,166 +161,19 @@ Page({
     }
   },
 
-  formatDate(date) {
-    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    return `${date.getMonth() + 1}月${date.getDate()}日 ${weekdays[date.getDay()]}`;
-  },
-
-  // 加载推荐
-  loadRecommendations() {
-    const { ExitUploadManager, RecommendEngine } = app.globalData;
-    
-    // 优先使用预加载包
-    const preload = ExitUploadManager.getPreloadPackage();
-    let recipes;
-    
-    if (preload?.recommendations) {
-      recipes = preload.recommendations;
-    } else {
-      recipes = RecommendEngine.getRecommendations(5);
-    }
-
-    // 为每道菜添加搭配推荐
-    const context = this.data.context;
-    const recipesWithPairings = recipes.map(recipe => {
-      const pairings = RecommendEngine.getPairingRecommendations(recipe, context, 2);
-      return {
-        ...recipe,
-        pairings: pairings.length > 0 ? pairings : null
-      };
-    });
-
-    this.setData({ personalizedRecipes: recipesWithPairings });
-  },
-
-  // 加载电影
-  loadMovies() {
-    const movies = app.globalData.RecommendEngine.getMovies();
-    this.setData({ recommendedMovies: movies });
-  },
-
-  // 更新探索统计
-  updateExplorationStats() {
-    const stats = app.globalData.RecommendEngine.getExplorationStats();
-    this.setData({ explorationStats: stats });
-  },
-
-  // 统一记录行为
-  recordBehavior(actionType, recipe, extra = {}) {
-    const { RecommendEngine, ExitUploadManager } = app.globalData;
-    
-    // 实时调整权重
-    if (actionType === 'view') RecommendEngine.recordView(recipe.id);
-    if (actionType === 'like') RecommendEngine.recordLike(recipe.id, recipe);
-    if (actionType === 'dislike') RecommendEngine.recordDislike(recipe.id, recipe, extra.reason);
-    
-    // 记录到本地队列（离场时上传）
-    ExitUploadManager.recordBehavior(actionType, 'recipe', recipe.id, extra);
-  },
-
-  // 查看菜谱
-  viewRecipe(e) {
-    const recipe = e.currentTarget.dataset.recipe;
-    app.globalData.MetricsTracker.recordView();
-    this.recordBehavior('view', recipe);
-    wx.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` });
-  },
-
-  // 查看一日三餐中的菜谱
   viewMealRecipe(e) {
     const recipe = e.currentTarget.dataset.recipe;
-    app.globalData.MetricsTracker.recordView();
-    this.recordBehavior('view', recipe);
     wx.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` });
   },
 
-  // 喜欢
-  likeRecipe(e) {
-    const recipe = e.currentTarget.dataset.recipe;
-    app.globalData.MetricsTracker.recordLike();
-    this.recordBehavior('like', recipe);
-    
-    // 更新UI
-    const recipes = this.data.personalizedRecipes.map(r => 
-      r.id === recipe.id ? { ...r, liked: true } : r
-    );
-    this.setData({ personalizedRecipes: recipes });
-    
-    wx.showToast({ title: '已添加到喜欢', icon: 'success' });
-  },
-
-  // 显示不喜欢选项
-  showDislikeOptions(e) {
-    const recipe = e.currentTarget.dataset.recipe;
-    app.globalData.MetricsTracker.recordDislike();
-    
-    wx.showActionSheet({
-      itemList: ['太贵了', '不合口味', '不喜欢食材', '其他原因'],
-      success: (res) => {
-        const reasons = ['太贵了', '不合口味', '不喜欢食材', '其他原因'];
-        const reason = reasons[res.tapIndex];
-        
-        this.recordBehavior('dislike', recipe, { reason });
-        
-        // 从列表中移除
-        const recipes = this.data.personalizedRecipes.filter(r => r.id !== recipe.id);
-        this.setData({ personalizedRecipes: recipes });
-        
-        // 显示反馈提示
-        this.showPreferenceToast('已记录，将为你调整推荐');
-        
-        // 自动补充新推荐
-        if (recipes.length < 3) {
-          this.loadMoreRecommendations();
-        }
-      }
-    });
-  },
-
-  // 加载更多推荐
-  loadMoreRecommendations() {
-    const newRecipes = app.globalData.RecommendEngine.getRecommendations(2, { skipColdStart: true });
-    this.setData({
-      personalizedRecipes: [...this.data.personalizedRecipes, ...newRecipes]
-    });
-  },
-
-  // 显示偏好更新提示
-  showPreferenceToast(message) {
-    this.setData({ 
-      showPreferenceToast: true, 
-      preferenceToastMessage: message 
-    });
-    
-    setTimeout(() => {
-      this.setData({ showPreferenceToast: false });
-    }, 3000);
-  },
-
-  // 切换推荐理由显示
-  toggleExplanation() {
-    this.setData({ showExplanation: !this.data.showExplanation });
-  },
-
-  // 导航方法
   goToMenu() { wx.switchTab({ url: '/pages/menu/menu' }); },
   goToMovies() { wx.switchTab({ url: '/pages/movies/movies' }); },
   goToProfile() { wx.switchTab({ url: '/pages/profile/profile' }); },
   
-  // 弹窗控制
   openOnboarding() { 
     this.setData({ showOnboardingModal: false });
     wx.navigateTo({ url: '/pages/onboarding/onboarding' }); 
   },
   closeOnboardingModal() { this.setData({ showOnboardingModal: false }); },
-  stopPropagation() {},
-
-  // 其他方法
-  generateMenu() {
-    wx.showToast({ title: '功能开发中', icon: 'none' });
-  },
-  
-  searchRecipes() {
-    wx.navigateTo({ url: '/pages/menu/menu?search=true' });
-  }
+  stopPropagation() {}
 });

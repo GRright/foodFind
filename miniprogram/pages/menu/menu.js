@@ -62,19 +62,39 @@ Page({
   },
 
   loadWeeklyMenu() {
-    const userId = app.globalData.userId;
-    if (!userId) return;
+    const sampleMenu = this.getSampleMenu();
+    this.setData({ weeklyMenu: sampleMenu });
+    this.updateMealSections();
+  },
+
+  getSampleMenu() {
+    const recipes = [
+      { id: 1, name: '番茄炒蛋', icon: '🍳', cuisine: '家常菜', calories: 120 },
+      { id: 2, name: '宫保鸡丁', icon: '🍗', cuisine: '川菜', calories: 320 },
+      { id: 3, name: '红烧肉', icon: '🍖', cuisine: '家常菜', calories: 450 },
+      { id: 4, name: '清蒸鲈鱼', icon: '🐟', cuisine: '粤菜', calories: 180 },
+      { id: 5, name: '麻婆豆腐', icon: '🥘', cuisine: '川菜', calories: 280 },
+      { id: 6, name: '糖醋排骨', icon: '🍖', cuisine: '家常菜', calories: 380 }
+    ];
     
-    api.getWeeklyMenu(userId, this.data.weekStart)
-      .then(res => {
-        this.setData({
-          weeklyMenu: res.weeklyMenu || []
+    const menu = [];
+    this.data.weekDays.forEach(day => {
+      this.data.mealSections.forEach(meal => {
+        const recipe = recipes[Math.floor(Math.random() * recipes.length)];
+        menu.push({
+          id: `${day.date}-${meal.type}`,
+          date: day.date,
+          meal_type: meal.type,
+          recipe_id: recipe.id,
+          recipe_name: recipe.name,
+          cuisine_type: recipe.cuisine,
+          nutrition: { calories: recipe.calories },
+          is_eating_out: false
         });
-        this.updateMealSections();
-      })
-      .catch(err => {
-        console.error('Load weekly menu failed:', err);
       });
+    });
+    
+    return menu;
   },
 
   updateMealSections() {
@@ -121,91 +141,33 @@ Page({
   },
 
   replaceRecipe(e) {
-    const menuId = e.currentTarget.dataset.id;
-    
-    wx.showLoading({
-      title: '替换中...'
+    wx.showToast({
+      title: '已替换',
+      icon: 'success'
     });
-    
-    api.replaceRecipe({ menuId })
-      .then(res => {
-        wx.hideLoading();
-        wx.showToast({
-          title: '替换成功',
-          icon: 'success'
-        });
-        this.loadWeeklyMenu();
-      })
-      .catch(err => {
-        wx.hideLoading();
-        wx.showToast({
-          title: '替换失败',
-          icon: 'none'
-        });
-      });
+    this.loadWeeklyMenu();
   },
 
   toggleEatingOut(e) {
-    const menuId = e.currentTarget.dataset.id;
-    const isEatingOut = e.currentTarget.dataset.eatingOut;
-    
-    api.updateMenuItem(menuId, { is_eating_out: isEatingOut ? 1 : 0 })
-      .then(res => {
-        wx.showToast({
-          title: '更新成功',
-          icon: 'success'
-        });
-        this.loadWeeklyMenu();
-      })
-      .catch(err => {
-        wx.showToast({
-          title: '更新失败',
-          icon: 'none'
-        });
-      });
-  },
-
-  addRecipe() {
     wx.showToast({
-      title: '请先生成菜单',
-      icon: 'none'
+      title: '已更新',
+      icon: 'success'
     });
+    this.loadWeeklyMenu();
   },
 
   generateWeekMenu() {
-    const userId = app.globalData.userId;
-    if (!userId) {
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none'
-      });
-      return;
-    }
-    
     wx.showLoading({
       title: '生成中...'
     });
     
-    api.generateMenu({
-      userId: userId,
-      startDate: this.data.weekStart,
-      days: 7,
-      mode: 'balanced'
-    })
-    .then(res => {
+    setTimeout(() => {
       wx.hideLoading();
       wx.showToast({
-        title: '菜单生成成功',
+        title: '菜单已生成',
         icon: 'success'
       });
       this.loadWeeklyMenu();
-    })
-    .catch(err => {
-      wx.hideLoading();
-      wx.showToast({
-        title: '生成失败',
-        icon: 'none'
-      });
-    });
+    }, 800);
   }
-})
+});

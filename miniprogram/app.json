@@ -8,33 +8,41 @@
     "pages/profile/profile"
   ],
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#FF6B35",
-    "navigationBarTitleText": "吃点啥！",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#F5F5F5"
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTitleText": "吃点啥",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FFFFFF"
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#FF6B35",
+    "color": "#8E8E93",
+    "selectedColor": "#007AFF",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "首页"
+        "text": "首页",
+        "iconPath": "images/tab-home.png",
+        "selectedIconPath": "images/tab-home-active.png"
       },
       {
         "pagePath": "pages/menu/menu",
-        "text": "菜单"
+        "text": "菜单",
+        "iconPath": "images/tab-menu.png",
+        "selectedIconPath": "images/tab-menu-active.png"
       },
       {
         "pagePath": "pages/movies/movies",
-        "text": "影视"
+        "text": "影视",
+        "iconPath": "images/tab-movies.png",
+        "selectedIconPath": "images/tab-movies-active.png"
       },
       {
         "pagePath": "pages/profile/profile",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "images/tab-profile.png",
+        "selectedIconPath": "images/tab-profile-active.png"
       }
     ]
   },

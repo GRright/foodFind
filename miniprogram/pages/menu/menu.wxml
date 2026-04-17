@@ -1,5 +1,5 @@
 <view class="container">
-  <view class="date-selector">
+  <view class="date-header">
     <view class="date-nav">
       <view class="nav-btn" bindtap="prevWeek">‹</view>
       <view class="week-display">{{weekDisplay}}</view>
@@ -18,47 +18,42 @@
     </view>
   </view>
 
-  <view class="menu-list">
-    <view class="meal-section" wx:for="{{mealSections}}" wx:key="type">
-      <view class="meal-header">
-        <text class="meal-type-name">{{item.name}}</text>
+  <view class="menu-section">
+    <view class="meal-item" wx:for="{{mealSections}}" wx:key="type">
+      <view class="meal-label">
         <text class="meal-icon">{{item.icon}}</text>
+        <text class="meal-name">{{item.name}}</text>
       </view>
       
       <view class="meal-card" wx:if="{{item.menu}}">
-        <view class="recipe-info" wx:if="{{!item.menu.is_eating_out}}">
-          <view class="recipe-name">{{item.menu.recipe_name}}</view>
+        <view class="recipe-content" wx:if="{{!item.menu.is_eating_out}}">
+          <text class="recipe-name">{{item.menu.recipe_name}}</text>
           <view class="recipe-meta">
-            <text class="cuisine-type">{{item.menu.cuisine_type}}</text>
-            <text class="nutrition-info" wx:if="{{item.nutrition}}">
-              热量: {{item.nutrition.calories}}kcal
-            </text>
+            <text class="meta-tag">{{item.menu.cuisine_type}}</text>
+            <text class="meta-cal" wx:if="{{item.nutrition}}">{{item.nutrition.calories}}kcal</text>
           </view>
         </view>
         
         <view class="eating-out" wx:else>
-          <text>不在家用餐</text>
+          <text class="eating-out-text">不在家用餐</text>
         </view>
         
         <view class="meal-actions">
-          <button class="action-btn small" size="mini" bindtap="viewRecipe" wx:if="{{!item.menu.is_eating_out}}" data-id="{{item.menu.recipe_id}}">详情</button>
-          <button class="action-btn outline small" size="mini" bindtap="replaceRecipe" wx:if="{{!item.menu.is_eating_out}}" data-id="{{item.menu.id}}">换一个</button>
-          <button class="action-btn outline small" size="mini" bindtap="toggleEatingOut" data-id="{{item.menu.id}}" data-eating-out="{{!item.menu.is_eating_out}}">
+          <button class="action-btn" wx:if="{{!item.menu.is_eating_out}}" bindtap="viewRecipe" data-id="{{item.menu.recipe_id}}">详情</button>
+          <button class="action-btn outline" wx:if="{{!item.menu.is_eating_out}}" bindtap="replaceRecipe" data-id="{{item.menu.id}}">换一个</button>
+          <button class="action-btn outline" bindtap="toggleEatingOut" data-id="{{item.menu.id}}" data-eating-out="{{!item.menu.is_eating_out}}">
             {{item.menu.is_eating_out ? '在家吃' : '外出'}}
           </button>
         </view>
       </view>
       
-      <view class="empty-meal" wx:else>
+      <view class="empty-card" wx:else>
         <text class="empty-text">暂无安排</text>
-        <button class="action-btn small" size="mini" bindtap="addRecipe">添加</button>
       </view>
     </view>
   </view>
 
-  <view class="generate-btn-container">
-    <button class="primary-btn generate-btn" bindtap="generateWeekMenu">
-      生成本周菜单
-    </button>
+  <view class="bottom-bar">
+    <button class="generate-btn" bindtap="generateWeekMenu">生成本周菜单</button>
   </view>
 </view>

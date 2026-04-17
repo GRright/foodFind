@@ -10,109 +10,31 @@ Page({
       { label: '综艺', value: '综艺' }
     ],
     currentType: '',
-    movies: [],
-    loading: false,
-    page: 1,
-    hasMore: true
+    movies: [
+      { id: 1, title: '阿甘正传', genre: '剧情', year: 1994, rating: 9.5, platform: '腾讯视频', icon: '🎬' },
+      { id: 2, title: '肖申克的救赎', genre: '剧情', year: 1994, rating: 9.7, platform: '爱奇艺', icon: '🎥' },
+      { id: 3, title: '盗梦空间', genre: '科幻', year: 2010, rating: 9.3, platform: '优酷', icon: '🍿' },
+      { id: 4, title: '人生一串', genre: '纪录片', year: 2018, rating: 9.0, platform: '哔哩哔哩', icon: '📺' },
+      { id: 5, title: '风味人间', genre: '纪录片', year: 2018, rating: 9.1, platform: '腾讯视频', icon: '🎞️' }
+    ],
+    loading: false
   },
 
   onLoad() {
     this.loadMovies();
   },
 
-  onReachBottom() {
-    if (this.data.hasMore && !this.data.loading) {
-      this.loadMoreMovies();
-    }
-  },
-
   selectType(e) {
     const type = e.currentTarget.dataset.type;
-    this.setData({
-      currentType: type,
-      page: 1,
-      movies: [],
-      hasMore: true
-    });
-    this.loadMovies();
+    this.setData({ currentType: type });
   },
 
-  loadMovies() {
-    this.setData({ loading: true });
-    
-    const params = {
-      page: this.data.page,
-      limit: 10
-    };
-    
-    if (this.data.currentType) {
-      params.type = this.data.currentType;
-    }
-    
-    api.getMovies(params)
-      .then(res => {
-        this.setData({
-          movies: res.movies || [],
-          loading: false,
-          hasMore: (res.movies || []).length >= 10
-        });
-      })
-      .catch(err => {
-        console.error('Load movies failed:', err);
-        this.setData({ loading: false });
-      });
-  },
-
-  loadMoreMovies() {
-    this.setData({ loading: true });
-    
-    const params = {
-      page: this.data.page + 1,
-      limit: 10
-    };
-    
-    if (this.data.currentType) {
-      params.type = this.data.currentType;
-    }
-    
-    api.getMovies(params)
-      .then(res => {
-        const newMovies = res.movies || [];
-        this.setData({
-          movies: [...this.data.movies, ...newMovies],
-          page: this.data.page + 1,
-          loading: false,
-          hasMore: newMovies.length >= 10
-        });
-      })
-      .catch(err => {
-        console.error('Load more movies failed:', err);
-        this.setData({ loading: false });
-      });
-  },
+  loadMovies() {},
 
   viewMovie(e) {
-    const id = e.currentTarget.dataset.id;
-    const movie = this.data.movies.find(m => m.id === id);
-    
-    if (movie && movie.platform_url) {
-      wx.showModal({
-        title: '跳转提示',
-        content: `即将跳转到${movie.platform}观看`,
-        success: (res) => {
-          if (res.confirm) {
-            wx.showToast({
-              title: '正在跳转...',
-              icon: 'none'
-            });
-          }
-        }
-      });
-    } else {
-      wx.showToast({
-        title: '暂无观看链接',
-        icon: 'none'
-      });
-    }
+    wx.showToast({
+      title: '即将跳转到视频平台',
+      icon: 'none'
+    });
   }
-})
+});
