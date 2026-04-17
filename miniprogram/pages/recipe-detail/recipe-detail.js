@@ -40,10 +40,6 @@ Page({
     }
   },
 
-  onRateChange(e) {
-    this.setData({ selectedRating: e.detail });
-  },
-
   selectRating(e) {
     const rating = parseInt(e.currentTarget.dataset.rating);
     this.setData({ selectedRating: rating });

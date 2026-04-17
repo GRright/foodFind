@@ -27,9 +27,9 @@ Page({
     this.loadMovies();
   },
 
-  onTypeChange(e) {
-    const index = e.detail;
-    const type = this.data.movieTypes[index].value;
+  selectType(e) {
+    const type = e.currentTarget.dataset.type;
+    const index = e.currentTarget.dataset.index;
     this.setData({ currentTypeIndex: index, currentType: type });
     this.filterMovies();
   },
@@ -39,11 +39,6 @@ Page({
       ? this.data.movies.filter(m => m.genre === this.data.currentType || m.platform === this.data.currentType)
       : this.data.movies;
     this.setData({ filteredMovies: filtered.length > 0 ? filtered : this.data.movies });
-  },
-
-  selectType(e) {
-    const type = e.currentTarget.dataset.type;
-    this.setData({ currentType: type });
   },
 
   loadMovies() {},

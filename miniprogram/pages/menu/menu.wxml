@@ -1,13 +1,20 @@
 <view class="container">
   <view class="date-header">
-    <van-button icon="arrow-left" size="small" bindtap="prevWeek" />
+    <view class="nav-btn" bindtap="prevWeek">◀</view>
     <text class="week-display">{{weekDisplay}}</text>
-    <van-button icon="arrow" size="small" bindtap="nextWeek" />
+    <view class="nav-btn" bindtap="nextWeek">▶</view>
   </view>
 
-  <van-tabs active="{{currentDateIndex}}" bind:change="onTabChange" color="#07c160">
-    <van-tab wx:for="{{weekDays}}" wx:key="date" title="{{item.weekday}}">{{item.day}}日</van-tab>
-  </van-tabs>
+  <view class="tabs">
+    <view class="tab-item {{currentDateIndex === index ? 'active' : ''}}" 
+          wx:for="{{weekDays}}" 
+          wx:key="date" 
+          bindtap="selectDate"
+          data-index="{{index}}">
+      <text class="tab-weekday">{{item.weekday}}</text>
+      <text class="tab-day">{{item.day}}</text>
+    </view>
+  </view>
 
   <view class="menu-section">
     <view class="meal-item" wx:for="{{mealSections}}" wx:key="type">
@@ -16,19 +23,21 @@
         <text class="meal-name">{{item.name}}</text>
       </view>
       
-      <van-cell-group inset wx:if="{{item.menus && item.menus.length > 0}}">
-        <van-cell 
-          wx:for="{{item.menus}}" 
-          wx:for-item="menu"
-          wx:key="id"
-          title="{{menu.recipe_name}}"
-          is-link
-          bindtap="viewRecipe"
-          data-id="{{menu.recipe_id}}">
-          <van-tag slot="label" type="primary" size="mini">{{menu.cuisine_type}}</van-tag>
-          <van-tag slot="right-icon" type="success" size="mini" wx:if="{{menu.nutrition}}">{{menu.nutrition.calories}}kcal</van-tag>
-        </van-cell>
-      </van-cell-group>
+      <view class="recipe-list" wx:if="{{item.menus && item.menus.length > 0}}">
+        <view class="recipe-item" 
+              wx:for="{{item.menus}}" 
+              wx:for-item="menu"
+              wx:key="id"
+              bindtap="viewRecipe"
+              data-id="{{menu.recipe_id}}">
+          <text class="recipe-name">{{menu.recipe_name}}</text>
+          <view class="recipe-meta">
+            <text class="meta-item">{{menu.cuisine_type}}</text>
+            <text class="meta-dot">·</text>
+            <text class="meta-item" wx:if="{{menu.nutrition}}">{{menu.nutrition.calories}}kcal</text>
+          </view>
+        </view>
+      </view>
       
       <view class="empty-card" wx:else>
         <text class="empty-text">暂无安排</text>
@@ -37,6 +46,6 @@
   </view>
 
   <view class="bottom-bar">
-    <van-button type="primary" size="large" block bindtap="generateWeekMenu">生成本周菜单</van-button>
+    <view class="generate-btn" bindtap="generateWeekMenu">生成本周菜单</view>
   </view>
 </view>

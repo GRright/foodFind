@@ -1,25 +1,31 @@
 <view class="container">
-  <van-tabs active="{{currentTypeIndex}}" bind:change="onTypeChange" color="#07c160">
-    <van-tab wx:for="{{movieTypes}}" wx:key="value" title="{{item.label}}"></van-tab>
-  </van-tabs>
+  <view class="tabs">
+    <view class="tab-item {{currentTypeIndex === index ? 'active' : ''}}" 
+          wx:for="{{movieTypes}}" 
+          wx:key="value"
+          bindtap="selectType"
+          data-type="{{item.value}}"
+          data-index="{{index}}">
+      {{item.label}}
+    </view>
+  </view>
 
   <view class="movie-list">
-    <van-card
-      wx:for="{{filteredMovies}}"
-      wx:key="id"
-      title="{{item.title}}"
-      thumb="{{item.thumb || ''}}"
-      desc="{{item.genre}} · {{item.year}}"
-      price="{{item.rating}}"
-      currency="★"
-      bindtap="viewMovie"
-      data-id="{{item.id}}"
-    >
-      <van-tag slot="tag" type="primary" size="mini">{{item.platform}}</van-tag>
-      <view slot="thumb" class="movie-thumb">
-        <text class="thumb-icon">{{item.icon}}</text>
+    <view class="movie-card" 
+          wx:for="{{filteredMovies}}" 
+          wx:key="id"
+          bindtap="viewMovie"
+          data-id="{{item.id}}">
+      <view class="movie-icon">{{item.icon}}</view>
+      <view class="movie-info">
+        <text class="movie-title">{{item.title}}</text>
+        <text class="movie-desc">{{item.genre}} · {{item.year}}</text>
+        <view class="movie-meta">
+          <text class="movie-rating">★ {{item.rating}}</text>
+          <text class="movie-platform">{{item.platform}}</text>
+        </view>
       </view>
-    </van-card>
+    </view>
   </view>
 
   <view class="footer-space"></view>

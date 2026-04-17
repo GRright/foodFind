@@ -3,15 +3,24 @@
     <view class="recipe-icon">{{recipe.image}}</view>
     <text class="recipe-name">{{recipe.name}}</text>
     <view class="tag-row">
-      <van-tag wx:for="{{recipe.tags}}" wx:key="*this" type="primary" size="medium" plain>{{item}}</van-tag>
+      <view class="tag" wx:for="{{recipe.tags}}" wx:key="*this">{{item}}</view>
     </view>
   </view>
 
-  <van-cell-group inset class="info-group">
-    <van-cell title="⏱️ 烹饪时间" value="{{recipe.cooking_time}}分钟" is-link="{{false}}" />
-    <van-cell title="📊 难度" value="{{recipe.difficulty}}" is-link="{{false}}" />
-    <van-cell title="🌍 菜系" value="{{recipe.cuisine_type}}" is-link="{{false}}" />
-  </van-cell-group>
+  <view class="info-group">
+    <view class="info-item">
+      <text class="info-label">⏱️ 烹饪时间</text>
+      <text class="info-value">{{recipe.cooking_time}}分钟</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">📊 难度</text>
+      <text class="info-value">{{recipe.difficulty}}</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">🌍 菜系</text>
+      <text class="info-value">{{recipe.cuisine_type}}</text>
+    </view>
+  </view>
 
   <view class="section">
     <view class="section-title">营养信息</view>
@@ -41,36 +50,21 @@
 
   <view class="section">
     <view class="section-title">食材清单</view>
-    <van-cell-group inset>
-      <van-cell 
-        wx:for="{{recipe.ingredients}}" 
-        wx:key="name"
-        title="{{item.name}}"
-        value="{{item.amount}}"
-        is-link="{{false}}"
-      />
-    </van-cell-group>
+    <view class="ingredient-list">
+      <view class="ingredient-item" wx:for="{{recipe.ingredients}}" wx:key="name">
+        <text class="ingredient-name">{{item.name}}</text>
+        <text class="ingredient-amount">{{item.amount}}</text>
+      </view>
+    </view>
   </view>
 
   <view class="section">
     <view class="section-title">制作步骤</view>
-    <van-cell-group inset>
-      <van-cell 
-        wx:for="{{recipe.steps}}" 
-        wx:key="index"
-        title="步骤{{index + 1}}"
-        label="{{item}}"
-        is-link="{{false}}"
-      />
-    </van-cell-group>
-  </view>
-
-  <view class="section">
-    <view class="section-title">评价这道菜</view>
-    <view class="rating-section">
-      <van-rate value="{{selectedRating}}" bind:change="onRateChange" />
-      <textarea class="feedback-input" placeholder="分享你的想法..." value="{{feedbackText}}" bindinput="onFeedbackInput"></textarea>
-      <van-button type="primary" size="large" block bindtap="submitFeedback">提交评价</van-button>
+    <view class="step-list">
+      <view class="step-item" wx:for="{{recipe.steps}}" wx:key="index">
+        <view class="step-num">{{index + 1}}</view>
+        <text class="step-text">{{item}}</text>
+      </view>
     </view>
   </view>
 
