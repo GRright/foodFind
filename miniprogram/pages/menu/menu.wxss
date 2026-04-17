@@ -1,39 +1,43 @@
 page {
-  background: #FFFFFF;
+  background: #f5f5f5;
 }
 
 .container {
   min-height: 100vh;
-  padding-bottom: 160rpx;
+  padding-bottom: 40rpx;
 }
 
 .date-header {
-  padding: 32rpx 32rpx 16rpx;
-}
-
-.date-nav {
+  background: #ffffff;
+  padding: 32rpx;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
 .nav-btn {
-  font-size: 44rpx;
-  font-weight: 300;
-  color: #007AFF;
-  padding: 8rpx 16rpx;
+  width: 64rpx;
+  height: 64rpx;
+  background: #f5f5f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #333333;
 }
 
 .week-display {
-  font-size: 28rpx;
-  color: #1A1A1A;
-  font-weight: 500;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
 }
 
-.week-tabs {
+.tabs {
+  background: #ffffff;
   display: flex;
-  padding: 16rpx 24rpx;
-  gap: 8rpx;
+  padding: 16rpx 32rpx;
+  gap: 16rpx;
 }
 
 .tab-item {
@@ -43,173 +47,120 @@ page {
   align-items: center;
   padding: 16rpx 8rpx;
   border-radius: 16rpx;
-  transition: all 0.2s ease;
+  background: #f5f5f5;
 }
 
 .tab-item.active {
-  background: #F5F5F7;
+  background: #e8f7ef;
 }
 
 .tab-weekday {
-  font-size: 22rpx;
-  color: #8E8E93;
-  margin-bottom: 6rpx;
+  font-size: 24rpx;
+  color: #999999;
+  margin-bottom: 8rpx;
 }
 
 .tab-item.active .tab-weekday {
-  color: #007AFF;
+  color: #07c160;
 }
 
-.tab-date {
-  font-size: 30rpx;
+.tab-day {
+  font-size: 32rpx;
   font-weight: 600;
-  color: #1A1A1A;
+  color: #333333;
 }
 
-.tab-item.active .tab-date {
-  color: #007AFF;
+.tab-item.active .tab-day {
+  color: #07c160;
 }
 
 .menu-section {
-  padding: 0 32rpx;
+  padding: 32rpx 0;
 }
 
 .meal-item {
-  margin-bottom: 24rpx;
+  margin: 0 32rpx 24rpx;
 }
 
 .meal-label {
   display: flex;
   align-items: center;
-  gap: 12rpx;
-  margin-bottom: 12rpx;
+  margin-bottom: 16rpx;
 }
 
 .meal-icon {
-  font-size: 32rpx;
+  font-size: 40rpx;
+  margin-right: 16rpx;
 }
 
 .meal-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #1A1A1A;
+  color: #333333;
 }
 
-.meal-card,
-.empty-card {
-  background: #F5F5F7;
-  border-radius: 20rpx;
-  padding: 28rpx;
+.recipe-list {
+  background: #ffffff;
+  border-radius: 24rpx;
+  overflow: hidden;
 }
 
-.recipe-content {
-  margin-bottom: 20rpx;
+.recipe-item {
+  padding: 32rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.recipe-item:last-child {
+  border-bottom: none;
 }
 
 .recipe-name {
-  display: block;
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #1A1A1A;
-  margin-bottom: 12rpx;
+  font-size: 30rpx;
+  color: #333333;
+  font-weight: 500;
 }
 
 .recipe-meta {
   display: flex;
-  gap: 12rpx;
   align-items: center;
+  gap: 8rpx;
 }
 
-.meta-tag {
+.meta-item {
   font-size: 24rpx;
-  color: #007AFF;
-  background: rgba(0, 122, 255, 0.1);
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
-  font-weight: 500;
+  color: #999999;
 }
 
-.meta-cal {
-  font-size: 24rpx;
-  color: #8E8E93;
-}
-
-.eating-out {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20rpx 0;
-  margin-bottom: 20rpx;
-}
-
-.eating-out-text {
-  font-size: 28rpx;
-  color: #8E8E93;
-}
-
-.meal-actions {
-  display: flex;
-  gap: 12rpx;
-}
-
-.action-btn {
-  flex: 1;
-  height: 72rpx;
-  background: #FFFFFF;
-  border: none;
-  border-radius: 16rpx;
-  font-size: 26rpx;
-  font-weight: 500;
-  color: #1A1A1A;
-  line-height: 72rpx;
-  padding: 0;
-}
-
-.action-btn::after {
-  border: none;
-}
-
-.action-btn.outline {
-  background: transparent;
-  border: 1rpx solid #D1D1D6;
-  color: #007AFF;
+.meta-dot {
+  color: #e0e0e0;
+  font-size: 20rpx;
 }
 
 .empty-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 64rpx;
+  text-align: center;
 }
 
 .empty-text {
   font-size: 28rpx;
-  color: #8E8E93;
+  color: #999999;
 }
 
 .bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #FFFFFF;
-  padding: 20rpx 32rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  border-top: 1rpx solid #F5F5F7;
+  padding: 32rpx;
 }
 
 .generate-btn {
-  width: 100%;
-  height: 92rpx;
-  background: #007AFF;
-  border: none;
-  border-radius: 20rpx;
-  font-size: 30rpx;
+  background: #07c160;
+  color: #ffffff;
+  text-align: center;
+  padding: 28rpx;
+  border-radius: 48rpx;
+  font-size: 32rpx;
   font-weight: 600;
-  color: #FFFFFF;
-  line-height: 92rpx;
-  padding: 0;
-}
-
-.generate-btn::after {
-  border: none;
 }

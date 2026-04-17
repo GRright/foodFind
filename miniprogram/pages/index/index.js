@@ -1,4 +1,3 @@
-const api = require('../../utils/api.js');
 const app = getApp();
 
 Page({
@@ -148,18 +147,8 @@ Page({
     this.generateDailyRecipes();
   },
 
-  async checkAndShowOnboarding() {
-    const userId = app.globalData.userId;
-    if (!userId) return;
-    
-    try {
-      const status = await api.getOnboardingStatus(userId);
-      if (status.isNewUser || !status.onboardingCompleted) {
-        this.setData({ showOnboardingModal: true });
-      }
-    } catch (error) {
-      console.error('Check onboarding failed:', error);
-    }
+  checkAndShowOnboarding() {
+    // 暂时移除云函数调用
   },
 
   viewMealRecipe(e) {
