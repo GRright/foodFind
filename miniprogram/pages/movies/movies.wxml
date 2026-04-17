@@ -1,42 +1,25 @@
 <view class="container">
-  <view class="header">
-    <text class="page-title">下饭影视</text>
-  </view>
-
-  <view class="filter-row">
-    <scroll-view class="type-scroll" scroll-x="true">
-      <view class="type-list">
-        <view class="type-item {{currentType === item.value ? 'active' : ''}}" 
-              wx:for="{{movieTypes}}" 
-              wx:key="value"
-              bindtap="selectType"
-              data-type="{{item.value}}">
-          {{item.label}}
-        </view>
-      </view>
-    </scroll-view>
-  </view>
+  <van-tabs active="{{currentTypeIndex}}" bind:change="onTypeChange" color="#07c160">
+    <van-tab wx:for="{{movieTypes}}" wx:key="value" title="{{item.label}}"></van-tab>
+  </van-tabs>
 
   <view class="movie-list">
-    <view class="movie-card" wx:for="{{movies}}" wx:key="id" bindtap="viewMovie" data-id="{{item.id}}">
-      <view class="movie-poster">
-        <text class="poster-icon">{{item.icon}}</text>
+    <van-card
+      wx:for="{{filteredMovies}}"
+      wx:key="id"
+      title="{{item.title}}"
+      thumb="{{item.thumb || ''}}"
+      desc="{{item.genre}} · {{item.year}}"
+      price="{{item.rating}}"
+      currency="★"
+      bindtap="viewMovie"
+      data-id="{{item.id}}"
+    >
+      <van-tag slot="tag" type="primary" size="mini">{{item.platform}}</van-tag>
+      <view slot="thumb" class="movie-thumb">
+        <text class="thumb-icon">{{item.icon}}</text>
       </view>
-      <view class="movie-info">
-        <text class="movie-title">{{item.title}}</text>
-        <view class="movie-meta">
-          <text class="meta-tag">{{item.genre}}</text>
-          <text class="meta-year">{{item.year}}</text>
-        </view>
-        <view class="movie-bottom">
-          <view class="rating-row">
-            <text class="star">★</text>
-            <text class="rating">{{item.rating}}</text>
-          </view>
-          <text class="platform">{{item.platform}}</text>
-        </view>
-      </view>
-    </view>
+    </van-card>
   </view>
 
   <view class="footer-space"></view>

@@ -1,5 +1,5 @@
 page {
-  background: #f5f5f5;
+  background: #f7f8fa;
 }
 
 .container {
@@ -17,20 +17,20 @@ page {
   display: block;
   font-size: 48rpx;
   font-weight: 700;
-  color: #333333;
+  color: #323233;
   margin-bottom: 12rpx;
 }
 
 .subtitle {
   display: block;
   font-size: 28rpx;
-  color: #999999;
+  color: #969799;
   margin-bottom: 40rpx;
 }
 
 .progress-bar {
   height: 8rpx;
-  background: #e0e0e0;
+  background: #ebedf0;
   border-radius: 4rpx;
   margin-bottom: 20rpx;
   overflow: hidden;
@@ -45,7 +45,7 @@ page {
 
 .step-text {
   font-size: 24rpx;
-  color: #999999;
+  color: #969799;
   text-align: right;
 }
 
@@ -57,77 +57,17 @@ page {
   display: block;
   font-size: 32rpx;
   font-weight: 600;
-  color: #333333;
+  color: #323233;
   margin-bottom: 32rpx;
 }
 
-.options {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
+.active-cell {
+  background: #e8f7ef !important;
 }
 
-.option {
-  background: #ffffff;
-  border-radius: 16rpx;
-  padding: 32rpx;
-  display: flex;
-  align-items: center;
-  border: 2rpx solid transparent;
-}
-
-.option.active {
-  border-color: #07c160;
-  background: #e8f7ef;
-}
-
-.option-dot {
-  width: 40rpx;
-  height: 40rpx;
-  border: 3rpx solid #d0d0d0;
-  border-radius: 50%;
-  margin-right: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.option.active .option-dot {
-  border-color: #07c160;
-}
-
-.dot-inner {
-  width: 20rpx;
-  height: 20rpx;
-  background: #07c160;
-  border-radius: 50%;
-}
-
-.option-box {
-  width: 40rpx;
-  height: 40rpx;
-  border: 3rpx solid #d0d0d0;
-  border-radius: 8rpx;
-  margin-right: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.option.active .option-box {
-  border-color: #07c160;
-  background: #07c160;
-}
-
-.check-icon {
-  color: #ffffff;
-  font-size: 28rpx;
-  font-weight: 700;
-}
-
-.option-label {
-  font-size: 30rpx;
-  color: #333333;
+.active-cell .van-cell__title {
+  color: #07c160 !important;
+  font-weight: 600 !important;
 }
 
 .footer {
@@ -139,27 +79,4 @@ page {
 
 .btn-wrap {
   flex: 1;
-}
-
-.btn {
-  text-align: center;
-  padding: 28rpx;
-  border-radius: 48rpx;
-  font-size: 32rpx;
-  font-weight: 600;
-}
-
-.btn-secondary {
-  background: #f5f5f5;
-  color: #333333;
-}
-
-.btn-primary {
-  background: #07c160;
-  color: #ffffff;
-}
-
-.btn-primary.disabled {
-  background: #d0d0d0;
-  color: #999999;
 }

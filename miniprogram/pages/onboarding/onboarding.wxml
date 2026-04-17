@@ -12,41 +12,41 @@
   <view class="question-card" wx:if="{{currentQuestion}}">
     <text class="question-text">{{currentQuestion.question}}</text>
     
-    <view class="options" wx:if="{{currentQuestion.type === 'single_choice'}}">
-      <view class="option {{selectedAnswer === option.value ? 'active' : ''}}" 
-            wx:for="{{currentQuestion.options}}" 
-            wx:key="value"
-            bindtap="selectSingleOption"
-            data-value="{{option.value}}">
-        <view class="option-dot">
-          <view class="dot-inner" wx:if="{{selectedAnswer === option.value}}"></view>
-        </view>
-        <text class="option-label">{{option.label}}</text>
-      </view>
-    </view>
+    <van-cell-group inset wx:if="{{currentQuestion.type === 'single_choice'}}">
+      <van-cell 
+        wx:for="{{currentQuestion.options}}" 
+        wx:key="value"
+        title="{{item.label}}"
+        is-link="{{false}}"
+        bindtap="selectSingleOption"
+        data-value="{{item.value}}"
+        class="{{selectedAnswer === item.value ? 'active-cell' : ''}}">
+        <van-radio slot="right-icon" name="{{item.value}}" checked="{{selectedAnswer === item.value}}" />
+      </van-cell>
+    </van-cell-group>
     
-    <view class="options" wx:if="{{currentQuestion.type === 'multi_choice'}}">
-      <view class="option {{selectedAnswers.includes(option.value) ? 'active' : ''}}" 
-            wx:for="{{currentQuestion.options}}" 
-            wx:key="value"
-            bindtap="toggleMultiOption"
-            data-value="{{option.value}}">
-        <view class="option-box">
-          <text class="check-icon" wx:if="{{selectedAnswers.includes(option.value)}}">✓</text>
-        </view>
-        <text class="option-label">{{option.label}}</text>
-      </view>
-    </view>
+    <van-cell-group inset wx:if="{{currentQuestion.type === 'multi_choice'}}">
+      <van-cell 
+        wx:for="{{currentQuestion.options}}" 
+        wx:key="value"
+        title="{{item.label}}"
+        is-link="{{false}}"
+        bindtap="toggleMultiOption"
+        data-value="{{item.value}}"
+        class="{{selectedAnswers.includes(item.value) ? 'active-cell' : ''}}">
+        <van-checkbox slot="right-icon" name="{{item.value}}" checked="{{selectedAnswers.includes(item.value)}}" />
+      </van-cell>
+    </van-cell-group>
   </view>
 
   <view class="footer">
     <view class="btn-wrap" wx:if="{{currentStep > 0}}">
-      <view class="btn btn-secondary" bindtap="prevStep">上一步</view>
+      <van-button type="default" size="large" bindtap="prevStep">上一步</van-button>
     </view>
     <view class="btn-wrap">
-      <view class="btn btn-primary {{!canProceed ? 'disabled' : ''}}" bindtap="handleNext">
+      <van-button type="primary" size="large" bindtap="handleNext" disabled="{{!canProceed}}">
         {{currentStep === totalSteps - 1 ? '完成' : '下一步'}}
-      </view>
+      </van-button>
     </view>
   </view>
 </view>

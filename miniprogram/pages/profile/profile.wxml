@@ -12,29 +12,28 @@
   </view>
 
   <view class="section">
-    <view class="section-title">我的</view>
-    <view class="list-card">
-      <view class="list-item" wx:for="{{menuItems}}" wx:key="title" bindtap="{{item.action}}">
-        <view class="item-left">
-          <text class="item-icon">{{item.icon}}</text>
-          <text class="item-title">{{item.title}}</text>
-        </view>
-        <text class="item-arrow">›</text>
-      </view>
-    </view>
+    <van-cell-group inset>
+      <van-cell title="偏好设置" is-link bindtap="goToPreferences">
+        <view slot="icon" class="cell-icon">⚙️</view>
+      </van-cell>
+      <van-cell title="我的收藏" is-link bindtap="goToFavorites">
+        <view slot="icon" class="cell-icon">❤️</view>
+      </van-cell>
+      <van-cell title="历史记录" is-link bindtap="goToHistory">
+        <view slot="icon" class="cell-icon">📜</view>
+      </van-cell>
+    </van-cell-group>
   </view>
 
   <view class="section">
-    <view class="section-title">其他</view>
-    <view class="list-card">
-      <view class="list-item" wx:for="{{aboutItems}}" wx:key="title" bindtap="{{item.action}}">
-        <view class="item-left">
-          <text class="item-icon">{{item.icon}}</text>
-          <text class="item-title">{{item.title}}</text>
-        </view>
-        <text class="item-arrow">›</text>
-      </view>
-    </view>
+    <van-cell-group inset>
+      <van-cell title="关于我们" is-link bindtap="about">
+        <view slot="icon" class="cell-icon">ℹ️</view>
+      </van-cell>
+      <van-cell title="意见反馈" is-link bindtap="feedback">
+        <view slot="icon" class="cell-icon">💬</view>
+      </van-cell>
+    </van-cell-group>
   </view>
 
   <view class="footer">

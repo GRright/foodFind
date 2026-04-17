@@ -9,7 +9,9 @@ Page({
       { label: '纪录片', value: '纪录片' },
       { label: '综艺', value: '综艺' }
     ],
+    currentTypeIndex: 0,
     currentType: '',
+    filteredMovies: [],
     movies: [
       { id: 1, title: '阿甘正传', genre: '剧情', year: 1994, rating: 9.5, platform: '腾讯视频', icon: '🎬' },
       { id: 2, title: '肖申克的救赎', genre: '剧情', year: 1994, rating: 9.7, platform: '爱奇艺', icon: '🎥' },
@@ -21,7 +23,22 @@ Page({
   },
 
   onLoad() {
+    this.setData({ filteredMovies: this.data.movies });
     this.loadMovies();
+  },
+
+  onTypeChange(e) {
+    const index = e.detail;
+    const type = this.data.movieTypes[index].value;
+    this.setData({ currentTypeIndex: index, currentType: type });
+    this.filterMovies();
+  },
+
+  filterMovies() {
+    const filtered = this.data.currentType 
+      ? this.data.movies.filter(m => m.genre === this.data.currentType || m.platform === this.data.currentType)
+      : this.data.movies;
+    this.setData({ filteredMovies: filtered.length > 0 ? filtered : this.data.movies });
   },
 
   selectType(e) {
