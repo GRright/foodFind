@@ -1,13 +1,15 @@
 const api = require('./utils/api.js');
 const RecommendEngine = require('./utils/recommendEngine.js');
 const ExitUploadManager = require('./utils/exitUploadManager.js');
+const UserProfileManager = require('./utils/userProfileManager.js');
 
 App({
   globalData: {
     userInfo: null,
     userId: null,
     RecommendEngine,
-    ExitUploadManager
+    ExitUploadManager,
+    UserProfileManager
   },
 
   async onLaunch() {
@@ -20,6 +22,8 @@ App({
       });
     }
     
+    // 初始化各个管理器
+    UserProfileManager.init();
     RecommendEngine.init();
     ExitUploadManager.resetSession();
     
@@ -84,6 +88,9 @@ App({
         this.globalData.userId = res.result.user.id;
         wx.setStorageSync('userInfo', res.result.user);
         wx.setStorageSync('userId', res.result.user.id);
+        
+        // 初始化用户画像
+        UserProfileManager.init();
       }
     } catch (err) {
       console.error('Login failed:', err);

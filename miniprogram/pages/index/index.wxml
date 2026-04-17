@@ -1,116 +1,182 @@
 <view class="container">
+  <!-- 头部 -->
   <view class="header">
-    <view class="greeting">
-      <text class="greeting-text">你好，{{userInfo.nickname || '美食家'}} 👋</text>
-      <text class="date-text">{{currentDate}}</text>
+    <view class="header-content">
+      <text class="greeting">{{greeting}}，{{userInfo.nickname || '美食家'}}</text>
+      <text class="date">{{currentDate}}</text>
+    </view>
+    <view class="weather-badge" wx:if="{{weather}}">
+      <text class="weather-icon">{{weather.icon}}</text>
+      <text class="weather-text">{{weather.text}}</text>
     </view>
   </view>
 
-  <view class="modal-mask" wx:if="{{showOnboardingModal}}" bindtap="closeOnboardingModal">
-    <view class="modal-content" catchtap="stopPropagation">
-      <view class="modal-icon">🎉</view>
-      <view class="modal-title">欢迎来到吃点啥！</view>
-      <view class="modal-desc">花30秒告诉我们你的口味偏好，让推荐更懂你～</view>
-      <view class="modal-buttons">
-        <button class="btn-skip" bindtap="closeOnboardingModal">稍后再说</button>
-        <button class="btn-start" bindtap="openOnboarding">立即开始</button>
+  <!-- 引导弹窗 -->
+  <view class="modal-overlay" wx:if="{{showOnboardingModal}}" bindtap="closeOnboardingModal">
+    <view class="modal-box" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-emoji">🍽️</text>
+        <text class="modal-title">让推荐更懂你</text>
+      </view>
+      <text class="modal-desc">花10秒设置口味偏好，获得更精准的推荐</text>
+      <view class="modal-actions">
+        <button class="btn-secondary" bindtap="closeOnboardingModal">稍后再说</button>
+        <button class="btn-primary" bindtap="openOnboarding">立即设置</button>
       </view>
     </view>
   </view>
 
-  <view class="personalized-recommendations" wx:if="{{personalizedRecipes.length > 0}}">
+  <!-- 偏好更新提示 -->
+  <view class="preference-toast" wx:if="{{showPreferenceToast}}" animation="{{toastAnimation}}">
+    <text class="toast-icon">✨</text>
+    <text class="toast-text">{{preferenceToastMessage}}</text>
+  </view>
+
+  <!-- 智能推荐 -->
+  <view class="section" wx:if="{{personalizedRecipes.length > 0}}">
     <view class="section-header">
-      <text class="section-title">为你推荐</text>
-      <text class="why-btn" bindtap="toggleRecommendationReason">
-        {{showRecommendationReason ? '收起' : '为什么推荐？'}}
-      </text>
+      <view class="section-title-group">
+        <text class="section-title">为你推荐</text>
+        <text class="section-subtitle" wx:if="{{context}}">{{context.mealName}} · {{context.season}}</text>
+      </view>
+      <view class="section-actions">
+        <text class="explain-btn" bindtap="toggleExplanation" wx:if="{{!showExplanation}}">
+          为什么推荐
+        </text>
+        <text class="explain-btn" bindtap="toggleExplanation" wx:else>收起</text>
+      </view>
     </view>
-    
-    <view class="recipe-card" wx:for="{{personalizedRecipes}}" wx:key="id">
-      <view class="recipe-main" bindtap="viewPersonalizedRecipe" data-recipe="{{item}}">
-        <view class="recipe-emoji">{{item.image_url || '🍽️'}}</view>
-        <view class="recipe-content">
-          <text class="recipe-name">{{item.name}}</text>
-          <view class="recipe-tags">
-            <text class="tag-small" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+
+    <view class="recipe-list">
+      <view class="recipe-card {{item.isExploration ? 'exploration' : ''}}" 
+            wx:for="{{personalizedRecipes}}" 
+            wx:key="id">
+        
+        <!-- 探索标签 -->
+        <view class="explore-badge" wx:if="{{item.isExploration}}">
+          <text class="explore-text">新品尝鲜</text>
+        </view>
+
+        <view class="recipe-main" bindtap="viewRecipe" data-recipe="{{item}}">
+          <view class="recipe-image">
+            <text class="recipe-emoji">{{item.image_url || '🍽️'}}</text>
           </view>
-          <view class="recipe-meta">
-            <text class="cuisine">{{item.cuisine_type}}</text>
-            <text class="time">{{item.cooking_time}}分钟</text>
-            <text class="calories">{{item.nutrition.calories}}kcal</text>
+          <view class="recipe-info">
+            <text class="recipe-name">{{item.name}}</text>
+            <view class="recipe-tags">
+              <text class="tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+            </view>
+            <view class="recipe-meta">
+              <text class="meta-item">{{item.cuisine_type}}</text>
+              <text class="meta-dot">·</text>
+              <text class="meta-item">{{item.cooking_time}}分钟</text>
+              <text class="meta-dot">·</text>
+              <text class="meta-item">{{item.nutrition?.calories || '--'}}kcal</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 推荐理由 -->
+        <view class="explanation-bar" wx:if="{{showExplanation && item.explanation}}">
+          <text class="explanation-icon">💡</text>
+          <text class="explanation-text">{{item.explanation}}</text>
+        </view>
+
+        <!-- 反馈按钮 -->
+        <view class="feedback-bar">
+          <view class="feedback-hint">这个推荐怎么样？</view>
+          <view class="feedback-actions">
+            <button class="feedback-btn like {{item.liked ? 'active' : ''}}" 
+                    bindtap="likeRecipe" 
+                    data-recipe="{{item}}">
+              <text class="btn-icon">{{item.liked ? '❤️' : '🤍'}}</text>
+              <text class="btn-text">喜欢</text>
+            </button>
+            <button class="feedback-btn dislike" bindtap="showDislikeOptions" data-recipe="{{item}}">
+              <text class="btn-icon">👎</text>
+              <text class="btn-text">不喜欢</text>
+            </button>
           </view>
         </view>
       </view>
-      
-      <view class="reason-section" wx:if="{{showRecommendationReason && item.recommendation_reason}}">
-        <view class="reason-text">💡 {{item.recommendation_reason}}</view>
-      </view>
-      
-      <view class="recipe-actions">
-        <button class="action-like" bindtap="likeRecipe" data-recipe="{{item}}">
-          {{item.liked ? '❤️' : '🤍'}}
-        </button>
-        <button class="action-dislike" bindtap="dislikeRecipe" data-recipe="{{item}}">👎</button>
-      </view>
+    </view>
+
+    <!-- 探索统计 -->
+    <view class="explore-stats" wx:if="{{explorationStats.explorationRate > 0}}">
+      <text class="stats-text">
+        已为你探索 {{explorationStats.explorationCount}} 道新菜品
+      </text>
     </view>
   </view>
 
-  <view class="today-menu">
+  <!-- 今日三餐 -->
+  <view class="section">
     <view class="section-header">
       <text class="section-title">今日三餐</text>
       <text class="section-more" bindtap="goToMenu">查看全部 →</text>
     </view>
-    
-    <view class="meal-list">
-      <view class="meal-item" wx:for="{{todayMeals}}" wx:key="meal_type">
-        <view class="meal-icon">{{item.icon}}</view>
-        <view class="meal-info">
+    <view class="meal-grid">
+      <view class="meal-card" wx:for="{{todayMeals}}" wx:key="meal_type">
+        <view class="meal-icon-wrap">
+          <text class="meal-icon">{{item.icon}}</text>
+        </view>
+        <view class="meal-content">
           <text class="meal-name">{{item.name}}</text>
           <text class="meal-recipe" wx:if="{{item.recipe}}">{{item.recipe}}</text>
+          <text class="meal-empty" wx:else>暂无推荐</text>
         </view>
         <view class="meal-action">
-          <button class="action-btn" size="mini" bindtap="viewRecipe" data-id="{{item.recipeId}}">详情</button>
+          <text class="action-link" bindtap="viewMealDetail" data-meal="{{item}}">查看</text>
         </view>
       </view>
     </view>
   </view>
 
-  <view class="quick-actions">
+  <!-- 快捷功能 -->
+  <view class="section">
     <view class="section-header">
       <text class="section-title">快捷功能</text>
     </view>
-    <view class="action-grid">
-      <view class="action-item" bindtap="generateMenu">
-        <view class="action-icon">📅</view>
-        <text class="action-text">生成周菜单</text>
+    <view class="quick-grid">
+      <view class="quick-item" bindtap="generateMenu">
+        <view class="quick-icon" style="background: #E3F2FD;">📅</view>
+        <text class="quick-text">生成菜单</text>
       </view>
-      <view class="action-item" bindtap="goToMovies">
-        <view class="action-icon">🎬</view>
-        <text class="action-text">发现影视</text>
+      <view class="quick-item" bindtap="goToMovies">
+        <view class="quick-icon" style="background: #F3E5F5;">🎬</view>
+        <text class="quick-text">影视推荐</text>
       </view>
-      <view class="action-item" bindtap="searchRecipes">
-        <view class="action-icon">🔍</view>
-        <text class="action-text">搜索菜谱</text>
+      <view class="quick-item" bindtap="searchRecipes">
+        <view class="quick-icon" style="background: #E8F5E9;">🔍</view>
+        <text class="quick-text">搜索菜谱</text>
       </view>
-      <view class="action-item" bindtap="goToProfile">
-        <view class="action-icon">⚙️</view>
-        <text class="action-text">偏好设置</text>
+      <view class="quick-item" bindtap="goToProfile">
+        <view class="quick-icon" style="background: #FFF3E0;">⚙️</view>
+        <text class="quick-text">偏好设置</text>
       </view>
     </view>
   </view>
 
-  <view class="recommended-movies" wx:if="{{recommendedMovies.length > 0}}">
+  <!-- 影视推荐 -->
+  <view class="section" wx:if="{{recommendedMovies.length > 0}}">
     <view class="section-header">
-      <text class="section-title">今日推荐影视</text>
+      <text class="section-title">下饭影视</text>
+      <text class="section-more" bindtap="goToMovies">更多 →</text>
     </view>
-    <scroll-view class="movie-scroll" scroll-x="true">
-      <view class="movie-item" wx:for="{{recommendedMovies}}" wx:key="id">
+    <scroll-view class="movie-scroll" scroll-x="true" show-scrollbar="false">
+      <view class="movie-card" wx:for="{{recommendedMovies}}" wx:key="id">
         <view class="movie-poster">{{item.image_url || '🎬'}}</view>
         <view class="movie-info">
           <text class="movie-title">{{item.title}}</text>
-          <text class="movie-rating">⭐ {{item.rating}}</text>
+          <view class="movie-meta">
+            <text class="movie-rating">⭐ {{item.rating}}</text>
+            <text class="movie-genre">{{item.genre}}</text>
+          </view>
         </view>
       </view>
     </scroll-view>
   </view>
+
+  <!-- 底部留白 -->
+  <view class="footer-space"></view>
 </view>
