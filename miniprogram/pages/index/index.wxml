@@ -2,8 +2,16 @@
   <!-- 头部 -->
   <view class="header">
     <view class="header-content">
-      <text class="greeting">{{greeting}}，{{userInfo.nickname || '美食家'}}</text>
-      <text class="date">{{currentDate}}</text>
+      <view class="header-top">
+        <view class="greeting-row">
+          <text class="greeting">{{greeting}}，{{userInfo.nickname || '美食家'}}</text>
+          <view class="user-tier-badge" wx:if="{{userTier}}" style="background: {{userTier.color}}20; border-color: {{userTier.color}}40;">
+            <text class="tier-icon">{{userTier.icon}}</text>
+            <text class="tier-name" style="color: {{userTier.color}}">{{userTier.name}}</text>
+          </view>
+        </view>
+        <text class="date">{{currentDate}}</text>
+      </view>
     </view>
     <view class="weather-badge" wx:if="{{weather}}">
       <text class="weather-icon">{{weather.icon}}</text>
@@ -131,13 +139,23 @@
     </view>
 
     <view class="recipe-list">
-      <view class="recipe-card {{item.isExploration ? 'exploration' : ''}}" 
+      <view class="recipe-card {{item.isExploration ? 'exploration' : ''}} {{item.isExclusive ? 'exclusive' : ''}} {{item.isRecall ? 'recall' : ''}}" 
             wx:for="{{personalizedRecipes}}" 
             wx:key="id">
         
         <!-- 探索标签 -->
         <view class="explore-badge" wx:if="{{item.isExploration}}">
           <text class="explore-text">新品尝鲜</text>
+        </view>
+
+        <!-- 专属标签 -->
+        <view class="exclusive-badge" wx:if="{{item.isExclusive}}">
+          <text class="exclusive-text">专属推荐</text>
+        </view>
+
+        <!-- 召回标签 -->
+        <view class="recall-badge" wx:if="{{item.isRecall}}">
+          <text class="recall-text">曾经喜爱</text>
         </view>
 
         <view class="recipe-main" bindtap="viewRecipe" data-recipe="{{item}}">
@@ -163,6 +181,20 @@
         <view class="explanation-bar" wx:if="{{showExplanation && item.explanation}}">
           <text class="explanation-icon">💡</text>
           <text class="explanation-text">{{item.explanation}}</text>
+        </view>
+
+        <!-- 搭配推荐 -->
+        <view class="pairing-section" wx:if="{{item.pairings && item.pairings.length > 0}}">
+          <view class="pairing-header">
+            <text class="pairing-icon">🍽️</text>
+            <text class="pairing-title">常搭配</text>
+          </view>
+          <view class="pairing-items">
+            <view class="pairing-item" wx:for="{{item.pairings}}" wx:for-item="pair" wx:key="id">
+              <text class="pairing-name">{{pair.name}}</text>
+              <text class="pairing-reason">{{pair.reason}}</text>
+            </view>
+          </view>
         </view>
 
         <!-- 反馈按钮 -->

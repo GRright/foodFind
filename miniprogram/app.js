@@ -2,6 +2,7 @@ const api = require('./utils/api.js');
 const RecommendEngine = require('./utils/recommendEngine.js');
 const ExitUploadManager = require('./utils/exitUploadManager.js');
 const UserProfileManager = require('./utils/userProfileManager.js');
+const MetricsTracker = require('./utils/metricsTracker.js');
 
 App({
   globalData: {
@@ -9,7 +10,8 @@ App({
     userId: null,
     RecommendEngine,
     ExitUploadManager,
-    UserProfileManager
+    UserProfileManager,
+    MetricsTracker
   },
 
   async onLaunch() {

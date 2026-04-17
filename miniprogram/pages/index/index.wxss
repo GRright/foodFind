@@ -42,13 +42,42 @@ page {
   z-index: 1;
 }
 
+.header-top {
+  margin-bottom: 12rpx;
+}
+
+.greeting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
 .greeting {
   font-size: 48rpx;
   font-weight: 700;
   color: #FFFFFF;
-  display: block;
-  margin-bottom: 12rpx;
   text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 用户分层标签 */
+.user-tier-badge {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid;
+  backdrop-filter: blur(10rpx);
+}
+
+.tier-icon {
+  font-size: 28rpx;
+}
+
+.tier-name {
+  font-size: 24rpx;
+  font-weight: 600;
 }
 
 .date {
@@ -271,6 +300,16 @@ page {
   background: linear-gradient(135deg, #F0F7FF 0%, #FFFFFF 100%);
 }
 
+.recipe-card.exclusive {
+  border-color: #2196F3;
+  background: linear-gradient(135deg, #E3F2FD 0%, #FFFFFF 100%);
+}
+
+.recipe-card.recall {
+  border-color: #4CAF50;
+  background: linear-gradient(135deg, #E8F5E9 0%, #FFFFFF 100%);
+}
+
 .explore-badge {
   position: absolute;
   top: 16rpx;
@@ -282,6 +321,38 @@ page {
 }
 
 .explore-text {
+  font-size: 22rpx;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.exclusive-badge {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  background: #2196F3;
+  padding: 8rpx 16rpx;
+  border-radius: var(--radius-sm);
+  z-index: 2;
+}
+
+.exclusive-text {
+  font-size: 22rpx;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.recall-badge {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  background: #4CAF50;
+  padding: 8rpx 16rpx;
+  border-radius: var(--radius-sm);
+  z-index: 2;
+}
+
+.recall-text {
   font-size: 22rpx;
   color: #FFFFFF;
   font-weight: 600;
@@ -385,6 +456,56 @@ page {
   justify-content: space-between;
   align-items: center;
   background: var(--bg-secondary);
+}
+
+/* 搭配推荐区域 */
+.pairing-section {
+  padding: 20rpx 24rpx;
+  border-top: 2rpx solid var(--border-color);
+  background: linear-gradient(135deg, #FFF3E0 0%, #FFFFFF 100%);
+}
+
+.pairing-header {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+.pairing-icon {
+  font-size: 28rpx;
+}
+
+.pairing-title {
+  font-size: 26rpx;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.pairing-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.pairing-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 16rpx;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-sm);
+}
+
+.pairing-name {
+  font-size: 26rpx;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.pairing-reason {
+  font-size: 22rpx;
+  color: var(--text-secondary);
 }
 
 .feedback-hint {

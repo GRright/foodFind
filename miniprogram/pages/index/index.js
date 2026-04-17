@@ -8,6 +8,7 @@ Page({
     currentDate: '',
     weather: null,
     context: null,
+    userTier: null,
     // 一日三餐数据 - 每餐5道菜，共15道
     dailyMeals: {
       breakfast: {
@@ -55,10 +56,16 @@ Page({
 
   onLoad() {
     this.updateGreeting();
+    const { RecommendEngine, MetricsTracker } = app.globalData;
+    
+    MetricsTracker.recordSession();
+    
     this.setData({
       userInfo: app.globalData.userInfo || {},
       currentDate: this.formatDate(new Date()),
-      context: app.globalData.RecommendEngine.getContext()
+      context: RecommendEngine.getContext(),
+      userTier: RecommendEngine.getUserTier(),
+      metrics: MetricsTracker.getMetrics()
     });
     
     this.checkAndShowOnboarding();
@@ -116,7 +123,17 @@ Page({
       recipes = RecommendEngine.getRecommendations(5);
     }
 
-    this.setData({ personalizedRecipes: recipes });
+    // 为每道菜添加搭配推荐
+    const context = this.data.context;
+    const recipesWithPairings = recipes.map(recipe => {
+      const pairings = RecommendEngine.getPairingRecommendations(recipe, context, 2);
+      return {
+        ...recipe,
+        pairings: pairings.length > 0 ? pairings : null
+      };
+    });
+
+    this.setData({ personalizedRecipes: recipesWithPairings });
   },
 
   // 加载电影
@@ -147,6 +164,7 @@ Page({
   // 查看菜谱
   viewRecipe(e) {
     const recipe = e.currentTarget.dataset.recipe;
+    app.globalData.MetricsTracker.recordView();
     this.recordBehavior('view', recipe);
     wx.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` });
   },
@@ -154,6 +172,7 @@ Page({
   // 查看一日三餐中的菜谱
   viewMealRecipe(e) {
     const recipe = e.currentTarget.dataset.recipe;
+    app.globalData.MetricsTracker.recordView();
     this.recordBehavior('view', recipe);
     wx.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` });
   },
@@ -161,6 +180,7 @@ Page({
   // 喜欢
   likeRecipe(e) {
     const recipe = e.currentTarget.dataset.recipe;
+    app.globalData.MetricsTracker.recordLike();
     this.recordBehavior('like', recipe);
     
     // 更新UI
@@ -175,6 +195,7 @@ Page({
   // 显示不喜欢选项
   showDislikeOptions(e) {
     const recipe = e.currentTarget.dataset.recipe;
+    app.globalData.MetricsTracker.recordDislike();
     
     wx.showActionSheet({
       itemList: ['太贵了', '不合口味', '不喜欢食材', '其他原因'],

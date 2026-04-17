@@ -5,6 +5,11 @@ Page({
   data: {
     userInfo: {},
     userId: null,
+    userTier: null,
+    lifecycleStage: null,
+    sensitivityScore: null,
+    metrics: null,
+    dynamicTags: [],
     showPreferences: false,
     dietGoals: ['均衡饮食', '减脂', '增肌', '增重'],
     dietGoalIndex: 0,
@@ -17,9 +22,16 @@ Page({
   },
 
   onLoad() {
+    const { RecommendEngine, MetricsTracker, UserProfileManager } = app.globalData;
+    
     this.setData({
       userInfo: app.globalData.userInfo || {},
-      userId: app.globalData.userId
+      userId: app.globalData.userId,
+      userTier: RecommendEngine.getUserTier(),
+      lifecycleStage: UserProfileManager.getLifecycleStage(),
+      sensitivityScore: UserProfileManager.getSensitivityScore(),
+      metrics: MetricsTracker.getMetrics(),
+      dynamicTags: UserProfileManager.getDynamicTags()
     });
     this.loadPreferences();
   },

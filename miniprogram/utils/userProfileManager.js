@@ -384,6 +384,284 @@ class UserProfileManager {
     });
   }
 
+  // ========== 用户分层 ==========
+
+  getUserTier() {
+    const stats = this.profile.stats || {};
+    const now = Date.now();
+    const daysSinceCreation = (now - this.profile.createdAt) / (24 * 60 * 60 * 1000);
+    const daysSinceLastActive = stats.lastActiveAt ? (now - stats.lastActiveAt) / (24 * 60 * 60 * 1000) : 0;
+    const totalInteractions = stats.totalOrders + stats.totalViews + stats.totalFavorites;
+
+    if (daysSinceLastActive > 7) {
+      return {
+        id: 'churning',
+        name: '流失风险',
+        icon: '⚠️',
+        color: '#FF9800',
+        recommendStrategy: 'recall'
+      };
+    }
+
+    if (daysSinceCreation <= 3 && totalInteractions < 10) {
+      return {
+        id: 'new',
+        name: '新用户',
+        icon: '🌱',
+        color: '#4CAF50',
+        recommendStrategy: 'explore'
+      };
+    }
+
+    if (totalInteractions >= 50 || stats.totalOrders >= 10) {
+      return {
+        id: 'loyal',
+        name: '忠实用户',
+        icon: '💎',
+        color: '#2196F3',
+        recommendStrategy: 'personalized',
+        exclusive: true
+      };
+    }
+
+    return {
+      id: 'active',
+      name: '活跃用户',
+      icon: '🔥',
+      color: '#FF5722',
+      recommendStrategy: 'balanced'
+    };
+  }
+
+  getTierRecommendStrategy() {
+    const tier = this.getUserTier();
+    const strategies = {
+      new: {
+        exploreRatio: 0.4,
+        showExplanation: true,
+        enablePersonalization: false,
+        enableCollaborative: false,
+        focusOn: 'hot_and_popular'
+      },
+      active: {
+        exploreRatio: 0.25,
+        showExplanation: true,
+        enablePersonalization: true,
+        enableCollaborative: true,
+        focusOn: 'personalized_and_diverse'
+      },
+      loyal: {
+        exploreRatio: 0.15,
+        showExplanation: true,
+        enablePersonalization: true,
+        enableCollaborative: true,
+        enableExclusive: true,
+        focusOn: 'premium_and_new'
+      },
+      churning: {
+        exploreRatio: 0.3,
+        showExplanation: true,
+        enablePersonalization: true,
+        enableRecall: true,
+        focusOn: 'favorites_and_recall'
+      }
+    };
+    return strategies[tier.id] || strategies.active;
+  }
+
+  // ========== 动态标签生成 ==========
+
+  generateDynamicTags() {
+    const tags = [];
+    const implicit = this.profile.implicit;
+    const explicit = this.profile.explicit;
+
+    // 口味标签
+    const tastePreferences = [];
+    if (explicit.tastePreference.spicy > 0.6) {
+      tastePreferences.push('嗜辣');
+    } else if (explicit.tastePreference.spicy < 0.3) {
+      tastePreferences.push('不吃辣');
+    }
+    
+    if (explicit.tastePreference.sweet > 0.6) {
+      tastePreferences.push('嗜甜');
+    }
+
+    if (tastePreferences.length > 0) {
+      tags.push(...tastePreferences);
+    }
+
+    // 菜系标签
+    const topCuisines = this.getTopCuisines(2);
+    if (topCuisines.length > 0) {
+      topCuisines.forEach(c => {
+        if (c.weight > 10) {
+          tags.push(`常点${c.cuisine}`);
+        }
+      });
+    }
+
+    // 时间偏好标签
+    const timePref = implicit.timePreference;
+    if (timePref.breakfast && timePref.breakfast.length > 0) {
+      tags.push('早餐达人');
+    }
+    if (timePref.dinner && timePref.dinner.length > 0) {
+      tags.push('晚餐常客');
+    }
+
+    // 价格敏感度标签
+    if (this.isPriceSensitive()) {
+      tags.push('价格敏感');
+    }
+
+    // 行为标签
+    const stats = this.profile.stats;
+    if (stats.totalOrders >= 10) {
+      tags.push('美食达人');
+    }
+    if (stats.totalFavorites >= 20) {
+      tags.push('收藏达人');
+    }
+
+    // 探索标签
+    const exploreRatio = this.getExploreRatio();
+    if (exploreRatio > 0.3) {
+      tags.push('美食探险家');
+    }
+
+    return tags;
+  }
+
+  getExploreRatio() {
+    const history = this.behaviorHistory;
+    if (history.length === 0) return 0;
+    
+    const exploreActions = history.filter(b => 
+      b.details?.isExploration || b.action === 'VIEW_NEW_CATEGORY'
+    ).length;
+    
+    return exploreActions / history.length;
+  }
+
+  /**
+   * 更新用户动态标签
+   */
+  updateDynamicTags() {
+    const tags = this.generateDynamicTags();
+    this.profile.dynamicTags = tags;
+    this.profile.tagsUpdatedAt = Date.now();
+    this._saveProfile();
+    return tags;
+  }
+
+  /**
+   * 获取用户动态标签
+   */
+  getDynamicTags() {
+    if (!this.profile.dynamicTags || 
+        Date.now() - (this.profile.tagsUpdatedAt || 0) > 24 * 60 * 60 * 1000) {
+      return this.updateDynamicTags();
+    }
+    return this.profile.dynamicTags || [];
+  }
+
+  // ========== 用户生命周期阶段 ==========
+
+  getLifecycleStage() {
+    const stats = this.profile.stats || {};
+    const now = Date.now();
+    const daysSinceCreation = (now - this.profile.createdAt) / (24 * 60 * 60 * 1000);
+    const lastActiveDays = stats.lastActiveAt ? (now - stats.lastActiveAt) / (24 * 60 * 60 * 1000) : 0;
+    const totalInteractions = stats.totalOrders + stats.totalViews + stats.totalFavorites;
+
+    if (daysSinceCreation <= 7) {
+      return {
+        id: 'exploration',
+        name: '探索期',
+        icon: '🌱',
+        color: '#4CAF50',
+        description: '正在发现美食的新用户'
+      };
+    } else if (daysSinceCreation <= 30 && totalInteractions >= 5) {
+      return {
+        id: 'growth',
+        name: '成长期',
+        icon: '🌿',
+        color: '#8BC34A',
+        description: '正在建立偏好的活跃用户'
+      };
+    } else if (totalInteractions >= 30) {
+      return {
+        id: 'maturity',
+        name: '成熟期',
+        icon: '🌳',
+        color: '#009688',
+        description: '已形成稳定偏好的老用户'
+      };
+    } else if (lastActiveDays > 7) {
+      return {
+        id: 'dormant',
+        name: '休眠期',
+        icon: '🍂',
+        color: '#795548',
+        description: '需要召回的非活跃用户'
+      };
+    }
+
+    return {
+      id: 'unknown',
+      name: '未知阶段',
+      icon: '❓',
+      color: '#9E9E9E',
+      description: '用户状态未知'
+    };
+  }
+
+  // ========== 用户敏感度评分 ==========
+
+  getSensitivityScore() {
+    const stats = this.profile.stats || {};
+    const likeRate = stats.totalViews > 0 ? stats.totalLikes / stats.totalViews : 0;
+    const dislikeRate = stats.totalViews > 0 ? stats.totalDislikes / stats.totalViews : 0;
+    const feedbackRate = stats.totalViews > 0 ? (stats.totalLikes + stats.totalDislikes) / stats.totalViews : 0;
+
+    if (feedbackRate > 0.5 && likeRate > 0.3) {
+      return {
+        id: 'positive_sensitive',
+        name: '正向敏感',
+        icon: '😊',
+        color: '#FF5722',
+        recommendation: '快速响应，加大资源投放'
+      };
+    } else if (feedbackRate > 0.4 && dislikeRate > 0.3) {
+      return {
+        id: 'negative_sensitive',
+        name: '负向敏感',
+        icon: '😐',
+        color: '#607D8B',
+        recommendation: '减少干预，精准推送'
+      };
+    } else if (feedbackRate > 0.2) {
+      return {
+        id: 'neutral',
+        name: '中性反应',
+        icon: '😀',
+        color: '#FFB74D',
+        recommendation: '适度干预，均衡推荐'
+      };
+    } else {
+      return {
+        id: 'unresponsive',
+        name: '无反应',
+        icon: '😴',
+        color: '#BDBDBD',
+        recommendation: '尝试新的干预方式'
+      };
+    }
+  }
+
   // ========== 公共API ==========
 
   getProfile() {
@@ -413,6 +691,20 @@ class UserProfileManager {
       .map(([cuisine, weight]) => ({ cuisine, weight }));
   }
 
+  getFavoriteRecipes() {
+    const favorites = this.behaviorHistory
+      .filter(b => b.action === 'FAVORITE' || b.action === 'ORDER')
+      .reduce((acc, b) => {
+        acc[b.itemId] = (acc[b.itemId] || 0) + b.weight;
+        return acc;
+      }, {});
+    
+    return Object.entries(favorites)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([id, score]) => ({ id, score }));
+  }
+
   /**
    * 导出数据（用于云端同步）
    */
@@ -421,6 +713,7 @@ class UserProfileManager {
       profile: this.profile,
       recentBehaviors: this._getRecentBehaviors(30),
       timeline: this.getPreferenceTimeline(),
+      tier: this.getUserTier(),
       exportAt: Date.now()
     };
   }

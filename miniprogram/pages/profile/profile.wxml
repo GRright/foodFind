@@ -4,6 +4,59 @@
     <view class="user-info">
       <text class="nickname">{{userInfo.nickname || '美食爱好者'}}</text>
       <text class="user-id">ID: {{userId}}</text>
+      <view class="user-tier-badge" wx:if="{{userTier}}" style="background: {{userTier.color}}20; border-color: {{userTier.color}}40;">
+        <text class="tier-icon">{{userTier.icon}}</text>
+        <text class="tier-name" style="color: {{userTier.color}}">{{userTier.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关键指标展示 -->
+  <view class="metrics-section" wx:if="{{metrics}}">
+    <view class="metrics-grid">
+      <view class="metric-card">
+        <text class="metric-value">{{metrics.sessionCount}}</text>
+        <text class="metric-label">访问次数</text>
+      </view>
+      <view class="metric-card">
+        <text class="metric-value">{{metrics.dailyActiveDays}}</text>
+        <text class="metric-label">活跃天数</text>
+      </view>
+      <view class="metric-card">
+        <text class="metric-value">{{metrics.clickRate.toFixed(1)}}%</text>
+        <text class="metric-label">推荐点击率</text>
+      </view>
+      <view class="metric-card">
+        <text class="metric-value">{{metrics.engagementScore}}</text>
+        <text class="metric-label">活跃度评分</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 用户状态分析 -->
+  <view class="user-status-section" wx:if="{{lifecycleStage && sensitivityScore}}">
+    <view class="section-title">你的状态分析</view>
+    <view class="status-cards">
+      <view class="status-card" style="background: {{lifecycleStage.color}}10; border-color: {{lifecycleStage.color}}40;">
+        <text class="status-icon">{{lifecycleStage.icon}}</text>
+        <text class="status-name" style="color: {{lifecycleStage.color}}">{{lifecycleStage.name}}</text>
+        <text class="status-desc">{{lifecycleStage.description}}</text>
+      </view>
+      <view class="status-card" style="background: {{sensitivityScore.color}}10; border-color: {{sensitivityScore.color}}40;">
+        <text class="status-icon">{{sensitivityScore.icon}}</text>
+        <text class="status-name" style="color: {{sensitivityScore.color}}">{{sensitivityScore.name}}</text>
+        <text class="status-desc">{{sensitivityScore.recommendation}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 用户动态标签 -->
+  <view class="dynamic-tags-section" wx:if="{{dynamicTags && dynamicTags.length > 0}}">
+    <view class="section-title">你的美食标签</view>
+    <view class="tag-cloud">
+      <view class="dynamic-tag" wx:for="{{dynamicTags}}" wx:key="*this">
+        {{item}}
+      </view>
     </view>
   </view>
 
