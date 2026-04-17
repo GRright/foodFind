@@ -8,11 +8,42 @@ Page({
     currentDate: '',
     weather: null,
     context: null,
-    todayMeals: [
-      { meal_type: 'breakfast', name: '早餐', icon: '🌅', recipe: '番茄炒蛋', recipeId: 1 },
-      { meal_type: 'lunch', name: '午餐', icon: '☀️', recipe: '红烧肉', recipeId: 2 },
-      { meal_type: 'dinner', name: '晚餐', icon: '🌙', recipe: '日式咖喱饭', recipeId: 3 }
-    ],
+    // 一日三餐数据 - 每餐5道菜，共15道
+    dailyMeals: {
+      breakfast: {
+        title: '早餐',
+        icon: '🌅',
+        recipes: [
+          { id: 101, name: '番茄炒蛋', image: '🍳', calories: 120, time: 10 },
+          { id: 102, name: '豆浆油条', image: '🥖', calories: 280, time: 5 },
+          { id: 103, name: '皮蛋瘦肉粥', image: '🥣', calories: 180, time: 20 },
+          { id: 104, name: '煎饺', image: '🥟', calories: 220, time: 15 },
+          { id: 105, name: '三明治', image: '🥪', calories: 150, time: 5 }
+        ]
+      },
+      lunch: {
+        title: '午餐',
+        icon: '☀️',
+        recipes: [
+          { id: 201, name: '红烧肉', image: '🍖', calories: 450, time: 60 },
+          { id: 202, name: '宫保鸡丁', image: '🍗', calories: 320, time: 25 },
+          { id: 203, name: '麻婆豆腐', image: '🥘', calories: 280, time: 20 },
+          { id: 204, name: '糖醋排骨', image: '🍖', calories: 380, time: 45 },
+          { id: 205, name: '清蒸鲈鱼', image: '🐟', calories: 180, time: 20 }
+        ]
+      },
+      dinner: {
+        title: '晚餐',
+        icon: '🌙',
+        recipes: [
+          { id: 301, name: '日式咖喱饭', image: '🍛', calories: 380, time: 40 },
+          { id: 302, name: '番茄牛肉汤', image: '🍲', calories: 280, time: 45 },
+          { id: 303, name: '蒜蓉西兰花', image: '🥦', calories: 80, time: 10 },
+          { id: 304, name: '蛋炒饭', image: '🍚', calories: 320, time: 10 },
+          { id: 305, name: '韩式拌饭', image: '🍚', calories: 420, time: 25 }
+        ]
+      }
+    },
     recommendedMovies: [],
     personalizedRecipes: [],
     showExplanation: false,
@@ -120,6 +151,13 @@ Page({
     wx.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` });
   },
 
+  // 查看一日三餐中的菜谱
+  viewMealRecipe(e) {
+    const recipe = e.currentTarget.dataset.recipe;
+    this.recordBehavior('view', recipe);
+    wx.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` });
+  },
+
   // 喜欢
   likeRecipe(e) {
     const recipe = e.currentTarget.dataset.recipe;
@@ -206,12 +244,5 @@ Page({
   
   searchRecipes() {
     wx.navigateTo({ url: '/pages/menu/menu?search=true' });
-  },
-  
-  viewMealDetail(e) {
-    const meal = e.currentTarget.dataset.meal;
-    if (meal.recipeId) {
-      wx.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${meal.recipeId}` });
-    }
   }
 });

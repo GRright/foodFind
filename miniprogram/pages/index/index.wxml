@@ -32,6 +32,89 @@
     <text class="toast-text">{{preferenceToastMessage}}</text>
   </view>
 
+  <!-- 一日三餐 5×3 网格 -->
+  <view class="section daily-meals-section">
+    <view class="section-header">
+      <view class="section-title-group">
+        <text class="section-title">今日食谱</text>
+        <text class="section-subtitle">一日三餐 · 精心搭配</text>
+      </view>
+      <text class="section-more" bindtap="goToMenu">查看全部 →</text>
+    </view>
+
+    <!-- 早餐行 -->
+    <view class="meal-row">
+      <view class="meal-label">
+        <text class="meal-icon">{{dailyMeals.breakfast.icon}}</text>
+        <text class="meal-name">{{dailyMeals.breakfast.title}}</text>
+      </view>
+      <view class="recipe-grid">
+        <view class="recipe-item" 
+              wx:for="{{dailyMeals.breakfast.recipes}}" 
+              wx:key="id"
+              bindtap="viewMealRecipe"
+              data-recipe="{{item}}">
+          <view class="recipe-image-box">
+            <text class="recipe-emoji">{{item.image}}</text>
+          </view>
+          <text class="recipe-title">{{item.name}}</text>
+          <view class="recipe-meta">
+            <text class="meta-cal">{{item.calories}}kcal</text>
+            <text class="meta-time">{{item.time}}min</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 午餐行 -->
+    <view class="meal-row">
+      <view class="meal-label">
+        <text class="meal-icon">{{dailyMeals.lunch.icon}}</text>
+        <text class="meal-name">{{dailyMeals.lunch.title}}</text>
+      </view>
+      <view class="recipe-grid">
+        <view class="recipe-item" 
+              wx:for="{{dailyMeals.lunch.recipes}}" 
+              wx:key="id"
+              bindtap="viewMealRecipe"
+              data-recipe="{{item}}">
+          <view class="recipe-image-box">
+            <text class="recipe-emoji">{{item.image}}</text>
+          </view>
+          <text class="recipe-title">{{item.name}}</text>
+          <view class="recipe-meta">
+            <text class="meta-cal">{{item.calories}}kcal</text>
+            <text class="meta-time">{{item.time}}min</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 晚餐行 -->
+    <view class="meal-row">
+      <view class="meal-label">
+        <text class="meal-icon">{{dailyMeals.dinner.icon}}</text>
+        <text class="meal-name">{{dailyMeals.dinner.title}}</text>
+      </view>
+      <view class="recipe-grid">
+        <view class="recipe-item" 
+              wx:for="{{dailyMeals.dinner.recipes}}" 
+              wx:key="id"
+              bindtap="viewMealRecipe"
+              data-recipe="{{item}}">
+          <view class="recipe-image-box">
+            <text class="recipe-emoji">{{item.image}}</text>
+          </view>
+          <text class="recipe-title">{{item.name}}</text>
+          <view class="recipe-meta">
+            <text class="meta-cal">{{item.calories}}kcal</text>
+            <text class="meta-time">{{item.time}}min</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- 智能推荐 -->
   <view class="section" wx:if="{{personalizedRecipes.length > 0}}">
     <view class="section-header">
@@ -59,7 +142,7 @@
 
         <view class="recipe-main" bindtap="viewRecipe" data-recipe="{{item}}">
           <view class="recipe-image">
-            <text class="recipe-emoji">{{item.image_url || '🍽️'}}</text>
+            <text class="recipe-emoji-large">{{item.image_url || '🍽️'}}</text>
           </view>
           <view class="recipe-info">
             <text class="recipe-name">{{item.name}}</text>
@@ -106,29 +189,6 @@
       <text class="stats-text">
         已为你探索 {{explorationStats.explorationCount}} 道新菜品
       </text>
-    </view>
-  </view>
-
-  <!-- 今日三餐 -->
-  <view class="section">
-    <view class="section-header">
-      <text class="section-title">今日三餐</text>
-      <text class="section-more" bindtap="goToMenu">查看全部 →</text>
-    </view>
-    <view class="meal-grid">
-      <view class="meal-card" wx:for="{{todayMeals}}" wx:key="meal_type">
-        <view class="meal-icon-wrap">
-          <text class="meal-icon">{{item.icon}}</text>
-        </view>
-        <view class="meal-content">
-          <text class="meal-name">{{item.name}}</text>
-          <text class="meal-recipe" wx:if="{{item.recipe}}">{{item.recipe}}</text>
-          <text class="meal-empty" wx:else>暂无推荐</text>
-        </view>
-        <view class="meal-action">
-          <text class="action-link" bindtap="viewMealDetail" data-meal="{{item}}">查看</text>
-        </view>
-      </view>
     </view>
   </view>
 
