@@ -1,0 +1,547 @@
+<template>
+  <view class="page" :class="{ 'page-enter': pageEnter }">
+    <view class="header fade-in">
+      <text class="header-title">一周菜单</text>
+      <text class="header-sub">点击日期查看 · 智能荤素搭配</text>
+    </view>
+
+    <view class="spark-banner pop-in" v-if="pairStats && pairStats.consecutiveShareDays > 0" style="animation-delay:0.1s;opacity:0">
+      <view class="spark-icon-wrap"><text class="spark-emoji">🔥</text></view>
+      <view class="spark-info">
+        <text class="spark-main">{{ pairStats.consecutiveShareDays }}天连续互动</text>
+        <text class="spark-sub">分享{{ pairStats.totalShareDays }}天 · 打开{{ pairStats.totalOpenDays }}次</text>
+      </view>
+      <view class="spark-badge" v-if="pairStats.consecutiveShareDays >= 7"><text class="badge-txt">💎</text></view>
+    </view>
+
+    <view class="calendar-wrap slide-up" style="animation-delay:0.08s">
+      <view class="cal-nav">
+        <view class="nav-btn" @click="prevWeek"><text class="nav-arrow">◀</text><text class="nav-txt">上一周</text></view>
+        <text class="cal-month">{{ calMonth }}</text>
+        <view class="nav-btn" @click="nextWeek"><text class="nav-txt">下一周</text><text class="nav-arrow">▶</text></view>
+      </view>
+
+      <view class="week-row">
+        <view
+          class="day-cell"
+          :class="{ active: d.isActive, 'is-today': d.isToday, 'has-data': d.hasData, 'has-spark': d.sparkLevel > 0 }"
+          v-for="(d, di) in weekDays"
+          :key="di"
+          @click="selectDay(d)"
+        >
+          <text class="day-week">{{ d.weekName }}</text>
+          <text class="day-num">{{ d.day }}</text>
+          <view class="spark-icon" v-if="d.sparkLevel === 1"><text class="si-txt">🔥</text></view>
+          <view class="spark-icon double" v-else-if="d.sparkLevel >= 2"><text class="si-txt">🔥🔥</text></view>
+          <view class="dot-row" v-if="d.hasData && d.sparkLevel === 0">
+            <view class="nutri-dot b-dot"></view>
+            <view class="nutri-dot l-dot"></view>
+            <view class="nutri-dot d-dot"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="action-bar pop-in" style="animation-delay:0.15s">
+      <view class="gen-btn" @click="generateWeekPlan">
+        <text class="gen-icon">✦</text>
+        <text class="gen-text">生成本周菜单</text>
+      </view>
+      <text class="gen-hint" v-if="weeklyData && weeklyData[selectedDateStr]">已生成 · {{ weekNutriSummary }}</text>
+    </view>
+
+    <scroll-view scroll-y class="meal-scroll" :style="{ height: scrollHeight }">
+      <view v-if="selectedDayMeals" class="day-meals">
+        <view class="day-label bounce-in">
+          <text class="dl-date">{{ selectedDayLabel }}</text>
+          <text class="dl-cal">{{ selectedDayCal }} kcal</text>
+        </view>
+
+        <view
+          class="meal-section"
+          v-for="(meal, mi) in mealSections"
+          :key="mi"
+          style="animation: slideUp .45s ease forwards; animation-delay: calc(0.12s * mi); opacity: 0;"
+        >
+          <view class="meal-header">
+            <view class="mh-left">
+              <text class="mh-icon">{{ meal.icon }}</text>
+              <text class="mh-title">{{ meal.title }}</text>
+            </view>
+            <text class="mh-cal">{{ meal.cal }} kcal</text>
+          </view>
+          <view class="food-row">
+            <view
+              class="food-card"
+              v-for="(food, fi) in meal.recipes"
+              :key="food.id"
+              @click="viewRecipe(food)"
+              style="animation: popIn .4s cubic-bezier(.175,.885,.32,1.275) forwards; animation-delay: calc(0.18s + mi*0.06s + fi*0.05s); opacity: 0;"
+            >
+              <view class="fc-icon-wrap"><text class="fc-icon">{{ food.image || '🍽️' }}</text></view>
+              <text class="fc-name">{{ food.name }}</text>
+              <text class="fc-kcal">{{ food.nutrition.calories * userCount }} kcal</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view v-else class="empty-state scale-in">
+        <text class="empty-icon">📅</text>
+        <text class="empty-title">该日暂无菜单</text>
+        <text class="empty-hint">点击上方「生成本周菜单」一键规划</text>
+      </view>
+
+      <view class="bottom-spacer"></view>
+    </scroll-view>
+  </view>
+</template>
+
+<script>
+import { ALL_RECIPES } from '@/utils/constants.js'
+
+export default {
+  data() {
+    return {
+      userCount: 2,
+      scrollHeight: 'calc(100vh - 580rpx)',
+      currentMonday: null,
+      selectedDate: null,
+      weeklyData: {},
+      sparkData: [],
+      pairStats: null,
+      pageEnter: true
+    }
+  },
+  computed: {
+    calMonth() {
+      if (!this.currentMonday) return ''
+      const m = this.currentMonday.getMonth() + 1
+      const y = this.currentMonday.getFullYear()
+      return `${y}年${m}月`
+    },
+    weekDays() {
+      if (!this.currentMonday) return []
+      const days = []
+      const today = new Date()
+      today.setHours(0,0,0,0)
+      const weekNames = ['一','二','三','四','五','六','日']
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(this.currentMonday)
+        d.setDate(d.getDate() + i)
+        const ds = this.dateToStr(d)
+
+        const sparkRecord = this.sparkData.find(s => s.date === ds)
+        const sparkLevel = sparkRecord ? sparkRecord.sparkLevel : 0
+
+        days.push({
+          date: d,
+          day: d.getDate(),
+          weekName: weekNames[i],
+          isToday: d.getTime() === today.getTime(),
+          isActive: this.selectedDate ? ds === this.dateToStr(this.selectedDate) : false,
+          hasData: !!this.weeklyData[ds],
+          dateStr: ds,
+          sparkLevel
+        })
+      }
+      return days
+    },
+    selectedDateStr() { return this.selectedDate ? this.dateToStr(this.selectedDate) : '' },
+    selectedDayMeals() {
+      if (!this.selectedDateStr) return null
+      if (this.weeklyData[this.selectedDateStr]) return this.weeklyData[this.selectedDateStr]
+      const todayStr = this.getTodayStr()
+      if (this.selectedDateStr === todayStr) {
+        const homeMeals = uni.getStorageSync('foodfind_meals')
+        if (homeMeals) return homeMeals
+      }
+      return null
+    },
+    selectedDayLabel() {
+      if (!this.selectedDate) return ''
+      const w = ['周日','周一','周二','周三','周四','周五','周六'][this.selectedDate.getDay()]
+      return `${this.selectedDate.getMonth()+1}月${this.selectedDate.getDate()}日 ${w}`
+    },
+    mealSections() {
+      if (!this.selectedDayMeals) return []
+      return [
+        { title: '早餐', icon: '☀', recipes: this.selectedDayMeals.breakfast || [] },
+        { title: '午餐', icon: '🌞', recipes: this.selectedDayMeals.lunch || [] },
+        { title: '晚餐', icon: '🌙', recipes: this.selectedDayMeals.dinner || [] }
+      ].map(m => ({
+        ...m,
+        cal: m.recipes.reduce((s, r) => s + (r.nutrition?.calories||0) * this.userCount, 0)
+      }))
+    },
+    selectedDayCal() {
+      if (!this.selectedDayMeals) return 0
+      let c = 0
+      ;['breakfast','lunch','dinner'].forEach(k => {
+        (this.selectedDayMeals[k]||[]).forEach(r => { c += (r.nutrition?.calories||0) * this.userCount })
+      })
+      return Math.round(c)
+    },
+    weekNutriSummary() {
+      let totalC = 0, totalP = 0, totalF = 0, totalCb = 0, days = 0
+      Object.keys(this.weeklyData).forEach(ds => {
+        const meals = this.weeklyData[ds]
+        if (!meals) return
+        days++
+        ;['breakfast','lunch','dinner'].forEach(k => {
+          (meals[k]||[]).forEach(r => {
+            totalC += r.nutrition?.calories||0
+            totalP += r.nutrition?.protein||0
+            totalF += r.nutrition?.fat||0
+            totalCb += r.nutrition?.carbs||0
+          })
+        })
+      })
+      if (days === 0) return ''
+      return `日均${Math.round(totalC/days*this.userCount)}kcal · 蛋白${Math.round(totalP/days)}g`
+    }
+  },
+  onLoad() {
+    this.initCalendar()
+    this.loadWeeklyCache()
+    this.loadUserPrefs()
+    this.loadSparkData()
+    this.loadPairStats()
+  },
+  onShow() {
+    this.pageEnter = true
+    setTimeout(() => { this.pageEnter = false }, 400)
+    if (this.currentMonday) {
+      const cached = uni.getStorageSync('foodfind_weekly')
+      if (cached) this.weeklyData = cached
+      this.loadSparkData()
+      this.loadPairStats()
+    }
+  },
+  methods: {
+    getTodayStr() {
+      const d = new Date()
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+    },
+    loadUserPrefs() {
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs')
+      if (prefs && prefs.userCount) this.userCount = prefs.userCount
+      else {
+        const uc = uni.getStorageSync('foodfind_user_count')
+        if (uc) this.userCount = uc
+      }
+    },
+    initCalendar() {
+      const now = new Date()
+      const day = now.getDay()
+      const diff = day === 0 ? -6 : 1 - day
+      this.currentMonday = new Date(now)
+      this.currentMonday.setDate(now.getDate() + diff)
+      this.currentMonday.setHours(0,0,0,0)
+      this.selectedDate = new Date(now)
+      this.selectedDate.setHours(0,0,0,0)
+    },
+    dateToStr(d) {
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+    },
+    prevWeek() {
+      const d = new Date(this.currentMonday)
+      d.setDate(d.getDate() - 7)
+      this.currentMonday = d
+      this.selectedDate = new Date(d)
+    },
+    nextWeek() {
+      const d = new Date(this.currentMonday)
+      d.setDate(d.getDate() + 7)
+      this.currentMonday = d
+      this.selectedDate = new Date(d)
+    },
+    selectDay(d) {
+      this.selectedDate = new Date(d.date)
+    },
+    loadWeeklyCache() {
+      const cached = uni.getStorageSync('foodfind_weekly')
+      if (cached) this.weeklyData = cached
+    },
+    loadSparkData() {
+      const partner = uni.getStorageSync('foodfind_partner')
+      if (!partner || !partner.pairId) return
+
+      wx.cloud.callFunction({
+        name: 'getDailyStatus',
+        data: { pairId: partner.pairId, range: 'week' }
+      }).then(res => {
+        if (res.result && res.result.code === 0) {
+          this.sparkData = res.result.data || []
+        }
+      }).catch(() => {})
+    },
+    loadPairStats() {
+      const partner = uni.getStorageSync('foodfind_partner')
+      if (!partner || !partner.pairId) return
+
+      wx.cloud.callFunction({
+        name: 'getPairStats',
+        data: { pairId: partner.pairId }
+      }).then(res => {
+        if (res.result && res.result.code === 0 && res.result.data) {
+          this.pairStats = res.result.data
+        }
+      }).catch(() => {})
+    },
+    getRecipeCount() {
+      const c = this.userCount
+      if (c === 1) return 2
+      if (c === 2) return 3
+      if (c <= 4) return 4
+      return 5
+    },
+    shuffle(arr, n) { return [...arr].sort(() => Math.random() - 0.5).slice(0, n) },
+    balanced(recipes, n) {
+      const meat = recipes.filter(r => r.type === 'meat' || r.type === 'mixed')
+      const veg = recipes.filter(r => r.type === 'vegetarian')
+      const mc = Math.ceil(n * 0.55), vc = n - mc
+      return [...this.shuffle(meat, mc), ...this.shuffle(veg, vc)].sort(() => Math.random() - 0.5)
+    },
+    nutritionBalanced(dayIndex, allDaysMeals) {
+      const usedRecipes = new Set()
+      allDaysMeals.forEach(dm => {
+        ;['breakfast','lunch','dinner'].forEach(k => { (dm[k]||[]).forEach(r => usedRecipes.add(r.id)) })
+      })
+
+      const availableBreakfast = ALL_RECIPES.breakfast.filter(r => !usedRecipes.has(r.id))
+      const availableLunch = ALL_RECIPES.lunch.filter(r => !usedRecipes.has(r.id))
+      const availableDinner = ALL_RECIPES.dinner.filter(r => !usedRecipes.has(r.id))
+
+      const n = this.getRecipeCount()
+
+      let breakfast = availableBreakfast.length >= n ? this.shuffle(availableBreakfast, n) : this.shuffle(ALL_RECIPES.breakfast, n)
+      let lunch = availableLunch.length >= n ? this.balanced(availableLunch, n) : this.balanced(ALL_RECIPES.lunch, n)
+      let dinner = availableDinner.length >= n ? this.balanced(availableDinner, n) : this.balanced(ALL_RECIPES.dinner, n)
+
+      if (dayIndex % 2 === 1) { [lunch, dinner] = [dinner, lunch] }
+
+      return { breakfast, lunch, dinner }
+    },
+    generateWeekPlan() {
+      uni.showLoading({ title: '智能生成中...' })
+      setTimeout(() => {
+        const data = {}
+        const allDaysMeals = []
+
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(this.currentMonday)
+          d.setDate(d.getDate() + i)
+          const ds = this.dateToStr(d)
+
+          const meals = this.nutritionBalanced(i, allDaysMeals)
+          data[ds] = meals
+          allDaysMeals.push(meals)
+        }
+
+        this.weeklyData = data
+        uni.setStorageSync('foodfind_weekly', data)
+
+        const app = getApp()
+        if (app?.globalData) app.globalData.weeklyMeals = data
+
+        if (data[this.selectedDateStr]) {
+          const dm = data[this.selectedDateStr]
+          uni.setStorageSync('foodfind_meals', dm)
+          uni.setStorageSync('foodfind_meals_date', this.selectedDateStr)
+          if (app?.globalData) app.globalData.dailyMeals = dm
+        }
+
+        uni.hideLoading()
+        uni.showToast({ title: '本周菜单已生成', icon: 'success' })
+      }, 800)
+    },
+    viewRecipe(r) {
+      uni.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${r.id}` })
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.page { min-height:100vh; background:#f7f8fa; padding:0 20rpx; }
+
+.header {
+  background:#fff; padding:32rpx 24rpx 20rpx;
+  border-radius:0 0 24rpx 24rpx;
+  margin-bottom:16rpx;
+  display:flex; flex-direction:column; gap:6rpx;
+}
+.header-title { font-size:38rpx; font-weight:700; color:#1a1a1a; }
+.header-sub { font-size:23rpx; color:#999; }
+
+.spark-banner {
+  display:flex; align-items:center; gap:16rpx;
+  background:linear-gradient(135deg,#fff5e6,#ffe8cc);
+  padding:20rpx 24rpx; border-radius:18rpx;
+  margin:0 0 16rpx; border:2rpx solid #ffd699;
+}
+.spark-icon-wrap {
+  width:64rpx; height:64rpx; background:linear-gradient(135deg,#ff9500,#ff6b00);
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+}
+.spark-emoji { font-size:32rpx; }
+.spark-info { flex:1; display:flex; flex-direction:column; gap:4rpx; }
+.spark-main { font-size:28rpx; font-weight:700; color:#cc5500; }
+.spark-sub { font-size:22rpx; color:#ee8833; }
+.spark-badge {
+  width:56rpx; height:56rpx; background:linear-gradient(135deg,#7c4dff,#5b30c4);
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+.badge-txt { font-size:28rpx; }
+
+.calendar-wrap {
+  background:#fff; border-radius:20rpx;
+  padding:24rpx 16rpx 20rpx;
+  box-shadow:0 2rpx 14rpx rgba(0,0,0,.04);
+  margin-bottom:16rpx;
+}
+
+.cal-nav {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:20rpx;
+}
+.nav-btn {
+  display:flex; align-items:center; gap:8rpx;
+  padding:10rpx 18rpx;
+  border-radius:12rpx;
+  transition:background .2s;
+  &:active { background:#f5f5f5; }
+}
+.nav-arrow { font-size:22rpx; color:#666; }
+.nav-txt { font-size:24rpx; color:#666; }
+.cal-month { font-size:30rpx; font-weight:700; color:#1a1a1a; }
+
+.week-row {
+  display:flex; justify-content:space-between;
+}
+
+.day-cell {
+  width:90rpx; display:flex; flex-direction:column; align-items:center;
+  padding:14rpx 0 10rpx; border-radius:16rpx;
+  transition:all .25s ease;
+  position:relative;
+  &:active { transform:scale(.95); }
+  &.active { background:#e8f7ef; }
+  &.has-spark { background:linear-gradient(135deg,#fff8f0,#ffedd5); }
+  &.is-today {
+    .day-num {
+      color:#07c160; font-weight:800;
+      text-decoration: underline;
+      text-decoration-color: rgba(7,193,96,.4);
+      text-underline-offset: 6rpx;
+    }
+  }
+}
+.day-week { font-size:21rpx; color:#999; margin-bottom:6rpx; }
+.day-num {
+  font-size:32rpx; font-weight:700; color:#333;
+  line-height:1.2;
+}
+.active.is-today .day-num {
+  color:#07c160;
+  background: linear-gradient(135deg,#e8f7ef,#d4f5e3);
+  width:48rpx; height:48rpx; line-height:48rpx;
+  text-align:center; border-radius:14rpx;
+  text-decoration:none;
+}
+
+.dot-row { display:flex; gap:6rpx; margin-top:8rpx; }
+.nutri-dot { width:10rpx; height:10rpx; border-radius:50%; }
+.b-dot { background:#ffc107; }
+.l-dot { background:#ff6b81; }
+.d-dot { background:#7c4dff; }
+
+.spark-icon {
+  position:absolute; bottom:4rpx;
+  display:flex; align-items:center; justify-content:center;
+  animation: shimmer 1.5s ease-in-out infinite;
+  &.double { bottom:2rpx; }
+}
+.si-txt { font-size:16rpx; }
+
+.action-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16rpx 8rpx; margin-bottom:12rpx;
+}
+.gen-btn {
+  display:flex; align-items:center; gap:10rpx;
+  padding:18rpx 36rpx;
+  background:linear-gradient(135deg,#07c160,#06ad56);
+  border-radius:48rpx;
+  transition:all .25s ease;
+  &:active { opacity:.85; transform:scale(.97); }
+}
+.gen-icon { font-size:28rpx; color:#fff; }
+.gen-text { font-size:27rpx; font-weight:600; color:#fff; }
+.gen-hint { font-size:23rpx; color:#07c160; font-weight:500; }
+
+.meal-scroll { }
+
+.day-meals { }
+.day-label {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:24rpx 8rpx 18rpx;
+}
+.dl-date { font-size:30rpx; font-weight:700; color:#1a1a1a; }
+.dl-cal { font-size:26rpx; color:#07c160; font-weight:700; }
+
+.meal-section {
+  background:#fff; border-radius:20rpx;
+  box-shadow:0 2rpx 14rpx rgba(0,0,0,.04);
+  margin-bottom:22rpx; overflow:hidden;
+}
+
+.meal-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:22rpx 24rpx 14rpx;
+}
+.mh-left { display:flex; align-items:center; gap:12rpx; }
+.mh-icon { font-size:32rpx; }
+.mh-title { font-size:28rpx; font-weight:700; color:#1a1a1a; }
+.mh-cal { font-size:24rpx; color:#07c160; font-weight:600; }
+
+.food-row {
+  display:flex; flex-wrap:wrap;
+  padding:0 12rpx 20rpx; gap:10rpx;
+}
+
+.food-card {
+  width:calc(20% - 8rpx); min-width:0;
+  background:#fafafa; border-radius:16rpx;
+  padding:16rpx 6rpx; display:flex; flex-direction:column; align-items:center;
+  box-sizing:border-box;
+  transition: all .25s ease;
+  &:active { background:#f0f0f0; transform:scale(.92); }
+}
+.fc-icon-wrap {
+  width:68rpx; height:68rpx; background:#fff; border-radius:18rpx;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:10rpx; box-shadow:0 2rpx 8rpx rgba(0,0,0,.04);
+  transition: transform .25s ease;
+}
+.food-card:active .fc-icon-wrap { transform: scale(0.9); }
+.fc-icon { font-size:36rpx; }
+.fc-name {
+  font-size:21rpx; font-weight:500; color:#333;
+  text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  max-width:100%; line-height:1.3;
+}
+.fc-kcal { font-size:18rpx; color:#07c160; font-weight:600; margin-top:6rpx; }
+
+.empty-state {
+  display:flex; flex-direction:column; align-items:center;
+  padding:120rpx 40rpx;
+}
+.empty-icon { font-size:80rpx; margin-bottom:24rpx; }
+.empty-title { font-size:30rpx; font-weight:600; color:#333; margin-bottom:12rpx; }
+.empty-hint { font-size:25rpx; color:#999; text-align:center; }
+
+.bottom-spacer { height:60rpx; }
+</style>

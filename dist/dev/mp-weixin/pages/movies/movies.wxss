@@ -1,0 +1,126 @@
+.page.data-v-7999d0fe {
+  min-height: 100vh;
+  background: #f7f8fa;
+}
+.tabs-bar.data-v-7999d0fe {
+  background: #fff;
+  padding: 20rpx 0;
+}
+.tab-scroll.data-v-7999d0fe {
+  white-space: nowrap;
+  padding: 0 24rpx;
+}
+.tab-item.data-v-7999d0fe {
+  display: inline-block;
+  padding: 14rpx 28rpx;
+  font-size: 27rpx;
+  color: #666;
+  border-radius: 28rpx;
+  margin-right: 12rpx;
+}
+.tab-item.active.data-v-7999d0fe {
+  background: #07c160;
+  color: #fff;
+  font-weight: 600;
+}
+.movie-scroll.data-v-7999d0fe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.movie-list.data-v-7999d0fe {
+  padding: 24rpx 28rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+.movie-card.data-v-7999d0fe {
+  display: flex;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.movie-card.data-v-7999d0fe:active {
+  transform: scale(0.98);
+}
+.movie-poster.data-v-7999d0fe {
+  width: 180rpx;
+  height: 240rpx;
+  background: linear-gradient(145deg, #f8f8f8, #eee);
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+  position: relative;
+  flex-shrink: 0;
+}
+.movie-emoji.data-v-7999d0fe {
+  font-size: 72rpx;
+}
+.movie-rating-badge.data-v-7999d0fe {
+  position: absolute;
+  top: 10rpx;
+  right: 10rpx;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8rpx);
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+.rating-star.data-v-7999d0fe {
+  color: #FFB800;
+  font-size: 22rpx;
+}
+.rating-num.data-v-7999d0fe {
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 700;
+}
+.movie-info.data-v-7999d0fe {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14rpx;
+}
+.movie-title.data-v-7999d0fe {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+  display: block;
+}
+.movie-tags.data-v-7999d0fe {
+  display: flex;
+  gap: 10rpx;
+}
+.tag.data-v-7999d0fe {
+  font-size: 22rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 10rpx;
+}
+.tag.genre-tag.data-v-7999d0fe {
+  background: #e8f7ef;
+  color: #07c160;
+}
+.tag.year-tag.data-v-7999d0fe {
+  background: #f0f0f0;
+  color: #888;
+}
+.movie-platform-row.data-v-7999d0fe {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.platform-icon.data-v-7999d0fe {
+  font-size: 22rpx;
+  color: #07c160;
+}
+.platform-name.data-v-7999d0fe {
+  font-size: 24rpx;
+  color: #999;
+}
+.bottom-spacer.data-v-7999d0fe {
+  height: 60rpx;
+}
