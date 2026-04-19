@@ -118,47 +118,53 @@
         </view>
       </view>
 
-      <view class="gesture-guide-mask" :class="{ show: showGestureGuide }">
-        <view class="gm-backdrop" @click="closeGestureGuide"></view>
+      <view class="gesture-guide-mask" :class="{ show: showGestureGuide }" @click="closeGestureGuide">
         <view class="gesture-modal" @click.stop>
-          <view class="gm-badge">👆 新手引导</view>
-          <view class="gm-step-indicator">
-            <view class="gm-dot" :class="{ active: ggStage === 0 }"></view>
-            <view class="gm-dot" :class="{ active: ggStage === 1 }"></view>
-            <view class="gm-dot" :class="{ active: ggStage === 2 }"></view>
+          <view class="gm-header">
+            <text class="gm-header-title">👆 新手引导</text>
+            <view class="gm-close-btn" @click="closeGestureGuide"><text class="gmc-icon">✕</text></view>
           </view>
+          <view class="gm-body">
+            <view class="gm-step-bar">
+              <view class="gm-step" :class="{ active: ggStage >= 0, done: ggStage > 0 }"></view>
+              <view class="gm-step-line"></view>
+              <view class="gm-step" :class="{ active: ggStage >= 1, done: ggStage > 1 }"></view>
+              <view class="gm-step-line"></view>
+              <view class="gm-step" :class="{ active: ggStage >= 2 }"></view>
+            </view>
 
-          <text class="gm-title">{{ ggOverlayTitle }}</text>
-          <text class="gm-subtitle">{{ ggOverlaySub }}</text>
+            <text class="gm-title">{{ ggOverlayTitle }}</text>
+            <text class="gm-subtitle">{{ ggOverlaySub }}</text>
 
-          <view class="gm-card-area">
-            <view class="gg-demo-card" :class="ggDemoCardAnim" @touchstart.stop="ggDemoCardTouchStart" @touchmove.stop="ggDemoCardTouchMove" @touchend.stop="ggDemoCardTouchEnd" @click.stop="ggDemoCardTap">
-              <view class="ggdc-swipe-hint" :class="ggHintClass">
-                <text class="ggsh-icon">{{ ggHintIcon }}</text>
-                <text class="ggsh-text">{{ ggHintText }}</text>
-              </view>
-              <view class="ggdc-inner">
-                <view class="ggdc-icon-wrap"><text class="ggdc-icon">{{ ggDemoFood?.image || '🍽️' }}</text></view>
-                <text class="ggdc-name">{{ ggDemoFood?.name || '示例菜品' }}</text>
-              </view>
-              <view class="ggdc-sparkle-layer" v-if="ggShowSparkle">
-                <text class="ggdc-sparkle gs1">✦</text>
-                <text class="ggdc-sparkle gs2">★</text>
-                <text class="ggdc-sparkle gs3">✧</text>
-                <text class="ggdc-sparkle gs4">✦</text>
-                <text class="ggdc-sparkle gs5">★</text>
-                <text class="ggdc-sparkle gs6">✧</text>
+            <view class="gm-demo-area">
+              <view class="gg-demo-card" :class="ggDemoCardAnim" @touchstart.stop="ggDemoCardTouchStart" @touchmove.stop="ggDemoCardTouchMove" @touchend.stop="ggDemoCardTouchEnd" @click.stop="ggDemoCardTap">
+                <view class="ggdc-swipe-hint" :class="ggHintClass">
+                  <text class="ggsh-icon">{{ ggHintIcon }}</text>
+                  <text class="ggsh-text">{{ ggHintText }}</text>
+                </view>
+                <view class="ggdc-inner">
+                  <view class="ggdc-icon-wrap"><text class="ggdc-icon">{{ ggDemoFood?.image || '🍽️' }}</text></view>
+                  <text class="ggdc-name">{{ ggDemoFood?.name || '示例菜品' }}</text>
+                </view>
+                <view class="ggdc-sparkle-layer" v-if="ggShowSparkle">
+                  <text class="ggdc-sparkle gs1">✦</text>
+                  <text class="ggdc-sparkle gs2">★</text>
+                  <text class="ggdc-sparkle gs3">✧</text>
+                  <text class="ggdc-sparkle gs4">✦</text>
+                  <text class="ggdc-sparkle gs5">★</text>
+                  <text class="ggdc-sparkle gs6">✧</text>
+                </view>
               </view>
             </view>
-          </view>
 
-          <view class="gm-actions">
-            <view class="gm-act-btn" @click="ggAct" :class="{ 'gm-act-btn-disabled': ggLocked }">
-              <text class="gma-icon">{{ ggActIcon }}</text>
-              <text class="gma-text">{{ ggActText }}</text>
-            </view>
-            <view class="gm-skip-btn" @click="closeGestureGuide">
-              <text class="gms-text">跳过引导</text>
+            <view class="gm-footer">
+              <view class="gm-act-btn" @click="ggAct" :class="{ 'gm-act-btn-disabled': ggLocked }">
+                <text class="gma-icon">{{ ggActIcon }}</text>
+                <text class="gma-text">{{ ggActText }}</text>
+              </view>
+              <view class="gm-skip-link" @click="closeGestureGuide">
+                <text class="gmsl-text">跳过引导</text>
+              </view>
             </view>
           </view>
         </view>
@@ -1079,48 +1085,48 @@ export default {
 
 .gesture-guide-mask {
   position:fixed; top:0; left:0; right:0; bottom:0;
-  z-index:1000; display:flex; align-items:center; justify-content:center;
-  pointer-events:none;
-}
-.gesture-guide-mask.show { pointer-events:auto; }
-.gm-backdrop {
-  position:absolute; top:0; left:0; right:0; bottom:0;
-  background:rgba(0,0,0,.7); opacity:0; transition:opacity .5s ease;
-  .gesture-guide-mask.show & { opacity:1; }
+  background:rgba(0,0,0,0); z-index:1000;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events:none; transition:background .5s ease;
+  &.show { background:rgba(0,0,0,.72); pointer-events:auto; }
 }
 .gesture-modal {
-  position:relative; width:620rpx; background:#fff; border-radius:36rpx;
-  overflow:hidden; transform:scale(.7) translateY(60rpx);
+  width:620rpx; background:#fff; border-radius:28rpx;
+  overflow:hidden; transform:translateY(80rpx) scale(.88);
   opacity:0; transition:all .5s cubic-bezier(.175,.885,.32,1.275);
   box-shadow:0 24rpx 80rpx rgba(0,0,0,.3);
-  .gesture-guide-mask.show & { transform:scale(1) translateY(0); opacity:1; }
+  .gesture-guide-mask.show & { transform:translateY(0) scale(1); opacity:1; }
 }
-.gm-badge {
-  display:flex; align-items:center; justify-content:center; gap:8rpx;
-  padding:22rpx 0; background:linear-gradient(135deg,#07c160,#059a4b);
-  font-size:26rpx; color:#fff; font-weight:700; letter-spacing:4rpx;
+.gm-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:28rpx 32rpx; background:linear-gradient(135deg,#07c160,#059a4b);
 }
-.gm-step-indicator {
-  display:flex; gap:14rpx; margin:32rpx auto 0; justify-content:center;
+.gm-header-title { font-size:30rpx; color:#fff; font-weight:700; letter-spacing:2rpx; }
+.gm-close-btn { width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center; }
+.gmc-icon { font-size:28rpx; color:rgba(255,255,255,.8); }
+.gm-body { padding:0 0 36rpx; }
+.gm-step-bar {
+  display:flex; align-items:center; justify-content:center;
+  padding:32rpx 48rpx 0; gap:0;
 }
-.gm-dot {
-  width:14rpx; height:14rpx; border-radius:50%;
-  background:#ddd; transition:all .3s ease;
-  &.active { background:#07c160; width:36rpx; border-radius:7rpx; }
+.gm-step {
+  width:44rpx; height:8rpx; border-radius:4rpx;
+  background:#e0e0e0; transition:all .3s ease;
+  &.active { background:#07c160; }
+  &.done { background:#07c160; opacity:.5; }
 }
+.gm-step-line { width:32rpx; height:4rpx; background:#e8e8e8; margin:0 8rpx; border-radius:2rpx; }
 .gm-title {
-  font-size:36rpx; font-weight:800; color:#1a1a1a;
-  margin:20rpx 0 6rpx; text-align:center;
+  display:block; font-size:34rpx; font-weight:800; color:#1a1a1a;
+  text-align:center; margin:20rpx 0 6rpx;
 }
 .gm-subtitle {
-  font-size:24rpx; color:#aaa; text-align:center;
-  margin-bottom:28rpx; padding:0 32rpx;
+  display:block; font-size:24rpx; color:#aaa; text-align:center;
+  margin-bottom:24rpx; padding:0 32rpx;
 }
-.gm-card-area {
-  width:calc(100% - 64rpx); margin:0 32rpx;
-  padding:48rpx 0; background:#f7f8fa; border-radius:28rpx;
+.gm-demo-area {
   display:flex; align-items:center; justify-content:center;
-  margin-bottom:28rpx;
+  padding:24rpx 0 32rpx;
 }
 
 .gg-demo-card {
@@ -1172,7 +1178,10 @@ export default {
   &.gs6 { left:10%; top:50%; animation-delay:.2s; font-size:30rpx; }
 }
 
-.gm-actions { width:100%; display:flex; flex-direction:column; align-items:center; gap:16rpx; }
+.gm-footer {
+  display:flex; flex-direction:column; align-items:center; gap:16rpx;
+  padding:0 32rpx;
+}
 .gm-act-btn {
   width:100%; display:flex; align-items:center; justify-content:center; gap:10rpx;
   padding:22rpx 0; background:linear-gradient(135deg,#07c160,#059a4b);
@@ -1182,8 +1191,8 @@ export default {
 }
 .gma-icon { font-size:26rpx; color:#fff; }
 .gma-text { font-size:26rpx; color:#fff; font-weight:600; }
-.gm-skip-btn { padding:16rpx; }
-.gms-text { font-size:24rpx; color:#bbb; }
+.gm-skip-link { padding:12rpx; }
+.gmsl-text { font-size:24rpx; color:#bbb; }
 
 @keyframes ggFlipOut {
   0% { transform:rotateX(0) scale(1); opacity:1; }
