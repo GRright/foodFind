@@ -119,6 +119,7 @@
       </view>
 
       <view class="gesture-guide-mask" :class="{ show: showGestureGuide }">
+        <view class="gm-backdrop" @click="closeGestureGuide"></view>
         <view class="gesture-modal" @click.stop>
           <view class="gm-badge">👆 新手引导</view>
           <view class="gm-step-indicator">
@@ -1078,41 +1079,46 @@ export default {
 
 .gesture-guide-mask {
   position:fixed; top:0; left:0; right:0; bottom:0;
-  background:rgba(0,0,0,0); z-index:1000;
-  display:flex; align-items:center; justify-content:center;
-  pointer-events:none; transition:background .5s ease;
-  &.show { background:rgba(0,0,0,.85); pointer-events:auto; }
+  z-index:1000; display:flex; align-items:center; justify-content:center;
+  pointer-events:none;
+}
+.gesture-guide-mask.show { pointer-events:auto; }
+.gm-backdrop {
+  position:absolute; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,.7); opacity:0; transition:opacity .5s ease;
+  .gesture-guide-mask.show & { opacity:1; }
 }
 .gesture-modal {
-  width:600rpx; background:#fff; border-radius:40rpx;
-  padding:0; position:relative; overflow:hidden;
-  box-shadow:0 20rpx 80rpx rgba(0,0,0,.25);
-  transform:scale(.75) translateY(60rpx); opacity:0;
-  transition:all .5s cubic-bezier(.175,.885,.32,1.275);
+  position:relative; width:620rpx; background:#fff; border-radius:36rpx;
+  overflow:hidden; transform:scale(.7) translateY(60rpx);
+  opacity:0; transition:all .5s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 24rpx 80rpx rgba(0,0,0,.3);
   .gesture-guide-mask.show & { transform:scale(1) translateY(0); opacity:1; }
 }
 .gm-badge {
   display:flex; align-items:center; justify-content:center; gap:8rpx;
-  padding:20rpx; background:linear-gradient(135deg,#07c160,#059a4b);
-  font-size:24rpx; color:#fff; font-weight:600; letter-spacing:2rpx;
+  padding:22rpx 0; background:linear-gradient(135deg,#07c160,#059a4b);
+  font-size:26rpx; color:#fff; font-weight:700; letter-spacing:4rpx;
 }
-.gm-step-indicator { display:flex; gap:12rpx; margin:28rpx auto 0; justify-content:center; }
+.gm-step-indicator {
+  display:flex; gap:14rpx; margin:32rpx auto 0; justify-content:center;
+}
 .gm-dot {
   width:14rpx; height:14rpx; border-radius:50%;
-  background:#e0e0e0; transition:all .3s ease;
+  background:#ddd; transition:all .3s ease;
   &.active { background:#07c160; width:36rpx; border-radius:7rpx; }
 }
 .gm-title {
   font-size:36rpx; font-weight:800; color:#1a1a1a;
-  margin:20rpx 32rpx 8rpx; text-align:center;
+  margin:20rpx 0 6rpx; text-align:center;
 }
 .gm-subtitle {
   font-size:24rpx; color:#aaa; text-align:center;
-  margin-bottom:28rpx;
+  margin-bottom:28rpx; padding:0 32rpx;
 }
 .gm-card-area {
-  width:calc(100% - 64rpx); margin:0 32rpx; padding:40rpx 0;
-  background:linear-gradient(135deg,#f7f8fa,#f0f1f3); border-radius:28rpx;
+  width:calc(100% - 64rpx); margin:0 32rpx;
+  padding:48rpx 0; background:#f7f8fa; border-radius:28rpx;
   display:flex; align-items:center; justify-content:center;
   margin-bottom:28rpx;
 }
