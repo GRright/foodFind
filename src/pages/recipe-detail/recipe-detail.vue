@@ -10,6 +10,15 @@
           <text class="hero-tag">{{ recipe.cooking_time || 15 }}分钟</text>
         </view>
       </view>
+
+      <view
+        class="like-btn"
+        :class="{ liked: isFavorited }"
+        @click="toggleFavorite"
+      >
+        <text class="lb-icon">{{ isFavorited ? '♥' : '♡' }}</text>
+        <text class="lb-text">{{ isFavorited ? '已收藏' : '收藏' }}</text>
+      </view>
     </view>
 
     <scroll-view scroll-y class="detail-scroll" :style="{ height: detailHeight }">
@@ -125,13 +134,15 @@ export default {
       detailHeight: 'calc(100vh - 360rpx)',
       selectedRating: 0,
       feedbackText: '',
-      showRatingPanel: false
+      showRatingPanel: false,
+      isFavorited: false
     }
   },
   onLoad(options) {
     if (options && options.id) {
       this.recipeId = parseInt(options.id)
       this.loadRecipe(this.recipeId)
+      this.checkFavorite()
     }
   },
   methods: {
@@ -139,6 +150,32 @@ export default {
       const allRecipes = [...ALL_RECIPES.breakfast, ...ALL_RECIPES.lunch, ...ALL_RECIPES.dinner]
       const found = allRecipes.find(r => r.id === id)
       if (found) { this.recipe = found }
+    },
+    checkFavorite() {
+      const favorites = uni.getStorageSync('foodfind_favorites') || []
+      this.isFavorited = favorites.some(f => f.id === this.recipeId)
+    },
+    toggleFavorite() {
+      let favorites = uni.getStorageSync('foodfind_favorites') || []
+      if (this.isFavorited) {
+        favorites = favorites.filter(f => f.id !== this.recipeId)
+        uni.setStorageSync('foodfind_favorites', favorites)
+        this.isFavorited = false
+        uni.showToast({ title: '已取消收藏', icon: 'none' })
+      } else {
+        favorites.unshift({
+          id: this.recipe.id,
+          name: this.recipe.name,
+          image: this.recipe.image,
+          cuisine_type: this.recipe.cuisine_type,
+          type: this.recipe.type,
+          nutrition: this.recipe.nutrition,
+          favoritedAt: new Date().toISOString()
+        })
+        uni.setStorageSync('foodfind_favorites', favorites)
+        this.isFavorited = true
+        uni.showToast({ title: '已加入收藏 ✓', icon: 'success' })
+      }
     },
     selectStar(s) {
       this.selectedRating = s
@@ -156,9 +193,21 @@ export default {
 .page { min-height: 100vh; background: #f7f8fa; }
 
 .recipe-hero {
-  height: 380rpx; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  height: 380rpx; background: linear-gradient(135deg, #07c160 0%, #06ad56 50%, #059a4b 100%);
   display: flex; align-items: center; justify-content: center; position: relative;
 }
+.like-btn {
+  position:absolute; top:calc(env(safe-area-inset-top) + 20rpx); right:24rpx;
+  display:flex; align-items:center; gap:6rpx;
+  padding:12rpx 22rpx; background:rgba(255,255,255,.25);
+  border-radius:40rpx; backdrop-filter:blur(10px);
+  transition:all .3s ease;
+  &:active { transform:scale(.92); }
+  &.liked { background:rgba(255,255,255,.4); }
+}
+.lb-icon { font-size:28rpx; color:#fff; }
+.liked .lb-icon { color:#fff; animation: heartBeat .4s ease; }
+.lb-text { font-size:23rpx; color:#fff; font-weight:600; }
 .hero-emoji { font-size: 140rpx; filter: drop-shadow(0 8rpx 20rpx rgba(0,0,0,0.2)); }
 .hero-overlay {
   position: absolute; bottom: 0; left: 0; right: 0;
@@ -253,7 +302,7 @@ export default {
 .stars-row { display: flex; justify-content: center; gap: 20rpx; margin-bottom: 28rpx; }
 .star {
   font-size: 56rpx; color: #ddd; transition: all .15s ease;
-  &.active { color: #FFB800; transform: scale(1.15); }
+  &.active { color: #07c160; transform: scale(1.15); }
   &:active { transform: scale(1.3); }
 }
 .feedback-input {
@@ -278,5 +327,11 @@ export default {
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.88); }
   to { opacity: 1; transform: scale(1); }
+}
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.35); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); }
 }
 </style>

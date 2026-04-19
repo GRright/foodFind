@@ -81,6 +81,15 @@
             </view>
           </template>
 
+          <view class="menu-item" @click="openFavorites">
+            <view class="menu-icon-wrap orange"><text class="menu-emoji">♥</text></view>
+            <view class="mi-center">
+              <text class="menu-label">我的收藏</text>
+              <text class="menu-desc">{{ favorites.length > 0 ? `已收藏 ${favorites.length} 道菜` : '收藏喜欢的菜品' }}</text>
+            </view>
+            <text class="menu-arrow">›</text>
+          </view>
+
           <view class="menu-item" @click="goToShare">
             <view class="menu-icon-wrap red"><text class="menu-emoji">✉</text></view>
             <view class="mi-center">
@@ -96,7 +105,6 @@
         <text class="group-title">我的</text>
         <view class="menu-list">
           <view class="menu-item" @click="openPrefModal">
-            <view class="menu-icon-wrap blue"><text class="menu-emoji">⚙</text></view>
             <view class="mi-center">
               <text class="menu-label">偏好设置</text>
               <text class="menu-desc">{{ prefSummaryText }}</text>
@@ -105,7 +113,6 @@
           </view>
 
           <view class="menu-item" @click="clearCache">
-            <view class="menu-icon-wrap gray"><text class="menu-emoji">✕</text></view>
             <view class="mi-center">
               <text class="menu-label">清除缓存</text>
               <text class="menu-desc">重新生成菜单数据</text>
@@ -114,8 +121,10 @@
           </view>
 
           <view class="menu-item" @click="showAbout">
-            <view class="menu-icon-wrap purple"><text class="menu-emoji">ⓘ</text></view>
-            <text class="menu-label">关于我们</text>
+            <view class="mi-center">
+              <text class="menu-label">关于我们</text>
+              <text class="menu-desc">关于吃点啥</text>
+            </view>
             <text class="menu-arrow">›</text>
           </view>
         </view>
@@ -195,7 +204,7 @@
     </view>
 
     <view class="version-info">
-      <text class="version-text">吃点啥 v1.5.2 · 完整体验版</text>
+      <text class="version-text">吃点啥 v1.6 · 完整体验版</text>
     </view>
 
     <view class="report-modal-mask" :class="{ show: showReportModal }" @click="closeReport"></view>
@@ -280,6 +289,46 @@
         </view>
       </scroll-view>
     </view>
+
+    <view class="fav-modal-mask" :class="{ show: showFavoritesModal }" @click="closeFavorites"></view>
+    <view class="fav-modal" :class="{ show: showFavoritesModal }">
+      <view class="fm-header">
+        <text class="fm-title">♥ 我的收藏</text>
+        <view class="fm-close" @click="closeFavorites"><text class="pm-close-txt">✕</text></view>
+      </view>
+
+      <scroll-view scroll-y class="fm-body">
+        <view v-if="favorites.length === 0" class="fav-empty">
+          <text class="fe-icon">💚</text>
+          <text class="fe-text">还没有收藏菜品</text>
+          <text class="fe-hint">点击菜品的收藏按钮，把喜欢的存起来~</text>
+        </view>
+
+        <view
+          class="fav-item"
+          v-for="(item, idx) in favorites"
+          :key="item.id"
+          @click="goToFavoriteDetail(item)"
+          style="animation: slideUp .35s ease forwards; animation-delay: calc(idx * 0.05s); opacity: 0;"
+        >
+          <view class="fi-left">
+            <text class="fi-emoji">{{ item.image || '🍽️' }}</text>
+          </view>
+          <view class="fi-center">
+            <text class="fi-name">{{ item.name }}</text>
+            <view class="fi-meta-row">
+              <text class="fi-tag">{{ item.cuisine_type }}</text>
+              <text class="fi-cal">{{ item.nutrition?.calories || 0 }}kcal</text>
+            </view>
+          </view>
+          <view class="fi-right">
+            <view class="fi-del-btn" @click.stop="removeFavorite(item.id)">
+              <text class="fdb-icon">✕</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
   </view>
 </template>
 
@@ -302,6 +351,8 @@ export default {
       myWeeklyMeals: [],
       partnerWeeklyMeals: [],
       pageEnter: true,
+      showFavoritesModal: false,
+      favorites: [],
       prefs: {
         noCookMode: false,
         userType: 'adult',
@@ -426,6 +477,7 @@ export default {
     this.loadPairInfo()
     this.loadPrefs()
     this.loadMyWeeklyMeals()
+    this.loadFavorites()
     if (this.hasPartner && this.pairStatus === 'paired') {
       this.loadPairStats()
     }
@@ -437,6 +489,7 @@ export default {
     },
     loadMyWeeklyMeals() {
       const meals = []
+      const allRecipes = [...ALL_RECIPES.breakfast, ...ALL_RECIPES.lunch, ...ALL_RECIPES.dinner]
       for (let i = 6; i >= 0; i--) {
         const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0]
         const daily = uni.getStorageSync('foodfind_meals_date')
@@ -446,7 +499,7 @@ export default {
             ;['breakfast', 'lunch', 'dinner'].forEach(mealType => {
               if (cached[mealType]) {
                 cached[mealType].forEach(food => {
-                  const recipe = ALL_RECIPES.find(r => r.id === food.id)
+                  const recipe = allRecipes.find(r => r.id === food.id)
                   if (recipe) meals.push({ ...recipe, mealType, date: d })
                 })
               }
@@ -649,8 +702,28 @@ export default {
     },
     showAbout() {
       uni.showModal({
-        title: '关于吃点啥 v1.5', content: '为情侣/家人打造的共同决策吃什么的小工具\n\n✅ 智能一周菜单规划\n✅ 荤素营养均衡算法\n✅ 云端配对，跨设备同步\n✅ 分享菜单+双向确认\n✅ 互动打卡+火花系统\n✅ 本周饮食报告\n\n每次交互约4次云函数调用', showCancel: false, confirmText: '知道了'
+        title: '关于吃点啥 v1.5', content: '为情侣/家人打造的共同决策吃什么的小工具\n\n✅ 智能一周菜单规划\n✅ 荤素营养均衡算法\n✅ 云端配对，跨设备同步\n✅ 分享菜单+双向确认\n✅ 互动打卡+火花系统\n✅ 本周饮食报告\n✅ 收藏喜欢的菜品\n\n每次交互约4次云函数调用', showCancel: false, confirmText: '知道了'
       })
+    },
+    loadFavorites() {
+      this.favorites = uni.getStorageSync('foodfind_favorites') || []
+    },
+    openFavorites() {
+      this.loadFavorites()
+      this.showFavoritesModal = true
+    },
+    closeFavorites() { this.showFavoritesModal = false },
+    removeFavorite(id) {
+      let list = uni.getStorageSync('foodfind_favorites') || []
+      const target = list.find(f => f.id === id)
+      list = list.filter(f => f.id !== id)
+      uni.setStorageSync('foodfind_favorites', list)
+      this.favorites = list
+      uni.showToast({ title: `已移除「${target?.name || ''}」`, icon: 'none' })
+    },
+    goToFavoriteDetail(item) {
+      this.closeFavorites()
+      uni.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${item.id}` })
     }
   }
 }
@@ -686,6 +759,7 @@ export default {
   transition: all .25s ease;
   &:active { background:#fafafa; transform:scale(.99); }
   margin-bottom:6rpx;
+  &.text-only .menu-label { padding-left:8rpx; }
 }
 .menu-icon-wrap {
   width:72rpx; height:72rpx; border-radius:18rpx;
@@ -722,25 +796,25 @@ export default {
 }
 
 .stats-card {
-  background: linear-gradient(135deg, #fff8f0, #ffedd5);
+  background: linear-gradient(135deg, #f0faf5, #e0f5ec);
   border-radius: 18rpx; padding: 24rpx; margin-bottom: 12rpx;
-  border: 2rpx solid #ffd699;
+  border: 2rpx solid #c8ebe0;
 }
 .stats-row {
   display: flex; align-items: center; justify-content: space-around;
 }
 .stat-item { display: flex; flex-direction: column; align-items: center; gap: 6rpx; }
-.stat-num { font-size: 36rpx; font-weight: 800; color: #cc5500; }
-.stat-label { font-size: 21rpx; color: #ee8833; }
-.stat-divider { width: 2rpx; height: 48rpx; background: #ffd699; border-radius: 1rpx; }
+.stat-num { font-size: 36rpx; font-weight: 800; color: #07c160; }
+.stat-label { font-size: 21rpx; color: #059a4b; }
+.stat-divider { width: 2rpx; height: 48rpx; background: #c8ebe0; border-radius: 1rpx; }
 
 .spark-streak {
   display: flex; align-items: center; justify-content: center;
-  gap: 10rpx; padding: 14rpx; background: linear-gradient(135deg, #f0e6ff, #e8d5ff);
+  gap: 10rpx; padding: 14rpx; background: linear-gradient(135deg, #f0faf5, #e0f5ec);
   border-radius: 12rpx; margin-top: 16rpx;
 }
 .streak-icon { font-size: 28rpx; }
-.streak-text { font-size: 23rpx; font-weight: 600; color: #7c4dff; }
+.streak-text { font-size: 23rpx; font-weight: 600; color: #059a4b; }
 
 .report-card {
   background: linear-gradient(135deg, #e8f7ef, #d4f5e3) !important;
@@ -767,7 +841,8 @@ export default {
 .pref-modal-mask {
   position:fixed; top:0; left:0; right:0; bottom:0;
   background:rgba(0,0,0,0); z-index:999; transition:background .3s ease;
-  &.show { background:rgba(0,0,0,.5); }
+  pointer-events:none;
+  &.show { background:rgba(0,0,0,.5); pointer-events:auto; }
 }
 .pref-modal {
   position:fixed; left:0; right:0; bottom:0;
@@ -842,7 +917,8 @@ export default {
 .report-modal-mask {
   position:fixed; top:0; left:0; right:0; bottom:0;
   background:rgba(0,0,0,0); z-index:999; transition:background .3s ease;
-  &.show { background:rgba(0,0,0,.5); }
+  pointer-events:none;
+  &.show { background:rgba(0,0,0,.5); pointer-events:auto; }
 }
 .report-modal {
   position:fixed; left:0; right:0; bottom:0;
@@ -861,19 +937,19 @@ export default {
 
 .rm-hero {
   position:relative; border-radius:24rpx; overflow:hidden;
-  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  background:linear-gradient(135deg, #07c160 0%, #059a4b 100%);
   padding:48rpx 24rpx; margin-bottom:20rpx;
 }
 .rmh-bg {
   position:absolute; top:-50%; left:-50%; width:200%; height:200%;
-  background:radial-gradient(circle at 30% 40%, rgba(255,255,255,.15) 0%, transparent 50%);
+  background:radial-gradient(circle at 30% 40%, rgba(255,255,255,.2) 0%, transparent 50%);
 }
 .rmh-content {
   position:relative; display:flex; flex-direction:column; align-items:center; gap:8rpx;
 }
 .rmh-emoji { font-size:56rpx; }
-.rmh-main { font-size:72rpx; font-weight:900; color:#fff; text-shadow:0 4rpx 20rpx rgba(0,0,0,.2); }
-.rmh-sub { font-size:26rpx; color:rgba(255,255,255,.85); letter-spacing:2rpx; }
+.rmh-main { font-size:72rpx; font-weight:900; color:#fff; text-shadow:0 4rpx 20rpx rgba(0,0,0,.15); }
+.rmh-sub { font-size:26rpx; color:rgba(255,255,255,.9); letter-spacing:2rpx; }
 
 .rm-section { margin-bottom:20rpx; }
 .rms-title { display:block; font-size:28rpx; font-weight:700; color:#333; margin-bottom:16rpx; }
@@ -889,10 +965,7 @@ export default {
 .rmsc-icon {
   width:56rpx; height:56rpx; border-radius:14rpx;
   display:flex; align-items:center; justify-content:center;
-  &.meat { background:#ffe8e8; }
-  &.veg { background:#e8fce8; }
-  &.cal { background:#fff5e6; }
-  &.pro { background:#e8ecff; }
+  &.meat, &.veg, &.cal, &.pro { background:#e8f7ef; }
 }
 .rmsci-txt { font-size:26rpx; }
 .rmsc-num { font-size:36rpx; font-weight:800; color:#1a1a1a; }
@@ -906,8 +979,8 @@ export default {
   gap:6rpx; padding:14rpx 6rpx; border-radius:14rpx;
   background:#f7f8fa; border:2rpx solid transparent;
   transition:all .25s;
-  &.has-spark { background:#fff8f0; border-color:#ffd699; }
-  &.today { background:#e8f7ef; border-color:#07c160; }
+  &.has-spark { background:#e8f7ef; border-color:#07c160; }
+  &.today { background:#d4f5e3; border-color:#059a4b; }
 }
 .rwd-date { font-size:20rpx; color:#666; font-weight:600; }
 .rwd-spark { font-size:20rpx; }
@@ -923,8 +996,8 @@ export default {
   width:100%; height:20rpx; background:#eee; border-radius:10rpx; overflow:hidden;
 }
 .rmcc-bar { height:100%; border-radius:10rpx; transition:width .5s ease; }
-.self-bar { background:linear-gradient(90deg,#07c160,#059a4b); }
-.partner-bar { background:linear-gradient(90deg,#764ba2,#667eea); }
+.self-bar { background:linear-gradient(90deg,#07c160,#06ad56); }
+.partner-bar { background:linear-gradient(90deg,#059a4b,#04853f); }
 .rmcc-num { font-size:22rpx; color:#666; font-weight:600; }
 
 .rm-tip-card {
@@ -932,6 +1005,57 @@ export default {
   background:linear-gradient(135deg,#f0faf5,#e8f7ef);
   border-radius:16rpx; padding:18rpx; border:2rpx solid #c8ebe0;
 }
-.rm-tip-icon { font-size:28rpx; flex-shrink:0; margin-top:2rpx; }
+.rm-tip-icon { font-size:28rpx; flex-shrink:0; margin-top:2px; }
 .rm-tip-text { font-size:23rpx; color:#059a4b; line-height:1.65; }
+
+.fav-modal-mask {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0); z-index:998; transition:background .3s ease;
+  pointer-events:none;
+  &.show { background:rgba(0,0,0,.5); pointer-events:auto; }
+}
+.fav-modal {
+  position:fixed; left:0; right:0; bottom:0;
+  background:#fff; border-radius:32rpx 32rpx 0 0;
+  z-index:1000; transform:translateY(100%); transition:transform .35s cubic-bezier(.175,.885,.32,1.275);
+  max-height:80vh; display:flex; flex-direction:column;
+  &.show { transform:translateY(0); }
+}
+.fm-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:32rpx 28rpx 20rpx; flex-shrink:0;
+}
+.fm-title { font-size:34rpx; font-weight:700; color:#07c160; }
+.fm-body { flex:1; overflow:hidden; padding:0 8rpx 20rpx; }
+
+.fav-empty {
+  display:flex; flex-direction:column; align-items:center;
+  padding:100rpx 40rpx; gap:16rpx;
+}
+.fe-icon { font-size:72rpx; }
+.fe-text { font-size:30rpx; font-weight:600; color:#666; }
+.fe-hint { font-size:24rpx; color:#bbb; text-align:center; }
+
+.fav-item {
+  display:flex; align-items:center; padding:22rpx 16rpx;
+  background:#fff; border-radius:18rpx; margin-bottom:12rpx;
+  box-shadow:0 2rpx 10rpx rgba(0,0,0,.04);
+  transition:all .25s ease;
+  &:active { background:#fafafa; transform:scale(.98); }
+}
+.fi-left { flex-shrink:0; margin-right:16rpx; }
+.fi-emoji { font-size:52rpx; }
+.fi-center { flex:1; min-width:0; display:flex; flex-direction:column; gap:6rpx; }
+.fi-name { font-size:29rpx; font-weight:600; color:#333; }
+.fi-meta-row { display:flex; align-items:center; gap:12rpx; }
+.fi-tag { font-size:21rpx; color:#07c160; background:#e8f7ef; padding:2rpx 14rpx; border-radius:10rpx; }
+.fi-cal { font-size:21rpx; color:#999; }
+.fi-right { flex-shrink:0; margin-left:12rpx; }
+.fi-del-btn {
+  width:56rpx; height:56rpx; background:#f5f5f5; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s ease;
+  &:active { background:#e8e8e8; transform:scale(.9); }
+}
+.fdb-icon { font-size:24rpx; color:#666; }
 </style>

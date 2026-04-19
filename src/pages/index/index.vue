@@ -57,20 +57,38 @@
           <view class="food-row">
             <view
               class="food-card"
-              :class="{ 'show-actions': activeFoodId === food.id }"
+              :class="getCardClass(food.id)"
+              :style="getCardStyle(food.id)"
               v-for="(food, fi) in section.recipes"
               :key="food.id"
-              @click="onFoodClick(food, $event)"
-              @dblclick="goToDetail(food)"
+              @click="goToDetail(food)"
+              @touchstart="onSwipeStart(food, section.key, $event)"
+              @touchmove.prevent="onSwipeMove($event)"
+              @touchend="onSwipeEnd(food, section.key)"
               style="animation: popIn .4s cubic-bezier(.175,.885,.32,1.275) forwards; animation-delay: calc(0.15s + si*0.06s + fi*0.05s); opacity: 0;"
             >
-              <view class="fc-icon-wrap"><text class="fc-icon">{{ food.image || '🍽️' }}</text></view>
-              <text class="fc-name">{{ food.name }}</text>
+              <view class="fc-inner" :class="{ 'flip-out': flippingCardId === food.id, 'flip-in': newCardId === food.id }">
+                <view class="fc-icon-wrap"><text class="fc-icon">{{ food.image || '🍽️' }}</text></view>
+                <text class="fc-name">{{ food.name }}</text>
+              </view>
 
-              <view class="action-bubble" v-if="activeFoodId === food.id" @click.stop>
-                <view class="ab-item like-btn" @click="likeFood(food)"><text class="abi-icon">♥</text><text class="abi-text">喜欢</text></view>
-                <view class="ab-item del-btn" @click="deleteFood(food, section.key)"><text class="abi-icon">✕</text><text class="abi-text">删除</text></view>
-                <view class="ab-item swap-btn" @click="swapOneFood(food, section.key)"><text class="abi-icon">↻</text><text class="abi-text">换一个</text></view>
+              <view class="swap-hint" v-if="swipeCardId === food.id && swipeOffset > 50">
+                <text class="sh-icon">✨</text>
+                <text class="sh-text">换一道</text>
+              </view>
+
+              <view class="delete-hint" v-if="swipeCardId === food.id && swipeOffset < -50">
+                <text class="dh-icon">✕</text>
+                <text class="dh-text">删除</text>
+              </view>
+
+              <view class="sparkle-layer" v-if="showSparkle && sparkleCardId === food.id">
+                <text class="sparkle s1">✦</text>
+                <text class="sparkle s2">★</text>
+                <text class="sparkle s3">✧</text>
+                <text class="sparkle s4">✦</text>
+                <text class="sparkle s5">★</text>
+                <text class="sparkle s6">✧</text>
               </view>
             </view>
           </view>
@@ -82,14 +100,23 @@
             <text class="ab-text">重新生成今日菜单</text>
           </view>
           <view class="action-hint">
-            <text class="ah-text">单击菜品操作 · 双击查看详情</text>
+            <text class="ah-text">点击查看详情 · 上滑换菜 · 下滑删除</text>
           </view>
         </view>
 
         <view class="bottom-spacer"></view>
       </scroll-view>
 
-      <view class="tap-mask" v-if="activeFoodId" @click="closeActions"></view>
+      <view class="delete-modal-mask" :class="{ show: showDeleteModal }" @click="showDeleteModal = false"></view>
+      <view class="delete-modal" :class="{ show: showDeleteModal }">
+        <text class="dm-title">确定删除这道菜？</text>
+        <text class="dm-food-name">{{ deleteTargetFood?.name }}</text>
+        <text class="dm-desc">删除后将从今日菜单中移除，可稍后重新生成</text>
+        <view class="dm-btns">
+          <view class="dm-btn cancel" @click="showDeleteModal = false"><text class="dmb-text">取消</text></view>
+          <view class="dm-btn confirm" @click="confirmDelete"><text class="dmb-text">确认删除</text></view>
+        </view>
+      </view>
     </template>
 
     <!-- ===== 不做饭模式（分享模式）===== -->
@@ -166,13 +193,22 @@ export default {
       userCount: 2,
       scrollHeight: 'calc(100vh - 260rpx)',
       isRefreshing: '',
-      activeFoodId: null,
-      lastTapTime: 0,
       noCookMode: false,
       feedList: [],
       feedScrollHeight: 'calc(100vh - 380rpx)',
       pageEnter: true,
-      mealCheckIn: { breakfast: false, lunch: false, dinner: false }
+      mealCheckIn: { breakfast: false, lunch: false, dinner: false },
+      swipeCardId: null,
+      swipeStartY: 0,
+      swipeOffset: 0,
+      swipeMealKey: '',
+      flippingCardId: null,
+      newCardId: null,
+      showSparkle: false,
+      sparkleCardId: null,
+      showDeleteModal: false,
+      deleteTargetFood: null,
+      deleteTargetMealKey: ''
     }
   },
   computed: {
@@ -236,6 +272,28 @@ export default {
     else { this.loadMeals(); this.recordAppOpen(); this.loadTodayCheckIn() }
   },
   methods: {
+    getSwipeOpacity() {
+      if (!this.swipeCardId) return 1
+      const absOffset = Math.abs(this.swipeOffset)
+      if (absOffset < 40) return 1
+      if (absOffset > 120) return 0.3
+      return 1 - (absOffset - 40) / 80 * 0.7
+    },
+    getCardClass(id) {
+      const classes = []
+      if (this.swipeCardId === id) classes.push('swiping')
+      if (this.flippingCardId === id) classes.push('flipping')
+      if (this.newCardId === id) classes.push('new-card')
+      return classes.join(' ')
+    },
+    getCardStyle(id) {
+      if (this.swipeCardId !== id && this.flippingCardId !== id) return ''
+      if (this.flippingCardId === id) return 'animation: none;'
+      let rotateX = 0
+      if (this.swipeOffset > 30) { rotateX = Math.min((this.swipeOffset - 30) / 2, 45) }
+      else if (this.swipeOffset < -30) { rotateX = Math.max((this.swipeOffset + 30) / 2, -25) }
+      return `transform: translateY(${Math.round(this.swipeOffset * 0.5)}rpx) rotateX(${rotateX}deg); opacity:${this.getSwipeOpacity()};`
+    },
     loadMode() {
       const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
       this.noCookMode = !!prefs.noCookMode
@@ -378,36 +436,67 @@ export default {
       } catch(e) { return '' }
     },
 
-    onFoodClick(food, e) {
-      const now = Date.now()
-      if (now - this.lastTapTime < 300) {
-        this.closeActions()
-        this.goToDetail(food)
-        this.lastTapTime = 0
-        return
-      }
-      this.lastTapTime = now
-      if (this.activeFoodId === food.id) { this.closeActions() }
-      else { this.activeFoodId = food.id }
+    onSwipeStart(food, mealKey, e) {
+      this.swipeCardId = food.id
+      this.swipeMealKey = mealKey
+      this.swipeOffset = 0
+      this.swipeStartY = e.touches[0].clientY
     },
-    closeActions() { this.activeFoodId = null },
-    likeFood(food) { uni.showToast({ title: `已标记「${food.name}」为喜欢`, icon: 'none' }); this.closeActions() },
-    deleteFood(food, mealKey) {
-      const meals = this.dailyMeals[mealKey] || []
-      const idx = meals.findIndex(r => r.id === food.id)
+    onSwipeMove(e) {
+      if (!this.swipeCardId) return
+      const currentY = e.touches[0].clientY
+      let delta = this.swipeStartY - currentY
+      if (delta > 160) delta = 160
+      if (delta < -100) delta = -100
+      this.swipeOffset = Math.round(delta)
+    },
+    onSwipeEnd(food, mealKey) {
+      if (!this.swipeCardId) return
+      const offset = this.swipeOffset
+
+      if (offset >= 60) {
+        this.triggerSwapAnimation(food, mealKey)
+      } else if (offset <= -50) {
+        this.deleteTargetFood = food
+        this.deleteTargetMealKey = mealKey
+        this.showDeleteModal = true
+        this.resetSwipe()
+      } else {
+        this.resetSwipe()
+      }
+    },
+    resetSwipe() {
+      this.swipeCardId = null
+      this.swipeOffset = 0
+      this.swipeMealKey = ''
+    },
+    triggerSwapAnimation(food, mealKey) {
+      this.flippingCardId = food.id
+      this.sparkleCardId = food.id
+      this.showSparkle = true
+      setTimeout(() => { this.showSparkle = false }, 600)
+      setTimeout(() => {
+        this.swapOneFood(food, mealKey)
+        this.newCardId = food.id
+        this.flippingCardId = null
+        setTimeout(() => { this.newCardId = null; this.resetSwipe() }, 450)
+      }, 350)
+    },
+    confirmDelete() {
+      if (!this.deleteTargetFood || !this.deleteTargetMealKey) return
+      const meals = this.dailyMeals[this.deleteTargetMealKey] || []
+      const idx = meals.findIndex(r => r.id === this.deleteTargetFood.id)
       if (idx > -1) {
         meals.splice(idx, 1)
-        const pool = ALL_RECIPES[mealKey] || []
-        const currentIds = new Set(meals.map(r => r.id))
-        const available = pool.filter(r => !currentIds.has(r.id))
-        if (available.length > 0) { meals.push(available[Math.floor(Math.random() * available.length)]) }
         uni.setStorageSync('foodfind_meals', this.dailyMeals)
         const wc = uni.getStorageSync('foodfind_weekly') || {}
         wc[this.getTodayStr()] = this.dailyMeals
         uni.setStorageSync('foodfind_weekly', wc)
       }
-      this.closeActions()
-      uni.showToast({ title: `已替换「${food.name}」`, icon: 'none' })
+      uni.showToast({ title: `已删除「${this.deleteTargetFood.name}」`, icon: 'none' })
+      this.showDeleteModal = false
+      this.deleteTargetFood = null
+      this.deleteTargetMealKey = ''
     },
     swapOneFood(food, mealKey) {
       const meals = this.dailyMeals[mealKey] || []
@@ -422,7 +511,6 @@ export default {
         wc[this.getTodayStr()] = this.dailyMeals
         uni.setStorageSync('foodfind_weekly', wc)
       }
-      this.closeActions()
       uni.showToast({ title: `已更换「${food.name}」`, icon: 'none' })
     },
 
@@ -618,16 +706,28 @@ export default {
   background:#fafafa; border-radius:16rpx;
   padding:16rpx 6rpx 12rpx; display:flex; flex-direction:column; align-items:center;
   box-sizing:border-box; transition:all .25s ease; position:relative;
-  &.show-actions { background:#e8f7ef; box-shadow:0 4rpx 20rpx rgba(7,193,96,.15); z-index:10; }
-  &:active:not(.show-actions) { background:#f0f0f0; transform:scale(.92); }
+  perspective:400rpx; overflow:visible;
+  &.swiping { z-index:10; transition:none; }
+  &.flipping { z-index:20; transition:none; }
+  &.new-card { animation: cardBounceIn .45s cubic-bezier(.175,.885,.32,1.275) forwards; }
+  &:active:not(.swiping):not(.flipping) { background:#f0f0f0; transform:scale(.92); }
+}
+.fc-inner {
+  width:100%; display:flex; flex-direction:column; align-items:center;
+  transform-style:preserve-3d; transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+.fc-inner.flip-out {
+  animation: cardFlipOut .35s ease-in forwards;
+}
+.fc-inner.flip-in {
+  animation: cardFlipIn .4s ease-out .1s both;
 }
 .fc-icon-wrap {
   width:68rpx; height:68rpx; background:#fff; border-radius:18rpx;
   display:flex; align-items:center; justify-content:center;
   margin-bottom:8rpx; box-shadow:0 2rpx 8rpx rgba(0,0,0,.04);
-  transition:transform .25s ease;
 }
-.show-actions .fc-icon-wrap { transform: scale(0.9); }
+.swiping .fc-icon-wrap, .flipping .fc-icon-wrap { opacity: 0.5; }
 .fc-icon { font-size:36rpx; }
 .fc-name {
   font-size:21rpx; font-weight:500; color:#333;
@@ -635,30 +735,70 @@ export default {
   max-width:100%; line-height:1.3;
 }
 
-.action-bubble {
-  position:absolute; bottom:-8rpx; left:50%; transform:translateX(-50%);
-  display:flex; gap:4rpx; padding:6rpx 8px;
-  background:#fff; border-radius:24rpx;
-  box-shadow:0 4rpx 20rpx rgba(0,0,0,.12);
-  animation: popIn .25s cubic-bezier(.175,.885,.32,1.275);
-  white-space:nowrap; z-index:20;
+.swap-hint {
+  position:absolute; top:-6rpx; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:4rpx; padding:6rpx 14rpx;
+  background:linear-gradient(135deg,#07c160,#059a4b); border-radius:20rpx;
+  white-space:nowrap; animation: popIn .2s ease; z-index:15;
 }
-.ab-item {
-  display:flex; align-items:center; gap:4rpx;
-  padding:8rpx 14rpx; border-radius:20rpx;
-  transition:all .2s ease;
-  &:active { transform:scale(.9); }
-}
-.like-btn { &:active { background:#e8f7ef; } }
-.del-btn { &:active { background:#fef0f0; } }
-.swap-btn { &:active { background:#f0faf3; } }
-.abi-icon { font-size:22rpx; }
-.like-btn .abi-icon { color:#ff4757; }
-.del-btn .abi-icon { color:#999; }
-.swap-btn .abi-icon { color:#07c160; }
-.abi-text { font-size:20rpx; font-weight:500; color:#555; }
+.sh-icon { font-size:20rpx; color:#fff; }
+.sh-text { font-size:20rpx; color:#fff; font-weight:600; }
 
-.tap-mask { position:fixed; top:0; left:0; right:0; bottom:0; z-index:5; }
+.delete-hint {
+  position:absolute; bottom:-6rpx; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:4rpx; padding:6rpx 14rpx;
+  background:linear-gradient(135deg,#ff4757,#ee3b4e); border-radius:20rpx;
+  white-space:nowrap; animation: popIn .2s ease; z-index:15;
+}
+.dh-icon { font-size:20rpx; color:#fff; }
+.dh-text { font-size:20rpx; color:#fff; font-weight:600; }
+
+.sparkle-layer {
+  position:absolute; top:0; left:0; right:0; bottom:0;
+  pointer-events:none; z-index:25; border-radius:16rpx; overflow:hidden;
+}
+.sparkle {
+  position:absolute; font-size:24rpx; color:#FFD700;
+  animation: sparkleFly .6s ease-out forwards;
+  text-shadow:0 0 8rpx rgba(255,215,0,.8), 0 0 20rpx rgba(255,215,0,.4);
+  &.s1 { left:10%; top:20%; animation-delay:0s; }
+  &.s2 { left:70%; top:10%; animation-delay:.08s; font-size:28rpx; }
+  &.s3 { left:30%; top:70%; animation-delay:.12s; }
+  &.s4 { left:80%; top:60%; animation-delay:.04s; font-size:20rpx; }
+  &.s5 { left:50%; top:5%; animation-delay:.16s; font-size:22rpx; }
+  &.s6 { left:15%; top:45%; animation-delay:.2s; font-size:26rpx; }
+}
+
+.delete-modal-mask {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0); z-index:998; transition:background .3s ease;
+  pointer-events:none;
+  &.show { background:rgba(0,0,0,.55); pointer-events:auto; }
+}
+.delete-modal {
+  position:fixed; left:50%; top:50%;
+  transform:translate(-50%,-50%) scale(0.85);
+  width:560rpx; background:#fff; border-radius:28rpx;
+  padding:44rpx 36rpx 36rpx; z-index:999;
+  opacity:0; pointer-events:none;
+  transition:all .35s cubic-bezier(.175,.885,.32,1.275);
+  text-align:center;
+  &.show { transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto; }
+}
+.dm-title { display:block; font-size:32rpx; font-weight:700; color:#1a1a1a; margin-bottom:16rpx; }
+.dm-food-name { display:block; font-size:28rpx; color:#ff4757; font-weight:600; margin-bottom:12rpx; }
+.dm-desc { display:block; font-size:24rpx; color:#999; line-height:1.5; margin-bottom:32rpx; }
+.dm-btns { display:flex; gap:16rpx; }
+.dm-btn {
+  flex:1; padding:22rpx 0; border-radius:48rpx; text-align:center;
+  transition:all .25s ease;
+  &:active { transform:scale(.95); }
+}
+.dm-btn.cancel { background:#f5f5f5; }
+.dm-btn.confirm { background:linear-gradient(135deg,#ff4757,#ee3b4e); }
+.dmb-text { font-size:28rpx; font-weight:600; }
+.cancel .dmb-text { color:#666; }
+.confirm .dmb-text { color:#fff; }
 
 .bottom-actions { display:flex; flex-direction:column; align-items:center; padding:40rpx 24rpx 20rpx; gap:14rpx; }
 .primary-action {
@@ -724,4 +864,25 @@ export default {
 .ef-icon { font-size:80rpx; margin-bottom:24rpx; }
 .ef-title { font-size:30rpx; font-weight:600; color:#333; margin-bottom:12rpx; }
 .ef-hint { font-size:25rpx; color:#bbb; text-align:center; }
+
+@keyframes cardFlipOut {
+  0% { transform: rotateX(0deg) scale(1); opacity: 1; }
+  50% { transform: rotateX(90deg) scale(0.8); opacity: 0.5; }
+  100% { transform: rotateX(180deg) scale(0.6); opacity: 0; }
+}
+@keyframes cardFlipIn {
+  0% { transform: rotateX(-90deg) scale(0.6); opacity: 0; }
+  60% { transform: rotateX(15deg) scale(1.05); opacity: 1; }
+  100% { transform: rotateX(0deg) scale(1); opacity: 1; }
+}
+@keyframes cardBounceIn {
+  0% { transform: scale(0.3) translateY(-20rpx); opacity: 0; }
+  50% { transform: scale(1.15) translateY(4rpx); opacity: 1; }
+  70% { transform: scale(0.95) translateY(-2rpx); }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+@keyframes sparkleFly {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.3) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--sx, 30rpx), var(--sy, -60rpx)) scale(1.2) rotate(180deg); }
+}
 </style>

@@ -14,6 +14,37 @@ const path = require('path')
 const SOURCE_DIR = path.join(__dirname, 'cloudfunctions')
 const TARGET_DIR = path.join(__dirname, 'dist', 'build', 'mp-weixin', 'cloudfunctions')
 
+function fixProjectConfig() {
+  const configPath = path.join(__dirname, 'dist', 'build', 'mp-weixin', 'project.config.json')
+  const privateConfigPath = path.join(__dirname, 'dist', 'build', 'mp-weixin', 'project.private.config.json')
+
+  if (fs.existsSync(configPath)) {
+    try {
+      const raw = fs.readFileSync(configPath, 'utf-8')
+      const cfg = JSON.parse(raw)
+      let changed = false
+      if (!cfg.cloudfunctionRoot) { cfg.cloudfunctionRoot = './cloudfunctions/'; changed = true }
+      if (!cfg.setting) { cfg.setting = {} }
+      if (cfg.setting.bigPackageSizeSupport !== true) { cfg.setting.bigPackageSizeSupport = true; changed = true }
+      if (changed) { fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2), 'utf-8'); console.log('  ✅ project.config.json 已更新 (cloudfunctionRoot + bigPackageSizeSupport)') }
+    } catch(e) { console.log('  ⚠️  project.config.json 修复失败:', e.message) }
+  }
+
+  if (fs.existsSync(privateConfigPath)) {
+    try {
+      const raw = fs.readFileSync(privateConfigPath, 'utf-8')
+      const cfg = JSON.parse(raw)
+      if (!cfg.setting) { cfg.setting = {} }
+      if (cfg.setting.ignoreDevUnusedFiles !== false) { 
+        cfg.setting.ignoreDevUnusedFiles = false
+        cfg.setting.bigPackageSizeSupport = true
+        fs.writeFileSync(privateConfigPath, JSON.stringify(cfg, null, 2), 'utf-8')
+        console.log('  ✅ project.private.config.json 已更新 (ignoreDevUnusedFiles=false)')
+      }
+    } catch(e) { console.log('  ⚠️  project.private.config.json 修复失败:', e.message) }
+  }
+}
+
 function sync() {
   console.log('')
   console.log('🔄 同步云函数到编译输出目录...')
@@ -69,8 +100,10 @@ function sync() {
   }
 
   console.log('')
-  console.log(`📊 同步完成: ${successCount} 成功, ${failCount} 失败`)
-  
+  console.log(`📊 云函数同步完成: ${successCount} 成功, ${failCount} 失败`)
+
+  fixProjectConfig()
+
   if (failCount > 0) {
     process.exit(1)
   }
