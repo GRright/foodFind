@@ -210,110 +210,155 @@
     <view class="report-modal-mask" :class="{ show: showReportModal }" @click="closeReport"></view>
     <view class="report-modal" :class="{ show: showReportModal }">
       <view class="rm-header">
-        <text class="rm-title">📊 本周饮食报告</text>
+        <view class="rm-header-left">
+          <text class="rm-title">📊 本周饮食报告</text>
+          <text class="rm-subtitle">{{ formatWeekDateRange() }}</text>
+        </view>
         <view class="rm-close" @click="closeReport"><text class="pm-close-txt">✕</text></view>
       </view>
 
       <scroll-view scroll-y class="rm-body">
         <view class="rm-hero">
-          <view class="rmh-bg"></view>
           <view class="rmh-content">
             <view v-if="reportMode === 'solo'" class="rmh-solo">
-              <view class="rmh-avatar solo-av"><text class="rmhav-txt">{{ (userInfo.nickname || '我').charAt(0) }}</text></view>
-              <text class="rmh-solo-streak">{{ reportStreakDays }}</text>
+              <view class="rmh-avatar-wrap">
+                <view class="rmh-avatar solo-av"><text class="rmhav-txt">{{ (userInfo.nickname || '我').charAt(0) }}</text></view>
+                <view class="rmh-streak-circle">
+                  <text class="rmh-solo-streak">{{ reportStreakDays }}</text>
+                </view>
+              </view>
               <text class="rmh-solo-label">天连续打卡</text>
               <text class="rmh-motto">{{ reportMotto }}</text>
             </view>
             <view v-else-if="reportMode === 'pair'" class="rmh-pair">
-              <view class="rmh-avatar"><text class="rmhav-txt">{{ (userInfo.nickname || '我').charAt(0) }}</text></view>
-              <view class="rmh-relation-line">
-                <view class="rmh-rl-badge"><text class="rmhrl-txt">{{ relationLabel }}</text></view>
+              <view class="rmh-pair-avatars">
+                <view class="rmh-avatar"><text class="rmhav-txt">{{ (userInfo.nickname || '我').charAt(0) }}</text></view>
+                <view class="rmh-connector">
+                  <view class="rmh-line"></view>
+                  <view class="rmh-relation-badge"><text class="rmhrl-txt">{{ relationLabel }}</text></view>
+                </view>
+                <view class="rmh-avatar"><text class="rmhav-txt">{{ (partnerInfo.nickname || 'TA').charAt(0) }}</text></view>
               </view>
-              <view class="rmh-avatar"><text class="rmhav-txt">{{ (partnerInfo.nickname || 'TA').charAt(0) }}</text></view>
-              <view class="rmh-pair-streak">
+              <view class="rmh-streak-wrap">
                 <text class="rmhps-num">{{ reportStreakDays }}</text>
                 <text class="rmhps-label">天连续互动</text>
               </view>
             </view>
             <view v-else class="rmh-family">
-              <view class="rmh-fam-row">
+              <view class="rmh-fam-avatars">
                 <view class="rmh-avatar fam-av"><text class="rmhav-txt">{{ (userInfo.nickname || '我').charAt(0) }}</text></view>
-                <view class="rmh-relation-line fam-line">
-                  <view class="rmh-rl-badge"><text class="rmhrl-txt">👨‍👩‍👧‍👦 {{ prefs.userCount }}人之家</text></view>
+                <view class="rmh-connector">
+                  <view class="rmh-line fam-line"></view>
+                  <view class="rmh-relation-badge"><text class="rmhrl-txt">👨‍👩‍👧‍👦 {{ prefs.userCount }}人</text></view>
                 </view>
                 <view class="rmh-avatar fam-av"><text class="rmhav-txt">{{ (partnerInfo.nickname || 'TA').charAt(0) }}</text></view>
               </view>
-              <view class="rmh-fam-streak">
+              <view class="rmh-streak-wrap">
                 <text class="rmhfs-num">{{ reportStreakDays }}</text>
-                <text class="rmhfs-label">天全家坚持好好吃饭</text>
+                <text class="rmhfs-label">天全家坚持</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="rm-stats-row">
+          <view class="rm-stat-card large">
+            <text class="rm-stat-value">{{ weeklyCalories }}</text>
+            <text class="rm-stat-label">总热量(kcal)</text>
+          </view>
+          <view class="rm-stat-card">
+            <text class="rm-stat-value">{{ myMealCount }}</text>
+            <text class="rm-stat-label">已打卡餐数</text>
+          </view>
+          <view class="rm-stat-card">
+            <text class="rm-stat-value">{{ weeklyCheckInDays }}</text>
+            <text class="rm-stat-label">打卡天数</text>
+          </view>
+          <view class="rm-stat-card">
+            <text class="rm-stat-value">{{ weeklyProtein }}</text>
+            <text class="rm-stat-label">蛋白质(g)</text>
+          </view>
+        </view>
+
+        <view class="rm-section">
+          <view class="rm-section-header">
+            <text class="rms-title">📈 打卡趋势</text>
+          </view>
+          <view class="rm-chart-card">
+            <view class="rm-chart-bars">
+              <view class="rm-chart-bar" v-for="(day, idx) in weeklyReportData" :key="idx">
+                <view class="rm-bar" :style="{ height: Math.max(10, (day.mealCount / 3) * 100) + '%' }">
+                  <text class="rm-bar-meals" v-if="day.mealCount > 0">{{ day.mealCount }}</text>
+                </view>
+                <text class="rm-bar-label">{{ formatDayDate(day.date) }}</text>
               </view>
             </view>
           </view>
         </view>
 
         <view class="rm-section">
-          <text class="rms-title">📈 本周饮食概览</text>
-          <view class="rms-grid">
-            <view class="rms-card">
-              <view class="rmsc-icon cal"><text class="rmsci-txt">🔥</text></view>
-              <text class="rmsc-num">{{ weeklyCalories }}</text>
-              <text class="rmsc-label">总热量(kcal)</text>
-            </view>
-            <view class="rms-card">
-              <view class="rmsc-icon meal"><text class="rmsci-txt">🍽️</text></view>
-              <text class="rmsc-num">{{ myMealCount }}</text>
-              <text class="rmsc-label">已打卡餐数</text>
-            </view>
-            <view class="rms-card">
-              <view class="rmsc-icon day"><text class="rmsci-txt">📅</text></view>
-              <text class="rmsc-num">{{ weeklyCheckInDays }}</text>
-              <text class="rmsc-label">打卡天数</text>
-            </view>
-            <view class="rms-card">
-              <view class="rmsc-icon pro"><text class="rmsci-txt">💪</text></view>
-              <text class="rmsc-num">{{ weeklyProtein }}</text>
-              <text class="rmsc-label">蛋白质(g)</text>
-            </view>
+          <view class="rm-section-header">
+            <text class="rms-title">🗓️ 每日打卡</text>
+            <text class="rms-desc">已打卡 {{ weeklyCheckInDays }}/7 天</text>
           </view>
-        </view>
-
-        <view class="rm-section">
-          <text class="rms-title">🗓️ 打卡日历</text>
-          <view class="rm-week-grid">
+          <view class="rm-cal-grid">
             <view
-              class="rw-day"
+              class="rm-cal-day"
               v-for="(day, idx) in weeklyReportData"
               :key="idx"
-              :class="{ 'has-spark': day.sparkLevel > 0, 'today': idx === 6 }"
+              :class="{ 'active': day.mealCount > 0, 'today': idx === 6 }"
             >
-              <text class="rwd-date">{{ formatDayDate(day.date) }}</text>
-              <text class="rwd-spark" v-if="day.sparkLevel === 1">🔥</text>
-              <text class="rwd-spark" v-else-if="day.sparkLevel >= 2">🔥🔥</text>
-              <text class="rwd-none" v-else>○</text>
+              <text class="rm-cal-date">{{ formatDayDate(day.date) }}</text>
+              <view class="rm-cal-streak">
+                <text class="rm-cal-spark" v-if="day.sparkLevel === 1">🔥</text>
+                <text class="rm-cal-spark" v-else-if="day.sparkLevel >= 2">🔥🔥</text>
+                <text class="rm-cal-check" v-else-if="day.mealCount > 0">✓</text>
+                <text class="rm-cal-none" v-else>○</text>
+              </view>
+              <text class="rm-cal-meals" v-if="day.mealCount > 0">{{ day.mealCount }}餐</text>
             </view>
           </view>
         </view>
 
         <view class="rm-section" v-if="hasPartner && pairStatus === 'paired'">
-          <text class="rms-title">👥 双人对比</text>
-          <view class="rm-compare">
+          <view class="rm-section-header">
+            <text class="rms-title">👥 双人对比</text>
+            <text class="rms-desc">一起好好吃饭</text>
+          </view>
+          <view class="rm-compare-card">
             <view class="rmc-col">
+              <view class="rmc-avatar">
+                <text class="rmc-char">{{ (userInfo.nickname || '我').charAt(0) }}</text>
+              </view>
               <text class="rmcc-name">我</text>
-              <view class="rmcc-bar-wrap"><view class="rmcc-bar self-bar" :style="{ width: myMealPercent + '%' }"></view></view>
+              <view class="rmcc-bar-wrap">
+                <view class="rmcc-bar self-bar" :style="{ width: Math.min(100, myMealPercent) + '%' }"></view>
+              </view>
               <text class="rmcc-num">{{ myMealCount }}餐</text>
             </view>
             <view class="rmc-col">
+              <view class="rmc-avatar partner">
+                <text class="rmc-char">{{ (partnerInfo.nickname || 'TA').charAt(0) }}</text>
+              </view>
               <text class="rmcc-name">{{ (partnerInfo.nickname || 'TA').slice(0,4) }}</text>
-              <view class="rmcc-bar-wrap"><view class="rmcc-bar partner-bar" :style="{ width: partnerMealPercent + '%' }"></view></view>
+              <view class="rmcc-bar-wrap">
+                <view class="rmcc-bar partner-bar" :style="{ width: Math.min(100, partnerMealPercent) + '%' }"></view>
+              </view>
               <text class="rmcc-num">{{ partnerMealCount }}餐</text>
             </view>
           </view>
         </view>
 
         <view class="rm-tip-card">
-          <text class="rm-tip-icon">💡</text>
-          <text class="rm-tip-text">{{ healthTip }}</text>
+          <view class="rm-tip-icon-wrap">
+            <text class="rm-tip-icon">💡</text>
+          </view>
+          <view class="rm-tip-content">
+            <text class="rm-tip-text">{{ healthTip }}</text>
+          </view>
         </view>
+
+        <view class="rm-footer-spacer"></view>
       </scroll-view>
     </view>
 
@@ -527,6 +572,15 @@ export default {
         return `本周互动很频繁，继续一起好好吃饭，感情升温中！💕`
       }
       return `全家本周打卡${days}天，一起吃饭才是最温暖的时光~ 👨‍👩‍👧‍👦`
+    },
+    formatWeekDateRange() {
+      const end = new Date()
+      const start = new Date(end.getTime() - 6 * 86400000)
+      const startMon = start.getMonth() + 1
+      const startDay = start.getDate()
+      const endMon = end.getMonth() + 1
+      const endDay = end.getDate()
+      return `${startMon}月${startDay}日 - ${endMon}月${endDay}日`
     }
   },
   onShow() {
@@ -611,12 +665,14 @@ export default {
         const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0]
         const dayChecks = checks[d]
         let sparkLevel = 0
+        let mealCount = 0
         if (dayChecks) {
           const eatenCount = [dayChecks.breakfast, dayChecks.lunch, dayChecks.dinner].filter(v => v).length
+          mealCount = eatenCount
           if (eatenCount >= 2) sparkLevel = 2
           else if (eatenCount >= 1) sparkLevel = 1
         }
-        data.push({ date: d, sparkLevel, allOpened: sparkLevel > 0, allShared: false })
+        data.push({ date: d, sparkLevel, mealCount, allOpened: sparkLevel > 0, allShared: false })
       }
       this.weeklyReportData = data
     },
@@ -977,123 +1033,183 @@ export default {
 /* ===== Report Modal ===== */
 .report-modal-mask {
   position:fixed; top:0; left:0; right:0; bottom:0;
-  background:rgba(0,0,0,0); z-index:999; transition:background .3s ease;
+  background:rgba(0,0,0,0); z-index:999; transition:background .35s ease;
   pointer-events:none;
-  &.show { background:rgba(0,0,0,.45); pointer-events:auto; }
+  &.show { background:rgba(0,0,0,.55); pointer-events:auto; }
 }
 .report-modal {
   position:fixed; left:0; right:0; bottom:0;
-  background:#fff; border-radius:32rpx 32rpx 0 0;
-  z-index:1000; transform:translateY(100%); transition:transform .35s cubic-bezier(.175,.885,.32,1.275);
-  max-height:85vh; display:flex; flex-direction:column;
+  background:#fafafa; border-radius:36rpx 36rpx 0 0;
+  z-index:1000; transform:translateY(100%); transition:transform .4s cubic-bezier(.175,.885,.32,1.275);
+  max-height:88vh; display:flex; flex-direction:column;
+  box-shadow:0 -10rpx 60rpx rgba(0,0,0,.15);
   &.show { transform:translateY(0); }
 }
 .rm-header {
-  display:flex; justify-content:space-between; align-items:center;
-  padding:32rpx 28rpx 16rpx; flex-shrink:0;
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:36rpx 32rpx 24rpx; flex-shrink:0;
+  background:#fff;
 }
-.rm-title { font-size:32rpx; font-weight:700; color:#1a1a1a; }
+.rm-header-left { display:flex; flex-direction:column; gap:6rpx; }
+.rm-title { font-size:36rpx; font-weight:800; color:#1a1a1a; letter-spacing:-1rpx; }
+.rm-subtitle { font-size:23rpx; color:#999; }
 
-.rm-body { flex:1; overflow:hidden; padding:0 20rpx 24rpx; box-sizing:border-box; }
+.rm-body { flex:1; overflow:hidden; padding:0 32rpx 24rpx; box-sizing:border-box; }
 
 .rm-hero {
-  position:relative; border-radius:24rpx; overflow:hidden;
-  background:#07c160;
-  padding:40rpx 20rpx 32rpx; margin-bottom:20rpx;
-}
-.rmh-bg {
-  position:absolute; top:-50%; left:-50%; width:200%; height:200%;
-  background:radial-gradient(circle at 30% 40%, rgba(255,255,255,.15) 0%, transparent 50%);
+  position:relative; border-radius:28rpx; overflow:hidden;
+  background:linear-gradient(135deg,#07c160 0%,#06a652 50%,#058a43 100%);
+  padding:48rpx 32rpx 36rpx; margin-bottom:24rpx;
+  box-shadow:0 8rpx 30rpx rgba(7,193,96,.25);
 }
 .rmh-content { position:relative; display:flex; flex-direction:column; align-items:center; }
 
-.rmh-solo { display:flex; flex-direction:column; align-items:center; gap:10rpx; }
+.rmh-solo { display:flex; flex-direction:column; align-items:center; gap:16rpx; }
+.rmh-avatar-wrap { position:relative; display:flex; align-items:center; justify-content:center; }
 .rmh-avatar {
-  width:80rpx; height:80rpx; border-radius:50%;
-  background:rgba(255,255,255,.2);
+  width:96rpx; height:96rpx; border-radius:50%;
+  background:rgba(255,255,255,.25);
   display:flex; align-items:center; justify-content:center;
-  &.solo-av { width:96rpx; height:96rpx; }
-  &.fam-av { width:68rpx; height:68rpx; }
+  border:3rpx solid rgba(255,255,255,.35);
+  &.solo-av { width:104rpx; height:104rpx; }
+  &.fam-av { width:76rpx; height:76rpx; }
 }
-.rmhav-txt { font-size:32rpx; color:#fff; font-weight:700; }
-.rmh-solo-streak { font-size:64rpx; font-weight:900; color:#fff; line-height:1.1; }
-.rmh-solo-label { font-size:25rpx; color:rgba(255,255,255,.85); letter-spacing:2rpx; }
-.rmh-motto { font-size:23rpx; color:rgba(255,255,255,.75); margin-top:6rpx; text-align:center; line-height:1.5; }
+.rmh-streak-circle {
+  position:absolute; right:-20rpx; bottom:-10rpx;
+  width:56rpx; height:56rpx; border-radius:50%;
+  background:#fff; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4rpx 18rpx rgba(0,0,0,.2);
+}
+.rmhav-txt { font-size:38rpx; color:#fff; font-weight:700; }
+.rmh-solo-streak { font-size:34rpx; font-weight:900; color:#07c160; line-height:1; }
+.rmh-solo-label { font-size:26rpx; color:rgba(255,255,255,.9); letter-spacing:1rpx; }
+.rmh-motto { font-size:24rpx; color:rgba(255,255,255,.82); margin-top:8rpx; text-align:center; line-height:1.5; }
 
-.rmh-pair { display:flex; flex-direction:column; align-items:center; gap:16rpx; width:100%; }
-.rmh-relation-line {
-  width:120rpx; height:4rpx; background:rgba(255,255,255,.3);
+.rmh-pair { display:flex; flex-direction:column; align-items:center; gap:18rpx; width:100%; }
+.rmh-pair-avatars { display:flex; align-items:center; justify-content:center; width:100%; }
+.rmh-connector {
   position:relative; display:flex; align-items:center; justify-content:center;
-  border-radius:2rpx; flex-shrink:0;
-  &.fam-line { width:100rpx; }
+  margin:0 8rpx;
 }
-.rmh-rl-badge {
+.rmh-line {
+  width:130rpx; height:4rpx; background:rgba(255,255,255,.35);
+  border-radius:2rpx; flex-shrink:0;
+  &.fam-line { width:110rpx; }
+}
+.rmh-relation-badge {
   position:absolute; top:50%; left:50%;
   transform:translate(-50%,-50%);
-  background:rgba(255,255,255,.95); border-radius:20rpx;
-  padding:4rpx 14rpx; white-space:nowrap;
+  background:#fff; border-radius:24rpx;
+  padding:6rpx 18rpx; white-space:nowrap;
+  box-shadow:0 4rpx 16rpx rgba(0,0,0,.15);
 }
-.rmhrl-txt { font-size:18rpx; color:#07c160; font-weight:600; }
-.rmh-pair-streak { display:flex; flex-direction:column; align-items:center; gap:4rpx; }
-.rmhps-num { font-size:48rpx; font-weight:900; color:#fff; }
-.rmhps-label { font-size:23rpx; color:rgba(255,255,255,.85); letter-spacing:1rpx; }
+.rmhrl-txt { font-size:19rpx; color:#07c160; font-weight:700; }
+.rmh-streak-wrap { display:flex; flex-direction:column; align-items:center; gap:6rpx; }
+.rmhps-num { font-size:56rpx; font-weight:900; color:#fff; text-shadow:0 2rpx 10rpx rgba(0,0,0,.1); }
+.rmhps-label { font-size:24rpx; color:rgba(255,255,255,.9); letter-spacing:1rpx; }
 
-.rmh-family { display:flex; flex-direction:column; align-items:center; gap:14rpx; width:100%; }
-.rmh-fam-row { display:flex; align-items:center; justify-content:center; gap:0; }
-.rmh-fam-streak { display:flex; flex-direction:column; align-items:center; gap:4rpx; }
-.rmhfs-num { font-size:44rpx; font-weight:900; color:#fff; }
-.rmhfs-label { font-size:22rpx; color:rgba(255,255,255,.85); }
+.rmh-family { display:flex; flex-direction:column; align-items:center; gap:16rpx; width:100%; }
+.rmh-fam-avatars { display:flex; align-items:center; justify-content:center; gap:0; }
+.rmh-fam-streak { display:flex; flex-direction:column; align-items:center; gap:6rpx; }
+.rmhfs-num { font-size:52rpx; font-weight:900; color:#fff; text-shadow:0 2rpx 10rpx rgba(0,0,0,.1); }
+.rmhfs-label { font-size:23rpx; color:rgba(255,255,255,.9); }
 
-.rm-section { margin-bottom:20rpx; }
-.rms-title { display:block; font-size:26rpx; font-weight:700; color:#1a1a1a; margin-bottom:16rpx; }
-
-.rms-grid { display:grid; grid-template-columns:1fr 1fr; gap:12rpx; }
-.rms-card {
-  background:#f5f6f8; border-radius:16rpx; padding:18rpx 12rpx;
+.rm-stats-row { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:12rpx; margin-bottom:24rpx; }
+.rm-stat-card {
+  background:#fff; border-radius:20rpx; padding:24rpx 16rpx;
   display:flex; flex-direction:column; align-items:center; gap:6rpx;
-  box-sizing:border-box; overflow:hidden;
+  box-shadow:0 2rpx 12rpx rgba(0,0,0,.06);
+  &.large { padding:30rpx 20rpx; }
 }
-.rmsc-icon {
-  width:52rpx; height:52rpx; border-radius:12rpx;
+.rm-stat-value { font-size:36rpx; font-weight:800; color:#1a1a1a; }
+.rm-stat-label { font-size:20rpx; color:#999; font-weight:500; }
+
+.rm-section { margin-bottom:24rpx; }
+.rm-section-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:14rpx;
+}
+.rms-title { font-size:28rpx; font-weight:700; color:#1a1a1a; }
+.rms-desc { font-size:22rpx; color:#999; font-weight:500; }
+
+.rm-chart-card {
+  background:#fff; border-radius:24rpx; padding:28rpx 24rpx 24rpx;
+  box-shadow:0 2rpx 12rpx rgba(0,0,0,.06);
+}
+.rm-chart-bars { display:flex; justify-content:space-between; align-items:flex-end; gap:10rpx; height:180rpx; }
+.rm-chart-bar {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+  gap:8rpx; height:100%;
+}
+.rm-bar {
+  width:100%; background:linear-gradient(180deg,#07c160 0%,#06a552 100%);
+  border-radius:14rpx 14rpx 6rpx 6rpx;
   display:flex; align-items:center; justify-content:center;
-  &.meat, &.veg, &.cal, &.pro, &.meal, &.day { background:#fff; }
+  transition:height .6s cubic-bezier(.4,0,.2,1);
+  min-height:20rpx;
 }
-.rmsci-txt { font-size:24rpx; }
-.rmsc-num { font-size:36rpx; font-weight:800; color:#1a1a1a; }
-.rmsc-label { font-size:21rpx; color:#999; }
+.rm-bar-meals { font-size:22rpx; color:#fff; font-weight:700; }
+.rm-bar-label { font-size:20rpx; color:#999; font-weight:500; }
 
-.rm-week-grid { display:flex; gap:8rpx; }
-.rw-day {
-  flex:1; display:flex; flex-direction:column; align-items:center;
-  gap:6rpx; padding:14rpx 6rpx; border-radius:14rpx;
-  background:#f5f6f8; border:2rpx solid transparent;
-  transition:all .25s;
-  &.has-spark { background:#e8f7ef; border-color:#07c160; }
-  &.today { background:#d4f5e3; border-color:#07c160; }
+.rm-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:8rpx; }
+.rm-cal-day {
+  position:relative; display:flex; flex-direction:column; align-items:center;
+  gap:10rpx; padding:18rpx 8rpx; border-radius:18rpx;
+  background:#fff; border:2rpx solid transparent;
+  box-shadow:0 2rpx 8rpx rgba(0,0,0,.04);
+  transition:all .3s ease;
+  &.active { border-color:#07c160; background:#f0faf5; }
+  &.today {
+    border-color:#07c160;
+    &::before {
+      content:''; position:absolute; top:6rpx; right:6rpx;
+      width:14rpx; height:14rpx; border-radius:50%;
+      background:#07c160;
+    }
+  }
+  &:active { transform:scale(.96); }
 }
-.rwd-date { font-size:20rpx; color:#666; font-weight:600; }
-.rwd-spark { font-size:20rpx; }
-.rwd-none { font-size:20rpx; color:#ddd; }
+.rm-cal-date { font-size:21rpx; color:#666; font-weight:700; }
+.rm-cal-streak { display:flex; align-items:center; justify-content:center; height:40rpx; }
+.rm-cal-spark { font-size:22rpx; }
+.rm-cal-check { font-size:28rpx; color:#07c160; font-weight:800; }
+.rm-cal-none { font-size:26rpx; color:#ddd; }
+.rm-cal-meals { font-size:19rpx; color:#999; font-weight:600; }
 
-.rm-compare {
-  display:flex; gap:16rpx; padding:20rpx;
-  background:#f5f6f8; border-radius:16rpx;
+.rm-compare-card {
+  display:flex; gap:20rpx; padding:24rpx;
+  background:#fff; border-radius:24rpx;
+  box-shadow:0 2rpx 12rpx rgba(0,0,0,.06);
 }
-.rmc-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:8rpx; }
+.rmc-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:10rpx; }
+.rmc-avatar {
+  width:64rpx; height:64rpx; border-radius:50%;
+  background:#e8f7ef; display:flex; align-items:center; justify-content:center;
+  border:2rpx solid rgba(7,193,96,.15);
+  &.partner { background:#f0f6f8; border-color:rgba(5,138,67,.15); }
+}
+.rmc-char { font-size:28rpx; font-weight:800; color:#07c160; }
 .rmcc-name { font-size:25rpx; font-weight:700; color:#1a1a1a; }
-.rmcc-bar-wrap { width:100%; height:20rpx; background:#eee; border-radius:10rpx; overflow:hidden; }
-.rmcc-bar { height:100%; border-radius:10rpx; transition:width .5s ease; }
-.self-bar { background:#07c160; }
-.partner-bar { background:#059a4b; }
-.rmcc-num { font-size:22rpx; color:#666; font-weight:600; }
+.rmcc-bar-wrap { width:100%; height:24rpx; background:#eee; border-radius:12rpx; overflow:hidden; }
+.rmcc-bar { height:100%; border-radius:12rpx; transition:width .7s cubic-bezier(.4,0,.2,1); }
+.self-bar { background:linear-gradient(90deg,#07c160,#06a652); }
+.partner-bar { background:linear-gradient(90deg,#058a43,#047739); }
+.rmcc-num { font-size:22rpx; color:#666; font-weight:700; }
 
 .rm-tip-card {
-  display:flex; gap:12rpx; align-items:flex-start;
-  background:#f5f6f8;
-  border-radius:16rpx; padding:18rpx;
+  display:flex; gap:16rpx; align-items:flex-start;
+  background:#fff; border-radius:20rpx; padding:20rpx 22rpx;
+  box-shadow:0 2rpx 12rpx rgba(0,0,0,.06);
 }
-.rm-tip-icon { font-size:28rpx; flex-shrink:0; margin-top:2px; }
-.rm-tip-text { font-size:23rpx; color:#666; line-height:1.65; }
+.rm-tip-icon-wrap {
+  width:56rpx; height:56rpx; border-radius:14rpx;
+  background:#e8f7ef; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.rm-tip-icon { font-size:28rpx; }
+.rm-tip-content { flex:1; }
+.rm-tip-text { font-size:24rpx; color:#666; line-height:1.7; font-weight:500; }
+
+.rm-footer-spacer { height:80rpx; }
 
 /* ===== Favorites Modal ===== */
 .fav-modal-mask {
