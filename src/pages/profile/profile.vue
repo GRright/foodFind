@@ -282,7 +282,7 @@
 
         <view class="rm-section">
           <view class="rm-section-header">
-            <text class="rms-title">📈 打卡趋势</text>
+            <text class="rms-title">🤝 互动趋势</text>
           </view>
           <view class="rm-chart-card">
             <view class="rm-chart-bars">
@@ -292,30 +292,6 @@
                 </view>
                 <text class="rm-bar-label">{{ formatDayDate(day.date) }}</text>
               </view>
-            </view>
-          </view>
-        </view>
-
-        <view class="rm-section">
-          <view class="rm-section-header">
-            <text class="rms-title">🗓️ 每日打卡</text>
-            <text class="rms-desc">已打卡 {{ weeklyCheckInDays }}/7 天</text>
-          </view>
-          <view class="rm-cal-grid">
-            <view
-              class="rm-cal-day"
-              v-for="(day, idx) in weeklyReportData"
-              :key="idx"
-              :class="{ 'active': day.mealCount > 0, 'today': idx === 6 }"
-            >
-              <text class="rm-cal-date">{{ formatDayDate(day.date) }}</text>
-              <view class="rm-cal-streak">
-                <text class="rm-cal-spark" v-if="day.sparkLevel === 1">🔥</text>
-                <text class="rm-cal-spark" v-else-if="day.sparkLevel >= 2">🔥🔥</text>
-                <text class="rm-cal-check" v-else-if="day.mealCount > 0">✓</text>
-                <text class="rm-cal-none" v-else>○</text>
-              </view>
-              <text class="rm-cal-meals" v-if="day.mealCount > 0">{{ day.mealCount }}餐</text>
             </view>
           </view>
         </view>
@@ -346,15 +322,6 @@
               </view>
               <text class="rmcc-num">{{ partnerMealCount }}餐</text>
             </view>
-          </view>
-        </view>
-
-        <view class="rm-tip-card">
-          <view class="rm-tip-icon-wrap">
-            <text class="rm-tip-icon">💡</text>
-          </view>
-          <view class="rm-tip-content">
-            <text class="rm-tip-text">{{ healthTip }}</text>
           </view>
         </view>
 

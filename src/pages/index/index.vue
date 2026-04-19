@@ -8,9 +8,9 @@
             <text class="greeting">{{ greetingText }}</text>
             <text class="greeting-sub">{{ greetingSubText }}</text>
           </view>
-          <view class="share-btn" open-type="share">
+          <view class="share-btn" :class="{ shared: shareBtnClicked }" open-type="share" @click="onShareClick">
             <text class="sb-icon">♡</text>
-            <text class="sb-text">分享</text>
+            <text class="sb-text">{{ shareBtnClicked ? '已分享' : '分享' }}</text>
           </view>
         </view>
 
@@ -270,6 +270,7 @@ export default {
       deleteTargetFood: null,
       deleteTargetMealKey: '',
       showGestureGuide: false,
+      shareBtnClicked: false,
       ggStage: 0,
       ggDemoFood: null,
       ggSwipeOffset: 0,
@@ -375,6 +376,8 @@ export default {
     }
   },
   onShow() {
+    this.shareBtnClicked = false
+    this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 400)
     this.loadMode()
     if (this.noCookMode) { this.loadFeed() }
@@ -784,6 +787,7 @@ export default {
       setTimeout(() => { this.generateDailyMeals(); uni.hideLoading(); uni.showToast({ title: '已重新生成', icon: 'success' }) }, 600)
     },
     goToDetail(recipe) { uni.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` }) },
+    onShareClick() { this.shareBtnClicked = true },
     onShareAppMessage() {
       const self = this
       const app = getApp()
@@ -829,12 +833,20 @@ export default {
 .share-btn {
   display:flex; align-items:center; gap:6rpx;
   padding:12rpx 24rpx;
-  background:#1a1a1a;
-  border-radius:40rpx; transition:all .25s ease;
-  &:active { transform:scale(.95); opacity:.85; }
+  border:2rpx solid #1a1a1a;
+  background:#fff;
+  border-radius:40rpx; transition:all .3s ease;
+  &:active { transform:scale(.95); }
+  &.shared {
+    background:linear-gradient(135deg,#ff6b8a,#ff8e9e);
+    border-color:transparent;
+    box-shadow:0 4rpx 16rpx rgba(255,107,138,.3);
+    .sb-icon { color:#fff; }
+    .sb-text { color:#fff; }
+  }
 }
-.sb-icon { font-size:22rpx; color:#fff; }
-.sb-text { font-size:23rpx; color:#fff; font-weight:600; }
+.sb-icon { font-size:22rpx; color:#1a1a1a; }
+.sb-text { font-size:23rpx; color:#1a1a1a; font-weight:600; }
 
 .mode-tag {
   display:flex; align-items:center; gap:6rpx;
