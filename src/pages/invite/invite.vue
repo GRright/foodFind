@@ -176,7 +176,7 @@ export default {
 
     savePartnerToLocal(data) {
       const partnerInfo = {
-        nickname: data.partnerName || this.inviterName,
+        nickname: data.inviterName || this.inviterName,
         relationType: data.relationType || this.relationType,
         status: 'paired',
         pairId: this.pairId
