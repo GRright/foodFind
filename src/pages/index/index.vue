@@ -118,38 +118,46 @@
         </view>
       </view>
 
-      <view class="gesture-guide-mask" :class="{ show: showGestureGuide }" @click="closeGestureGuide">
-        <view class="gesture-overlay">
-          <text class="go-title">{{ ggOverlayTitle }}</text>
-          <text class="go-subtitle">{{ ggOverlaySub }}</text>
-        </view>
+      <view class="gesture-guide-mask" :class="{ show: showGestureGuide }">
+        <view class="gesture-modal" @click.stop>
+          <view class="gm-step-indicator">
+            <view class="gm-dot" :class="{ active: ggStage === 0 }"></view>
+            <view class="gm-dot" :class="{ active: ggStage === 1 }"></view>
+            <view class="gm-dot" :class="{ active: ggStage === 2 }"></view>
+          </view>
 
-        <view class="gg-demo-card" :class="ggDemoCardAnim">
-          <view class="ggdc-inner">
-            <view class="ggdc-icon-wrap"><text class="ggdc-icon">{{ ggDemoFood?.image || '🍽️' }}</text></view>
-            <text class="ggdc-name">{{ ggDemoFood?.name || '示例菜品' }}</text>
-          </view>
-          <view class="ggdc-swipe-hint" :class="ggHintClass">
-            <text class="ggsh-icon">{{ ggHintIcon }}</text>
-            <text class="ggsh-text">{{ ggHintText }}</text>
-          </view>
-          <view class="ggdc-sparkle-layer" v-if="ggShowSparkle">
-            <text class="ggdc-sparkle gs1">✦</text>
-            <text class="ggdc-sparkle gs2">★</text>
-            <text class="ggdc-sparkle gs3">✧</text>
-            <text class="ggdc-sparkle gs4">✦</text>
-            <text class="ggdc-sparkle gs5">★</text>
-            <text class="ggdc-sparkle gs6">✧</text>
-          </view>
-        </view>
+          <text class="gm-title">{{ ggOverlayTitle }}</text>
+          <text class="gm-subtitle">{{ ggOverlaySub }}</text>
 
-        <view class="gg-actions" @click.stop>
-          <view class="gg-act-btn" @click="ggAct" :class="{ 'gg-act-btn-disabled': ggLocked }">
-            <text class="gga-icon">{{ ggActIcon }}</text>
-            <text class="gga-text">{{ ggActText }}</text>
+          <view class="gm-card-area">
+            <view class="gg-demo-card" :class="ggDemoCardAnim" @touchstart.stop="ggDemoCardTouchStart" @touchmove.stop="ggDemoCardTouchMove" @touchend.stop="ggDemoCardTouchEnd" @click.stop="ggDemoCardTap">
+              <view class="ggdc-swipe-hint" :class="ggHintClass">
+                <text class="ggsh-icon">{{ ggHintIcon }}</text>
+                <text class="ggsh-text">{{ ggHintText }}</text>
+              </view>
+              <view class="ggdc-inner">
+                <view class="ggdc-icon-wrap"><text class="ggdc-icon">{{ ggDemoFood?.image || '🍽️' }}</text></view>
+                <text class="ggdc-name">{{ ggDemoFood?.name || '示例菜品' }}</text>
+              </view>
+              <view class="ggdc-sparkle-layer" v-if="ggShowSparkle">
+                <text class="ggdc-sparkle gs1">✦</text>
+                <text class="ggdc-sparkle gs2">★</text>
+                <text class="ggdc-sparkle gs3">✧</text>
+                <text class="ggdc-sparkle gs4">✦</text>
+                <text class="ggdc-sparkle gs5">★</text>
+                <text class="ggdc-sparkle gs6">✧</text>
+              </view>
+            </view>
           </view>
-          <view class="gg-skip-btn" @click="closeGestureGuide">
-            <text class="ggs-text">跳过引导</text>
+
+          <view class="gm-actions">
+            <view class="gm-act-btn" @click="ggAct" :class="{ 'gm-act-btn-disabled': ggLocked }">
+              <text class="gma-icon">{{ ggActIcon }}</text>
+              <text class="gma-text">{{ ggActText }}</text>
+            </view>
+            <view class="gm-skip-btn" @click="closeGestureGuide">
+              <text class="gms-text">跳过引导</text>
+            </view>
           </view>
         </view>
       </view>
@@ -1070,16 +1078,38 @@ export default {
 .gesture-guide-mask {
   position:fixed; top:0; left:0; right:0; bottom:0;
   background:rgba(0,0,0,0); z-index:1000;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  display:flex; align-items:center; justify-content:center;
   pointer-events:none; transition:background .4s ease;
-  &.show { background:rgba(0,0,0,.7); pointer-events:auto; }
+  &.show { background:rgba(0,0,0,.75); pointer-events:auto; }
 }
-.gesture-overlay {
-  position:absolute; top:120rpx; left:0; right:0;
-  display:flex; flex-direction:column; align-items:center; gap:12rpx; z-index:5;
+.gesture-modal {
+  width:580rpx; background:#fff; border-radius:36rpx;
+  padding:48rpx 32rpx 36rpx; position:relative;
+  display:flex; flex-direction:column; align-items:center;
+  box-shadow:0 12rpx 60rpx rgba(0,0,0,.15);
+  transform:scale(.8) translateY(40rpx); opacity:0;
+  transition:all .45s cubic-bezier(.175,.885,.32,1.275);
+  .gesture-guide-mask.show & { transform:scale(1) translateY(0); opacity:1; }
 }
-.go-title { font-size:42rpx; font-weight:900; color:#fff; text-shadow:0 2rpx 12rpx rgba(0,0,0,.3); }
-.go-subtitle { font-size:26rpx; color:rgba(255,255,255,.75); }
+.gm-step-indicator { display:flex; gap:12rpx; margin-bottom:28rpx; }
+.gm-dot {
+  width:14rpx; height:14rpx; border-radius:50%;
+  background:#e8e8e8; transition:all .3s ease;
+  &.active { background:#07c160; width:32rpx; border-radius:7rpx; }
+}
+.gm-title {
+  font-size:34rpx; font-weight:800; color:#1a1a1a;
+  margin-bottom:8rpx; text-align:center;
+}
+.gm-subtitle {
+  font-size:24rpx; color:#999; text-align:center;
+  margin-bottom:32rpx;
+}
+.gm-card-area {
+  width:100%; display:flex; align-items:center; justify-content:center;
+  padding:32rpx 0; background:#f7f8fa; border-radius:24rpx;
+  margin-bottom:32rpx;
+}
 
 .gg-demo-card {
   position:relative; width:220rpx; padding:24rpx 16rpx 18rpx;
@@ -1130,21 +1160,18 @@ export default {
   &.gs6 { left:10%; top:50%; animation-delay:.2s; font-size:30rpx; }
 }
 
-.gg-actions {
-  position:absolute; bottom:120rpx; left:0; right:0;
-  display:flex; flex-direction:column; align-items:center; gap:16rpx; z-index:5;
-}
-.gg-act-btn {
-  display:flex; align-items:center; gap:10rpx;
-  padding:20rpx 44rpx; background:linear-gradient(135deg,#07c160,#059a4b);
+.gm-actions { width:100%; display:flex; flex-direction:column; align-items:center; gap:16rpx; }
+.gm-act-btn {
+  width:100%; display:flex; align-items:center; justify-content:center; gap:10rpx;
+  padding:22rpx 0; background:linear-gradient(135deg,#07c160,#059a4b);
   border-radius:48rpx; transition:all .25s ease;
-  &:active:not(.gg-act-btn-disabled) { transform:scale(.95); }
-  &.gg-act-btn-disabled { opacity:.5; }
+  &:active:not(.gm-act-btn-disabled) { transform:scale(.96); }
+  &.gm-act-btn-disabled { opacity:.5; }
 }
-.gga-icon { font-size:26rpx; color:#fff; }
-.gga-text { font-size:26rpx; color:#fff; font-weight:600; }
-.gg-skip-btn { padding:16rpx; }
-.ggs-text { font-size:24rpx; color:rgba(255,255,255,.5); }
+.gma-icon { font-size:26rpx; color:#fff; }
+.gma-text { font-size:26rpx; color:#fff; font-weight:600; }
+.gm-skip-btn { padding:16rpx; }
+.gms-text { font-size:24rpx; color:#bbb; }
 
 @keyframes ggFlipOut {
   0% { transform:rotateX(0) scale(1); opacity:1; }
