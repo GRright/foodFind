@@ -364,42 +364,44 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.page { min-height:100vh; background:#f7f8fa; padding:0 20rpx; }
+.page { min-height:100vh; background:#F5F6FA; padding:0 28rpx; }
 
+/* ===== Header ===== */
 .header {
-  background:#fff; padding:32rpx 24rpx 20rpx;
-  border-radius:0 0 24rpx 24rpx;
-  margin-bottom:16rpx;
+  padding:56rpx 0 24rpx;
   display:flex; flex-direction:column; gap:6rpx;
 }
-.header-title { font-size:38rpx; font-weight:700; color:#1a1a1a; }
-.header-sub { font-size:23rpx; color:#999; }
+.header-title { font-size:44rpx; font-weight:800; color:#1a1a1a; letter-spacing:-1rpx; }
+.header-sub { font-size:24rpx; color:#999; font-weight:400; }
 
+/* ===== Spark Banner ===== */
 .spark-banner {
   display:flex; align-items:center; gap:16rpx;
-  background:linear-gradient(135deg,#fff5e6,#ffe8cc);
-  padding:20rpx 24rpx; border-radius:18rpx;
-  margin:0 0 16rpx; border:2rpx solid #ffd699;
+  background:#fff;
+  padding:20rpx 24rpx; border-radius:20rpx;
+  margin:0 0 16rpx;
+  box-shadow:0 1rpx 8rpx rgba(0,0,0,.04);
 }
 .spark-icon-wrap {
-  width:64rpx; height:64rpx; background:linear-gradient(135deg,#ff9500,#ff6b00);
+  width:64rpx; height:64rpx; background:#e8f7ef;
   border-radius:50%; display:flex; align-items:center; justify-content:center;
 }
 .spark-emoji { font-size:32rpx; }
 .spark-info { flex:1; display:flex; flex-direction:column; gap:4rpx; }
-.spark-main { font-size:28rpx; font-weight:700; color:#cc5500; }
-.spark-sub { font-size:22rpx; color:#ee8833; }
+.spark-main { font-size:28rpx; font-weight:700; color:#1a1a1a; }
+.spark-sub { font-size:22rpx; color:#999; }
 .spark-badge {
-  width:56rpx; height:56rpx; background:linear-gradient(135deg,#7c4dff,#5b30c4);
+  width:56rpx; height:56rpx; background:#07c160;
   border-radius:50%; display:flex; align-items:center; justify-content:center;
   animation: glowPulse 2s ease-in-out infinite;
 }
 .badge-txt { font-size:28rpx; }
 
+/* ===== Calendar ===== */
 .calendar-wrap {
-  background:#fff; border-radius:20rpx;
+  background:#fff; border-radius:24rpx;
   padding:24rpx 16rpx 20rpx;
-  box-shadow:0 2rpx 14rpx rgba(0,0,0,.04);
+  box-shadow:0 1rpx 12rpx rgba(0,0,0,.04);
   margin-bottom:16rpx;
 }
 
@@ -414,22 +416,19 @@ export default {
   transition:background .2s;
   &:active { background:#f5f5f5; }
 }
-.nav-arrow { font-size:22rpx; color:#666; }
+.nav-arrow { font-size:22rpx; color:#999; }
 .nav-txt { font-size:24rpx; color:#666; }
 .cal-month { font-size:30rpx; font-weight:700; color:#1a1a1a; }
 
-.week-row {
-  display:flex; justify-content:space-between;
-}
+.week-row { display:flex; justify-content:space-between; }
 
 .day-cell {
   width:90rpx; display:flex; flex-direction:column; align-items:center;
   padding:14rpx 0 10rpx; border-radius:16rpx;
-  transition:all .25s ease;
-  position:relative;
+  transition:all .25s ease; position:relative;
   &:active { transform:scale(.95); }
   &.active { background:#e8f7ef; }
-  &.has-spark { background:linear-gradient(135deg,#fff8f0,#ffedd5); }
+  &.has-spark { background:#e8f7ef; }
   &.is-today {
     .day-num {
       color:#07c160; font-weight:800;
@@ -440,13 +439,10 @@ export default {
   }
 }
 .day-week { font-size:21rpx; color:#999; margin-bottom:6rpx; }
-.day-num {
-  font-size:32rpx; font-weight:700; color:#333;
-  line-height:1.2;
-}
+.day-num { font-size:32rpx; font-weight:700; color:#333; line-height:1.2; }
 .active.is-today .day-num {
   color:#07c160;
-  background: linear-gradient(135deg,#e8f7ef,#d4f5e3);
+  background:#e8f7ef;
   width:48rpx; height:48rpx; line-height:48rpx;
   text-align:center; border-radius:14rpx;
   text-decoration:none;
@@ -454,9 +450,9 @@ export default {
 
 .dot-row { display:flex; gap:6rpx; margin-top:8rpx; }
 .nutri-dot { width:10rpx; height:10rpx; border-radius:50%; }
-.b-dot { background:#ffc107; }
-.l-dot { background:#ff6b81; }
-.d-dot { background:#7c4dff; }
+.b-dot { background:#ccc; }
+.l-dot { background:#ccc; }
+.d-dot { background:#ccc; }
 
 .spark-icon {
   position:absolute; bottom:4rpx;
@@ -466,6 +462,7 @@ export default {
 }
 .si-txt { font-size:16rpx; }
 
+/* ===== Action Bar ===== */
 .action-bar {
   display:flex; align-items:center; justify-content:space-between;
   padding:16rpx 8rpx; margin-bottom:12rpx;
@@ -473,15 +470,17 @@ export default {
 .gen-btn {
   display:flex; align-items:center; gap:10rpx;
   padding:18rpx 36rpx;
-  background:linear-gradient(135deg,#07c160,#06ad56);
+  background:#07c160;
   border-radius:48rpx;
   transition:all .25s ease;
+  box-shadow:0 2rpx 12rpx rgba(7,193,96,.2);
   &:active { opacity:.85; transform:scale(.97); }
 }
 .gen-icon { font-size:28rpx; color:#fff; }
 .gen-text { font-size:27rpx; font-weight:600; color:#fff; }
-.gen-hint { font-size:23rpx; color:#07c160; font-weight:500; }
+.gen-hint { font-size:23rpx; color:#999; font-weight:500; }
 
+/* ===== Meal List ===== */
 .meal-scroll { }
 
 .day-meals { }
@@ -490,50 +489,49 @@ export default {
   padding:24rpx 8rpx 18rpx;
 }
 .dl-date { font-size:30rpx; font-weight:700; color:#1a1a1a; }
-.dl-cal { font-size:26rpx; color:#07c160; font-weight:700; }
+.dl-cal { font-size:26rpx; color:#999; font-weight:600; }
 
 .meal-section {
-  background:#fff; border-radius:20rpx;
-  box-shadow:0 2rpx 14rpx rgba(0,0,0,.04);
-  margin-bottom:22rpx; overflow:hidden;
+  background:#fff; border-radius:24rpx;
+  box-shadow:0 1rpx 12rpx rgba(0,0,0,.04);
+  margin-bottom:20rpx; overflow:hidden;
 }
 
 .meal-header {
   display:flex; justify-content:space-between; align-items:center;
-  padding:22rpx 24rpx 14rpx;
+  padding:24rpx 28rpx 16rpx;
 }
 .mh-left { display:flex; align-items:center; gap:12rpx; }
 .mh-icon { font-size:32rpx; }
-.mh-title { font-size:28rpx; font-weight:700; color:#1a1a1a; }
-.mh-cal { font-size:24rpx; color:#07c160; font-weight:600; }
+.mh-title { font-size:26rpx; font-weight:700; color:#1a1a1a; }
+.mh-cal { font-size:24rpx; color:#999; font-weight:600; }
 
 .food-row {
   display:flex; flex-wrap:wrap;
-  padding:0 12rpx 20rpx; gap:10rpx;
+  padding:0 16rpx 24rpx; gap:12rpx;
 }
 
 .food-card {
-  width:calc(20% - 8rpx); min-width:0;
-  background:#fafafa; border-radius:16rpx;
-  padding:16rpx 6rpx; display:flex; flex-direction:column; align-items:center;
-  box-sizing:border-box;
-  transition: all .25s ease;
-  &:active { background:#f0f0f0; transform:scale(.92); }
+  width:calc(20% - 9.6rpx); min-width:0;
+  background:#F5F6FA; border-radius:20rpx;
+  padding:18rpx 8rpx 14rpx; display:flex; flex-direction:column; align-items:center;
+  box-sizing:border-box; transition: all .25s ease;
+  &:active { background:#e8e9eb; transform:scale(.92); }
 }
 .fc-icon-wrap {
-  width:68rpx; height:68rpx; background:#fff; border-radius:18rpx;
+  width:64rpx; height:64rpx; background:#fff; border-radius:18rpx;
   display:flex; align-items:center; justify-content:center;
-  margin-bottom:10rpx; box-shadow:0 2rpx 8rpx rgba(0,0,0,.04);
+  margin-bottom:8rpx; box-shadow:0 1rpx 6rpx rgba(0,0,0,.06);
   transition: transform .25s ease;
 }
 .food-card:active .fc-icon-wrap { transform: scale(0.9); }
-.fc-icon { font-size:36rpx; }
+.fc-icon { font-size:32rpx; }
 .fc-name {
-  font-size:21rpx; font-weight:500; color:#333;
+  font-size:20rpx; font-weight:500; color:#333;
   text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   max-width:100%; line-height:1.3;
 }
-.fc-kcal { font-size:18rpx; color:#07c160; font-weight:600; margin-top:6rpx; }
+.fc-kcal { font-size:18rpx; color:#999; font-weight:600; margin-top:6rpx; }
 
 .empty-state {
   display:flex; flex-direction:column; align-items:center;
@@ -541,7 +539,7 @@ export default {
 }
 .empty-icon { font-size:80rpx; margin-bottom:24rpx; }
 .empty-title { font-size:30rpx; font-weight:600; color:#333; margin-bottom:12rpx; }
-.empty-hint { font-size:25rpx; color:#999; text-align:center; }
+.empty-hint { font-size:24rpx; color:#bbb; text-align:center; }
 
 .bottom-spacer { height:60rpx; }
 </style>

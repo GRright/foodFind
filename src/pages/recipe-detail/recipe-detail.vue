@@ -190,37 +190,37 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.page { min-height: 100vh; background: #f7f8fa; }
+.page { min-height: 100vh; background: #F5F6FA; }
 
 .recipe-hero {
-  height: 380rpx; background: linear-gradient(135deg, #07c160 0%, #06ad56 50%, #059a4b 100%);
+  height: 380rpx; background: #07c160;
   display: flex; align-items: center; justify-content: center; position: relative;
 }
 .like-btn {
   position:absolute; top:calc(env(safe-area-inset-top) + 20rpx); right:24rpx;
   display:flex; align-items:center; gap:6rpx;
-  padding:12rpx 22rpx; background:rgba(255,255,255,.25);
-  border-radius:40rpx; backdrop-filter:blur(10px);
+  padding:12rpx 22rpx; background:rgba(255,255,255,.2);
+  border-radius:40rpx;
   transition:all .3s ease;
   &:active { transform:scale(.92); }
-  &.liked { background:rgba(255,255,255,.4); }
+  &.liked { background:rgba(255,255,255,.35); }
 }
 .lb-icon { font-size:28rpx; color:#fff; }
 .liked .lb-icon { color:#fff; animation: heartBeat .4s ease; }
 .lb-text { font-size:23rpx; color:#fff; font-weight:600; }
-.hero-emoji { font-size: 140rpx; filter: drop-shadow(0 8rpx 20rpx rgba(0,0,0,0.2)); }
+.hero-emoji { font-size: 140rpx; }
 .hero-overlay {
   position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 32rpx; background: linear-gradient(transparent, rgba(0,0,0,0.5));
+  padding: 32rpx; background: rgba(0,0,0,.2);
 }
 .hero-title {
-  font-size: 40rpx; font-weight: 700; color: #fff; display: block;
-  text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.2); margin-bottom: 12rpx;
+  font-size: 40rpx; font-weight: 800; color: #fff; display: block;
+  margin-bottom: 12rpx; letter-spacing:-1rpx;
 }
 .hero-tags { display: flex; gap: 10rpx; }
 .hero-tag {
-  font-size: 22rpx; color: rgba(255,255,255,0.9);
-  background: rgba(255,255,255,0.2); padding: 6rpx 16rpx; border-radius: 16rpx;
+  font-size: 22rpx; color: rgba(255,255,255,.85);
+  background: rgba(255,255,255,.15); padding: 6rpx 16rpx; border-radius: 16rpx;
 }
 
 .detail-scroll { padding-top: 40rpx; padding-bottom: env(safe-area-inset-bottom); }
@@ -228,7 +228,7 @@ export default {
 .nutrition-bar {
   background: #fff; margin: -40rpx 28rpx 24rpx; border-radius: 20rpx;
   padding: 28rpx 20rpx; display: flex; align-items: center; justify-content: space-around;
-  box-shadow: 0 4rpx 24rpx rgba(0,0,0,0.08); position: relative; z-index: 10;
+  box-shadow: 0 1rpx 12rpx rgba(0,0,0,.04); position: relative; z-index: 10;
 }
 .nutri-item { display: flex; flex-direction: column; align-items: center; gap: 6rpx; }
 .nutri-value { font-size: 30rpx; font-weight: 700; color: #1a1a1a; }
@@ -237,7 +237,7 @@ export default {
 
 .section-card {
   background: #fff; margin: 0 28rpx 24rpx; border-radius: 24rpx;
-  padding: 36rpx 32rpx; box-shadow: 0 2rpx 14rpx rgba(0,0,0,0.03);
+  padding: 36rpx 32rpx; box-shadow: 0 1rpx 12rpx rgba(0,0,0,.04);
 }
 
 .section-title-row {
@@ -253,7 +253,7 @@ export default {
   padding: 22rpx 0; border-bottom: 1rpx solid #f5f5f5;
   transition: background .15s ease;
   &:last-child { border-bottom: none; }
-  &:active { background: #fafafa; border-radius: 10rpx; }
+  &:active { background: #f5f6f8; border-radius: 10rpx; }
 }
 .ing-name { font-size: 28rpx; color: #333; font-weight: 500; }
 .ing-amount { font-size: 26rpx; color: #999; }
@@ -262,7 +262,7 @@ export default {
 .step-item { display: flex; gap: 18rpx; align-items: flex-start; }
 .step-left { flex-shrink: 0; padding-top: 2rpx; }
 .step-num-wrap {
-  width: 48rpx; height: 48rpx; background: linear-gradient(135deg, #07c160, #06ad56);
+  width: 48rpx; height: 48rpx; background: #07c160;
   border-radius: 50%; display: flex; align-items: center; justify-content: center;
   transition: transform .2s ease;
 }
@@ -275,8 +275,9 @@ export default {
 .action-btn {
   display:flex; align-items:center; justify-content:center; gap:10rpx;
   text-align: center; padding: 28rpx 0;
-  background: linear-gradient(135deg, #07c160, #06ad56);
+  background: #07c160;
   color: #fff; font-size: 29rpx; font-weight: 600; border-radius: 48rpx;
+  box-shadow:0 2rpx 12rpx rgba(7,193,96,.2);
   &:active { opacity: 0.85; transform: scale(0.97); transition: all 0.15s; }
 }
 .btn-icon { font-size:32rpx; }
@@ -290,7 +291,7 @@ export default {
   background: rgba(0, 0, 0, 0);
   display: flex; align-items: flex-end; z-index: 999;
   pointer-events: none; transition: background .25s ease;
-  &.show { background: rgba(0,0,0,.5); pointer-events: auto; }
+  &.show { background: rgba(0,0,0,.45); pointer-events: auto; }
 }
 .rating-sheet {
   width: 100%; background: #fff; border-radius: 32rpx 32rpx 0 0;
@@ -298,7 +299,7 @@ export default {
   transform: translateY(100%); transition: transform .3s cubic-bezier(.4,0,.2,1);
   &.show { transform: translateY(0); }
 }
-.rating-title { display: block; text-align: center; font-size: 32rpx; font-weight: 600; color: #333; margin-bottom: 28rpx; }
+.rating-title { display: block; text-align: center; font-size: 32rpx; font-weight: 600; color: #1a1a1a; margin-bottom: 28rpx; }
 .stars-row { display: flex; justify-content: center; gap: 20rpx; margin-bottom: 28rpx; }
 .star {
   font-size: 56rpx; color: #ddd; transition: all .15s ease;
@@ -306,12 +307,12 @@ export default {
   &:active { transform: scale(1.3); }
 }
 .feedback-input {
-  width: 100%; height: 180rpx; background: #f7f8fa; border-radius: 16rpx;
+  width: 100%; height: 180rpx; background: #f5f6f8; border-radius: 16rpx;
   padding: 20rpx; font-size: 27rpx; color: #333; margin-bottom: 28rpx; box-sizing: border-box;
 }
 .submit-btn {
   text-align: center; padding: 26rpx 0;
-  background: linear-gradient(135deg, #07c160, #06ad56);
+  background: #07c160;
   color: #fff; font-size: 29rpx; font-weight: 600; border-radius: 48rpx;
   &:active { opacity: 0.85; }
 }

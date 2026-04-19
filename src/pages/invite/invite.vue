@@ -196,14 +196,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.page { min-height:100vh; background:#f7f8fa; }
+.page { min-height:100vh; background:#F5F6FA; }
 
 .invite-hero {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #a855f7 100%);
   padding: 80rpx 32rpx 56rpx;
   display:flex; flex-direction:column; align-items:center;
   transition: background .5s ease;
-  &.accepted { background: linear-gradient(135deg, #07c160 0%, #06ad56 50%, #059a4b 100%); }
+  &.accepted { background:#07c160; }
+  &.pending { background:#1a1a1a; }
 }
 .hero-emoji { font-size:80rpx; margin-bottom:20rpx; animation: bounceIn .6s ease; }
 @keyframes bounceIn {
@@ -212,25 +212,25 @@ export default {
   100% { transform: scale(1); opacity: 1; }
 }
 .hero-title { font-size:34rpx; font-weight:700; color:#fff; text-align:center; line-height:1.4; }
-.hero-sub { font-size:26rpx; color:rgba(255,255,255,.85); margin-top:12rpx; }
+.hero-sub { font-size:26rpx; color:rgba(255,255,255,.8); margin-top:12rpx; }
 
 .body-scroll { padding-bottom: env(safe-area-inset-bottom); }
 
 .info-card {
   margin:24rpx 28rpx; padding:28rpx; background:#fff;
-  border-radius:20rpx; box-shadow:0 2rpx 14rpx rgba(0,0,0,.04);
+  border-radius:20rpx; box-shadow:0 1rpx 12rpx rgba(0,0,0,.04);
 }
 .ic-row { display:flex; justify-content:space-between; align-items:center; padding:14rpx 0; &:not(:last-child){ border-bottom:1rpx solid #f5f5f5;} }
-.ic-label { font-size:27rpx; color:#888; }
-.ic-value { font-size:28rpx; color:#333; font-weight:600; }
+.ic-label { font-size:26rpx; color:#999; }
+.ic-value { font-size:28rpx; color:#1a1a1a; font-weight:600; }
 .rel-badge {
-  background:#d4f5e3; color:#059a4b; padding:6px 18rpx; border-radius:12rpx; font-size:25rpx;
+  background:#e8f7ef; color:#07c160; padding:6rpx 18rpx; border-radius:12rpx; font-size:24rpx;
 }
 
 .action-area { padding:32rpx 28rpx; }
 .primary-btn {
   display:flex; align-items:center; justify-content:center; gap:14rpx;
-  padding:30rpx 0; background: linear-gradient(135deg, #667eea, #764ba2);
+  padding:30rpx 0; background:#1a1a1a;
   border-radius:48rpx; margin-bottom:20rpx;
   &:active { opacity:.85; transform:scale(.97); transition:all .15s; }
 }
@@ -241,7 +241,7 @@ export default {
 
 .success-card {
   margin:24rpx 28rpx; padding:40rpx 32rpx; background:#fff;
-  border-radius:24rpx; box-shadow:0 4rpx 20rpx rgba(7,193,96,.08);
+  border-radius:24rpx; box-shadow:0 1rpx 12rpx rgba(0,0,0,.04);
   display:flex; flex-direction:column; align-items:center;
 }
 .success-icon { font-size:72rpx; margin-bottom:16rpx; animation: popIn .5s ease .3s both; }
@@ -250,18 +250,18 @@ export default {
   60% { transform: scale(1.2); }
   100% { transform: scale(1); }
 }
-.success-title { font-size:30rpx; font-weight:700; color:#333; text-align:center; margin-bottom:10rpx; }
-.success-desc { font-size:25rpx; color:#999; text-align:center; margin-bottom:28rpx; }
+.success-title { font-size:30rpx; font-weight:700; color:#1a1a1a; text-align:center; margin-bottom:10rpx; }
+.success-desc { font-size:24rpx; color:#999; text-align:center; margin-bottom:28rpx; }
 .success-features { display:flex; flex-direction:column; gap:16rpx; width:100%; margin-bottom:32rpx; }
 .sf-item {
   display:flex; align-items:center; gap:14rpx; padding:16rpx 20rpx;
-  background:#e8f7ef; border-radius:14rpx;
+  background:#f5f6f8; border-radius:14rpx;
 }
 .sf-icon { font-size:28rpx; }
-.sf-txt { font-size:26rpx; color:#07c160; font-weight:500; }
+.sf-txt { font-size:26rpx; color:#666; font-weight:500; }
 .goto-btn {
   width:100%; text-align:center; padding:24rpx 0;
-  background: linear-gradient(135deg,#07c160,#06ad56); border-radius:40rpx;
+  background:#07c160; border-radius:40rpx;
   &:active { opacity:.85; }
 }
 .goto-text { font-size:29rpx; font-weight:600; color:#fff; }

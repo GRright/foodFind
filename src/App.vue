@@ -31,7 +31,7 @@ export default {
 
 <style lang="scss">
 page {
-  background-color: #f7f8fa;
+  background-color: #F5F6FA;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 

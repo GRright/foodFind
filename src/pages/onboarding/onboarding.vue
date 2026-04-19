@@ -204,14 +204,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.page { min-height: 100vh; background: #f7f8fa; display: flex; flex-direction: column; padding:0 20rpx; }
-.header-area { padding: 56rpx 24rpx 32rpx; background: #fff; border-radius:0 0 28rpx 28rpx; margin-bottom:16rpx; }
-.main-title { display: block; font-size: 46rpx; font-weight: 700; color: #1a1a1a; margin-bottom: 10rpx; }
-.sub-title { display: block; font-size: 26rpx; color: #999; margin-bottom: 30rpx; }
+.page { min-height: 100vh; background: #F5F6FA; display: flex; flex-direction: column; padding:0 28rpx; }
+.header-area { padding: 56rpx 0 32rpx; }
+.main-title { display: block; font-size: 44rpx; font-weight: 800; color: #1a1a1a; margin-bottom: 10rpx; letter-spacing:-1rpx; }
+.sub-title { display: block; font-size: 24rpx; color: #999; margin-bottom: 30rpx; }
 
 .progress-wrap { position:relative; }
 .progress-track { height: 8rpx; background: #eee; border-radius: 4rpx; overflow: hidden; margin-bottom:14rpx; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, #07c160, #06ad56); border-radius: 4rpx; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
+.progress-fill { height: 100%; background: #07c160; border-radius: 4rpx; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
 .step-dots { display:flex; gap:12rpx; justify-content:center; margin-bottom:12rpx; }
 .step-dot {
   width:14rpx; height:14rpx; border-radius:50%;
@@ -228,10 +228,10 @@ export default {
 .option-item {
   background: #fff; border-radius: 22rpx; padding: 28rpx 24rpx;
   display: flex; align-items: center; border: 3rpx solid transparent;
-  box-shadow: 0 2rpx 14rpx rgba(0,0,0,0.03);
+  box-shadow: 0 1rpx 12rpx rgba(0,0,0,.04);
   transition: all 0.25s cubic-bezier(.4,0,.2,1);
   position:relative;
-  &.active { border-color: #07c160; background: #f0faf5; box-shadow: 0 4rpx 20rpx rgba(7,193,96,.1); }
+  &.active { border-color: #07c160; background: #f5f6f8; }
   &:active { transform: scale(0.97); }
 }
 .radio-circle {
@@ -248,7 +248,7 @@ export default {
   .active & { border-color: #07c160; background: #07c160; }
 }
 .check-mark { color: #fff; font-size: 26rpx; font-weight: 700; }
-.opt-label { font-size: 28rpx; color: #333; font-weight: 500; flex:1; }
+.opt-label { font-size: 28rpx; color: #1a1a1a; font-weight: 500; flex:1; }
 .check-icon {
   position:absolute; right:24rpx;
   font-size:28rpx; color:#07c160; font-weight:700;
@@ -256,7 +256,7 @@ export default {
 
 .footer-btns { display: flex; gap: 16rpx; padding: 24rpx 16rpx 16rpx; align-items:center; justify-content:center; }
 .btn-secondary {
-  padding:22rpx 40rpx; background: #f7f8fa;
+  padding:22rpx 40rpx; background: #f5f6f8;
   color: #333; font-size:27rpx; font-weight:500; border-radius:48rpx;
   transition:background .2s;
   &:active { background: #eee; }
@@ -264,7 +264,7 @@ export default {
 .btn-txt { font-size:27rpx; }
 .btn-primary {
   flex:1; text-align:center; padding:24rpx 0;
-  background: linear-gradient(135deg, #07c160, #06ad56);
+  background: #07c160;
   color: #fff; font-size:28rpx; font-weight:600; border-radius:50rpx;
   transition:all .25s;
   &.disabled { opacity:.45; pointer-events:none; }
