@@ -45,7 +45,7 @@
                 @click.stop="markMealEaten(section.key)"
               >
                 <text class="eb-icon">{{ mealCheckIn[section.key] ? '✓' : '○' }}</text>
-                <text class="eb-txt">{{ mealCheckIn[section.key] ? '已吃' : '标记' }}</text>
+                <text class="eb-txt">{{ mealCheckIn[section.key] ? '已打卡' : '打卡' }}</text>
               </view>
               <view class="refresh-btn" :class="{ shimmering: isRefreshing === section.key }" @click.stop="refreshMeal(section.key)">
                 <text class="rb-icon">↻</text>
@@ -458,7 +458,7 @@ export default {
       }
 
       if (newState) {
-        uni.showToast({ title: `${mealKey === 'breakfast' ? '早餐' : mealKey === 'lunch' ? '午餐' : '晚餐'}已标记 ✓`, icon: 'success' })
+        uni.showToast({ title: `${mealKey === 'breakfast' ? '早餐' : mealKey === 'lunch' ? '午餐' : '晚餐'}已打卡 ✓`, icon: 'success' })
       }
     },
 
