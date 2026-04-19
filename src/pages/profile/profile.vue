@@ -218,29 +218,56 @@
         <view class="rm-hero">
           <view class="rmh-bg"></view>
           <view class="rmh-content">
-            <text class="rmh-emoji">🔥</text>
-            <text class="rmh-main">{{ reportStreakDays }}</text>
-            <text class="rmh-sub">天连续互动</text>
+            <view v-if="reportMode === 'solo'" class="rmh-solo">
+              <view class="rmh-avatar solo-av"><text class="rmhav-txt">{{ (userInfo.nickname || '我').charAt(0) }}</text></view>
+              <text class="rmh-solo-streak">{{ reportStreakDays }}</text>
+              <text class="rmh-solo-label">天连续打卡</text>
+              <text class="rmh-motto">{{ reportMotto }}</text>
+            </view>
+            <view v-else-if="reportMode === 'pair'" class="rmh-pair">
+              <view class="rmh-avatar"><text class="rmhav-txt">{{ (userInfo.nickname || '我').charAt(0) }}</text></view>
+              <view class="rmh-relation-line">
+                <view class="rmh-rl-badge"><text class="rmhrl-txt">{{ relationLabel }}</text></view>
+              </view>
+              <view class="rmh-avatar"><text class="rmhav-txt">{{ (partnerInfo.nickname || 'TA').charAt(0) }}</text></view>
+              <view class="rmh-pair-streak">
+                <text class="rmhps-num">{{ reportStreakDays }}</text>
+                <text class="rmhps-label">天连续互动</text>
+              </view>
+            </view>
+            <view v-else class="rmh-family">
+              <view class="rmh-fam-row">
+                <view class="rmh-avatar fam-av"><text class="rmhav-txt">{{ (userInfo.nickname || '我').charAt(0) }}</text></view>
+                <view class="rmh-relation-line fam-line">
+                  <view class="rmh-rl-badge"><text class="rmhrl-txt">👨‍👩‍👧‍👦 {{ prefs.userCount }}人之家</text></view>
+                </view>
+                <view class="rmh-avatar fam-av"><text class="rmhav-txt">{{ (partnerInfo.nickname || 'TA').charAt(0) }}</text></view>
+              </view>
+              <view class="rmh-fam-streak">
+                <text class="rmhfs-num">{{ reportStreakDays }}</text>
+                <text class="rmhfs-label">天全家坚持好好吃饭</text>
+              </view>
+            </view>
           </view>
         </view>
 
         <view class="rm-section">
-          <text class="rms-title">📈 营养概览</text>
+          <text class="rms-title">📈 本周饮食概览</text>
           <view class="rms-grid">
-            <view class="rms-card">
-              <view class="rmsc-icon meat"><text class="rmsci-txt">🥩</text></view>
-              <text class="rmsc-num">{{ weeklyMeatCount }}</text>
-              <text class="rmsc-label">荤菜道数</text>
-            </view>
-            <view class="rms-card">
-              <view class="rmsc-icon veg"><text class="rmsci-txt">🥬</text></view>
-              <text class="rmsc-num">{{ weeklyVegCount }}</text>
-              <text class="rmsc-label">素菜道数</text>
-            </view>
             <view class="rms-card">
               <view class="rmsc-icon cal"><text class="rmsci-txt">🔥</text></view>
               <text class="rmsc-num">{{ weeklyCalories }}</text>
-              <text class="rmsc-label">热量(kcal)</text>
+              <text class="rmsc-label">总热量(kcal)</text>
+            </view>
+            <view class="rms-card">
+              <view class="rmsc-icon meal"><text class="rmsci-txt">🍽️</text></view>
+              <text class="rmsc-num">{{ myMealCount }}</text>
+              <text class="rmsc-label">已打卡餐数</text>
+            </view>
+            <view class="rms-card">
+              <view class="rmsc-icon day"><text class="rmsci-txt">📅</text></view>
+              <text class="rmsc-num">{{ weeklyCheckInDays }}</text>
+              <text class="rmsc-label">打卡天数</text>
             </view>
             <view class="rms-card">
               <view class="rmsc-icon pro"><text class="rmsci-txt">💪</text></view>
@@ -415,6 +442,29 @@ export default {
       const map = { couple: '💕 情侣', family: '👨‍👩‍👧 家人', friend: '🤝 朋友' }
       return map[this.partnerInfo.relationType] || '💕 伙伴'
     },
+    reportMode() {
+      const uc = this.prefs.userCount
+      if (!this.hasPartner || this.pairStatus !== 'paired') return 'solo'
+      if (uc === '3-4' || uc === '5+') return 'family'
+      return 'pair'
+    },
+    reportMotto() {
+      const days = this.reportStreakDays
+      const meals = this.myMealCount
+      if (days === 0) return '开始打卡，记录每一餐的美好~'
+      if (days < 3) return `已坚持${days}天，下周也要好好吃饭哦！`
+      if (days < 7) return `${days}天连续打卡，你比想象中更自律！`
+      return `连续${days}天好好吃饭，太棒了！继续加油！`
+    },
+    weeklyCheckInDays() {
+      const checks = uni.getStorageSync('foodfind_personal_checks') || {}
+      let days = 0
+      Object.keys(checks).forEach(date => {
+        const day = checks[date]
+        if (day.breakfast || day.lunch || day.dinner) days++
+      })
+      return days
+    },
     prefSummaryText() {
       const parts = []
       const ut = this.userTypeOptions.find(o => o.value === this.prefs.userCount)
@@ -462,13 +512,21 @@ export default {
       return 100 - this.myMealPercent
     },
     healthTip() {
-      if (this.weeklyMeatCount > this.weeklyVegCount * 2) {
-        return '本周荤菜较多，建议多吃蔬菜均衡营养~ 保持打卡让关系更亲密！'
-      } else if (this.weeklyCalories > 8000) {
-        return `本周摄入 ${this.weeklyCalories}kcal，注意控制总量哦~ 继续保持健康饮食习惯！`
-      } else {
-        return '饮食搭配很均衡，继续保持！每周坚持打卡，记录美好食光~ ✨'
+      const mode = this.reportMode
+      const days = this.weeklyCheckInDays
+      const cal = this.weeklyCalories
+      if (mode === 'solo') {
+        if (days === 0) return '还没有开始打卡哦，今天的三餐别忘了记录~ 🍚'
+        if (days <= 2) return `本周已打卡${days}天，坚持记录饮食是自律的第一步！`
+        if (days <= 5) return `本周${days}天有在好好吃饭，继续保持这个好习惯！`
+        return `太棒了！本周每天都打卡了，你是最棒的干饭人！🎉`
       }
+      if (mode === 'pair') {
+        if (days <= 3) return `两人本周互动${days}天，多关心TA有没有好好吃饭吧~`
+        if (this.myMealCount > this.partnerMealCount) return '你比TA更勤快打卡哦，提醒TA也要好好吃饭~'
+        return `本周互动很频繁，继续一起好好吃饭，感情升温中！💕`
+      }
+      return `全家本周打卡${days}天，一起吃饭才是最温暖的时光~ 👨‍👩‍👧‍👦`
     }
   },
   onShow() {
@@ -933,41 +991,74 @@ export default {
 }
 .rm-title { font-size:34rpx; font-weight:700; color:#1a1a1a; }
 
-.rm-body { flex:1; overflow:hidden; padding:0 24rpx 24rpx; }
+.rm-body { flex:1; overflow:hidden; padding:0 20rpx 24rpx; box-sizing:border-box; }
 
 .rm-hero {
   position:relative; border-radius:24rpx; overflow:hidden;
   background:linear-gradient(135deg, #07c160 0%, #059a4b 100%);
-  padding:48rpx 24rpx; margin-bottom:20rpx;
+  padding:40rpx 20rpx 32rpx; margin-bottom:20rpx;
 }
 .rmh-bg {
   position:absolute; top:-50%; left:-50%; width:200%; height:200%;
   background:radial-gradient(circle at 30% 40%, rgba(255,255,255,.2) 0%, transparent 50%);
 }
-.rmh-content {
-  position:relative; display:flex; flex-direction:column; align-items:center; gap:8rpx;
+.rmh-content { position:relative; display:flex; flex-direction:column; align-items:center; }
+
+.rmh-solo { display:flex; flex-direction:column; align-items:center; gap:10rpx; }
+.rmh-avatar {
+  width:80rpx; height:80rpx; border-radius:50%;
+  background:rgba(255,255,255,.25); border:3rpx solid rgba(255,255,255,.5);
+  display:flex; align-items:center; justify-content:center;
+  &.solo-av { width:96rpx; height:96rpx; }
+  &.fam-av { width:68rpx; height:68rpx; }
 }
-.rmh-emoji { font-size:56rpx; }
-.rmh-main { font-size:72rpx; font-weight:900; color:#fff; text-shadow:0 4rpx 20rpx rgba(0,0,0,.15); }
-.rmh-sub { font-size:26rpx; color:rgba(255,255,255,.9); letter-spacing:2rpx; }
+.rmhav-txt { font-size:32rpx; color:#fff; font-weight:700; }
+.rmh-solo-streak { font-size:64rpx; font-weight:900; color:#fff; text-shadow:0 4rpx 16rpx rgba(0,0,0,.15); line-height:1.1; }
+.rmh-solo-label { font-size:25rpx; color:rgba(255,255,255,.9); letter-spacing:2rpx; }
+.rmh-motto { font-size:23rpx; color:rgba(255,255,255,.8); margin-top:6rpx; text-align:center; line-height:1.5; }
+
+.rmh-pair { display:flex; flex-direction:column; align-items:center; gap:16rpx; width:100%; }
+.rmh-pair-top { display:flex; align-items:center; justify-content:center; gap:0; width:100%; }
+.rmh-relation-line {
+  width:120rpx; height:4rpx; background:rgba(255,255,255,.4);
+  position:relative; display:flex; align-items:center; justify-content:center;
+  border-radius:2rpx; flex-shrink:0;
+  &.fam-line { width:100rpx; }
+}
+.rmh-rl-badge {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(255,255,255,.95); border-radius:20rpx;
+  padding:4rpx 14rpx; white-space:nowrap;
+}
+.rmhrl-txt { font-size:18rpx; color:#059a4b; font-weight:600; }
+.rmh-pair-streak { display:flex; flex-direction:column; align-items:center; gap:4rpx; }
+.rmhps-num { font-size:48rpx; font-weight:900; color:#fff; text-shadow:0 3rpx 12rpx rgba(0,0,0,.15); }
+.rmhps-label { font-size:23rpx; color:rgba(255,255,255,.9); letter-spacing:1rpx; }
+
+.rmh-family { display:flex; flex-direction:column; align-items:center; gap:14rpx; width:100%; }
+.rmh-fam-row { display:flex; align-items:center; justify-content:center; gap:0; }
+.rmh-fam-streak { display:flex; flex-direction:column; align-items:center; gap:4rpx; }
+.rmhfs-num { font-size:44rpx; font-weight:900; color:#fff; text-shadow:0 3rpx 12rpx rgba(0,0,0,.15); }
+.rmhfs-label { font-size:22rpx; color:rgba(255,255,255,.9); }
 
 .rm-section { margin-bottom:20rpx; }
 .rms-title { display:block; font-size:28rpx; font-weight:700; color:#333; margin-bottom:16rpx; }
 
 .rms-grid {
-  display:grid; grid-template-columns:1fr 1fr; gap:14rpx;
+  display:grid; grid-template-columns:1fr 1fr; gap:12rpx;
 }
 .rms-card {
-  background:#fafffe; border-radius:18rpx; padding:20rpx 16rpx;
-  display:flex; flex-direction:column; align-items:center; gap:8rpx;
-  border:2rpx solid #e8fcfa;
+  background:#fafffe; border-radius:16rpx; padding:18rpx 12rpx;
+  display:flex; flex-direction:column; align-items:center; gap:6rpx;
+  border:2rpx solid #e8fcfa; box-sizing:border-box; overflow:hidden;
 }
 .rmsc-icon {
-  width:56rpx; height:56rpx; border-radius:14rpx;
+  width:52rpx; height:52rpx; border-radius:12rpx;
   display:flex; align-items:center; justify-content:center;
-  &.meat, &.veg, &.cal, &.pro { background:#e8f7ef; }
+  &.meat, &.veg, &.cal, &.pro, &.meal, &.day { background:#e8f7ef; }
 }
-.rmsci-txt { font-size:26rpx; }
+.rmsci-txt { font-size:24rpx; }
 .rmsc-num { font-size:36rpx; font-weight:800; color:#1a1a1a; }
 .rmsc-label { font-size:21rpx; color:#888; }
 
