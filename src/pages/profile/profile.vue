@@ -571,16 +571,7 @@ export default {
         if (this.myMealCount > this.partnerMealCount) return '你比TA更勤快打卡哦，提醒TA也要好好吃饭~'
         return `本周互动很频繁，继续一起好好吃饭，感情升温中！💕`
       }
-      return `全家本周打卡${days}天，一起吃饭才是最温暖的时光~ 👨‍👩‍👧‍👦`
-    },
-    formatWeekDateRange() {
-      const end = new Date()
-      const start = new Date(end.getTime() - 6 * 86400000)
-      const startMon = start.getMonth() + 1
-      const startDay = start.getDate()
-      const endMon = end.getMonth() + 1
-      const endDay = end.getDate()
-      return `${startMon}月${startDay}日 - ${endMon}月${endDay}日`
+      return `全家本周打卡${days}天，一起吃饭才是最温暖的时光~ 👨‍‍👧👦`
     }
   },
   onShow() {
@@ -681,6 +672,15 @@ export default {
       const m = parseInt(dateStr.slice(5, 7))
       const d = parseInt(dateStr.slice(8, 10))
       return `${m}/${d}`
+    },
+    formatWeekDateRange() {
+      const end = new Date()
+      const start = new Date(end.getTime() - 6 * 86400000)
+      const startMon = start.getMonth() + 1
+      const startDay = start.getDate()
+      const endMon = end.getMonth() + 1
+      const endDay = end.getDate()
+      return `${startMon}月${startDay}日 - ${endMon}月${endDay}日`
     },
     openPrefModal() { this.showPrefModal = true },
     closePrefModal() { this.showPrefModal = false },
