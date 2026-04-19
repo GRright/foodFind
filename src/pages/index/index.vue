@@ -118,26 +118,34 @@
         </view>
       </view>
 
-      <view class="gesture-guide-mask" :class="{ show: showGestureGuide }" @click="closeGestureGuide">
-        <view class="gesture-modal" @click.stop>
-          <view class="gm-header">
-            <text class="gm-header-title">👆 新手引导</text>
-            <view class="gm-close-btn" @click="closeGestureGuide"><text class="gmc-icon">✕</text></view>
+      <view class="gesture-guide-mask" :class="{ show: showGestureGuide }">
+        <view class="gesture-modal">
+          <view class="gm-top-bar">
+            <text class="gm-top-title">👆 新手引导</text>
+            <view class="gm-top-close" @click="closeGestureGuide"><text>✕</text></view>
           </view>
-          <view class="gm-body">
-            <view class="gm-step-bar">
-              <view class="gm-step" :class="{ active: ggStage >= 0, done: ggStage > 0 }"></view>
-              <view class="gm-step-line"></view>
-              <view class="gm-step" :class="{ active: ggStage >= 1, done: ggStage > 1 }"></view>
-              <view class="gm-step-line"></view>
-              <view class="gm-step" :class="{ active: ggStage >= 2 }"></view>
+
+          <view class="gm-progress">
+            <view class="gm-prog-track">
+              <view class="gm-prog-fill" :style="{ width: ((ggStage + 1) / 3 * 100) + '%' }"></view>
             </view>
+            <text class="gm-prog-label">{{ ggStage + 1 }} / 3</text>
+          </view>
 
-            <text class="gm-title">{{ ggOverlayTitle }}</text>
-            <text class="gm-subtitle">{{ ggOverlaySub }}</text>
+          <view class="gm-guide-area">
+            <text class="gm-guide-title">{{ ggOverlayTitle }}</text>
+            <text class="gm-guide-sub">{{ ggOverlaySub }}</text>
 
-            <view class="gm-demo-area">
-              <view class="gg-demo-card" :class="ggDemoCardAnim" @touchstart.stop="ggDemoCardTouchStart" @touchmove.stop="ggDemoCardTouchMove" @touchend.stop="ggDemoCardTouchEnd" @click.stop="ggDemoCardTap">
+            <view class="gm-demo-wrap">
+              <text class="gm-demo-tag">示例</text>
+              <view
+                class="gg-demo-card"
+                :class="ggDemoCardAnim"
+                @touchstart.stop="ggDemoCardTouchStart"
+                @touchmove.stop="ggDemoCardTouchMove"
+                @touchend.stop="ggDemoCardTouchEnd"
+                @click.stop="ggDemoCardTap"
+              >
                 <view class="ggdc-swipe-hint" :class="ggHintClass">
                   <text class="ggsh-icon">{{ ggHintIcon }}</text>
                   <text class="ggsh-text">{{ ggHintText }}</text>
@@ -156,16 +164,14 @@
                 </view>
               </view>
             </view>
+          </view>
 
-            <view class="gm-footer">
-              <view class="gm-act-btn" @click="ggAct" :class="{ 'gm-act-btn-disabled': ggLocked }">
-                <text class="gma-icon">{{ ggActIcon }}</text>
-                <text class="gma-text">{{ ggActText }}</text>
-              </view>
-              <view class="gm-skip-link" @click="closeGestureGuide">
-                <text class="gmsl-text">跳过引导</text>
-              </view>
+          <view class="gm-bottom">
+            <view class="gm-btn" @click="ggAct" :class="{ 'gm-btn-disabled': ggLocked }">
+              <text class="gmb-icon">{{ ggActIcon }}</text>
+              <text class="gmb-text">{{ ggActText }}</text>
             </view>
+            <view class="gm-skip" @click="closeGestureGuide"><text>跳过引导 ›</text></view>
           </view>
         </view>
       </view>
@@ -1085,48 +1091,47 @@ export default {
 
 .gesture-guide-mask {
   position:fixed; top:0; left:0; right:0; bottom:0;
-  background:rgba(0,0,0,0); z-index:1000;
-  display:flex; align-items:center; justify-content:center;
-  pointer-events:none; transition:background .5s ease;
-  &.show { background:rgba(0,0,0,.72); pointer-events:auto; }
+  background:rgba(0,0,0,0); z-index:10000;
+  pointer-events:none; transition:background .4s ease;
+  &.show { background:rgba(0,0,0,.82); pointer-events:auto; }
 }
 .gesture-modal {
-  width:620rpx; background:#fff; border-radius:28rpx;
-  overflow:hidden; transform:translateY(80rpx) scale(.88);
-  opacity:0; transition:all .5s cubic-bezier(.175,.885,.32,1.275);
-  box-shadow:0 24rpx 80rpx rgba(0,0,0,.3);
-  .gesture-guide-mask.show & { transform:translateY(0) scale(1); opacity:1; }
+  position:fixed; top:50%; left:50%;
+  transform:translate(-50%,-50%) scale(.7); opacity:0;
+  width:600rpx; max-height:88vh; background:#fff; border-radius:32rpx;
+  overflow:hidden; transition:all .45s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 24rpx 100rpx rgba(0,0,0,.35);
+  display:flex; flex-direction:column;
+  .gesture-guide-mask.show & { transform:translate(-50%,-50%) scale(1); opacity:1; }
 }
-.gm-header {
+.gm-top-bar {
   display:flex; justify-content:space-between; align-items:center;
-  padding:28rpx 32rpx; background:linear-gradient(135deg,#07c160,#059a4b);
+  padding:28rpx 32rpx 24rpx;
+  background:linear-gradient(135deg,#07c160,#059a4b);
 }
-.gm-header-title { font-size:30rpx; color:#fff; font-weight:700; letter-spacing:2rpx; }
-.gm-close-btn { width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center; }
-.gmc-icon { font-size:28rpx; color:rgba(255,255,255,.8); }
-.gm-body { padding:0 0 36rpx; }
-.gm-step-bar {
-  display:flex; align-items:center; justify-content:center;
-  padding:32rpx 48rpx 0; gap:0;
+.gm-top-title { font-size:30rpx; color:#fff; font-weight:700; letter-spacing:2rpx; }
+.gm-top-close {
+  width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center;
+  text { font-size:32rpx; color:rgba(255,255,255,.8); }
 }
-.gm-step {
-  width:44rpx; height:8rpx; border-radius:4rpx;
-  background:#e0e0e0; transition:all .3s ease;
-  &.active { background:#07c160; }
-  &.done { background:#07c160; opacity:.5; }
+.gm-progress {
+  padding:24rpx 32rpx 0; display:flex; align-items:center; gap:16rpx;
 }
-.gm-step-line { width:32rpx; height:4rpx; background:#e8e8e8; margin:0 8rpx; border-radius:2rpx; }
-.gm-title {
-  display:block; font-size:34rpx; font-weight:800; color:#1a1a1a;
-  text-align:center; margin:20rpx 0 6rpx;
+.gm-prog-track { flex:1; height:10rpx; background:#e8e8e8; border-radius:5rpx; overflow:hidden; }
+.gm-prog-fill { height:100%; background:linear-gradient(90deg,#07c160,#059a4b); border-radius:5rpx; transition:width .4s ease; }
+.gm-prog-label { font-size:22rpx; color:#999; flex-shrink:0; }
+.gm-guide-area { padding:24rpx 32rpx 0; display:flex; flex-direction:column; align-items:center; }
+.gm-guide-title { font-size:34rpx; font-weight:800; color:#1a1a1a; text-align:center; margin-bottom:8rpx; }
+.gm-guide-sub { font-size:24rpx; color:#aaa; text-align:center; margin-bottom:24rpx; }
+.gm-demo-wrap {
+  width:100%; display:flex; flex-direction:column; align-items:center;
+  background:linear-gradient(135deg,#f5f6f8,#f0f1f3); border-radius:24rpx;
+  padding:32rpx 0 28rpx; position:relative;
 }
-.gm-subtitle {
-  display:block; font-size:24rpx; color:#aaa; text-align:center;
-  margin-bottom:24rpx; padding:0 32rpx;
-}
-.gm-demo-area {
-  display:flex; align-items:center; justify-content:center;
-  padding:24rpx 0 32rpx;
+.gm-demo-tag {
+  position:absolute; top:16rpx; left:24rpx;
+  padding:4rpx 16rpx; background:rgba(7,193,96,.12); border-radius:10rpx;
+  font-size:20rpx; color:#07c160; font-weight:600;
 }
 
 .gg-demo-card {
@@ -1180,19 +1185,18 @@ export default {
 
 .gm-footer {
   display:flex; flex-direction:column; align-items:center; gap:16rpx;
-  padding:0 32rpx;
+  padding:24rpx 32rpx 28rpx;
 }
-.gm-act-btn {
+.gm-btn {
   width:100%; display:flex; align-items:center; justify-content:center; gap:10rpx;
   padding:22rpx 0; background:linear-gradient(135deg,#07c160,#059a4b);
   border-radius:48rpx; transition:all .25s ease;
-  &:active:not(.gm-act-btn-disabled) { transform:scale(.96); }
-  &.gm-act-btn-disabled { opacity:.5; }
+  &:active:not(.gm-btn-disabled) { transform:scale(.96); }
+  &.gm-btn-disabled { opacity:.5; }
 }
-.gma-icon { font-size:26rpx; color:#fff; }
-.gma-text { font-size:26rpx; color:#fff; font-weight:600; }
-.gm-skip-link { padding:12rpx; }
-.gmsl-text { font-size:24rpx; color:#bbb; }
+.gmb-icon { font-size:26rpx; color:#fff; }
+.gmb-text { font-size:26rpx; color:#fff; font-weight:600; }
+.gm-skip { padding:12rpx; text { font-size:24rpx; color:#bbb; } }
 
 @keyframes ggFlipOut {
   0% { transform:rotateX(0) scale(1); opacity:1; }
