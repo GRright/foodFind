@@ -127,9 +127,9 @@
 
           <view class="gm-progress">
             <view class="gm-prog-track">
-              <view class="gm-prog-fill" :style="{ width: ((ggStage + 1) / 3 * 100) + '%' }"></view>
+              <view class="gm-prog-fill" :style="{ width: ((ggStage + 1) / 2 * 100) + '%' }"></view>
             </view>
-            <text class="gm-prog-label">{{ ggStage + 1 }} / 3</text>
+            <text class="gm-prog-label">{{ ggStage + 1 }} / 2</text>
           </view>
 
           <view class="gm-guide-area">
@@ -144,7 +144,6 @@
                 @touchstart.stop="ggDemoCardTouchStart"
                 @touchmove.stop="ggDemoCardTouchMove"
                 @touchend.stop="ggDemoCardTouchEnd"
-                @click.stop="ggDemoCardTap"
               >
                 <view class="ggdc-swipe-hint" :class="ggHintClass">
                   <text class="ggsh-icon">{{ ggHintIcon }}</text>
@@ -332,16 +331,14 @@ export default {
     ggOverlayTitle() {
       const titles = [
         '上滑试试换菜？',
-        '下滑试试删除？',
-        '点击试试查看详情？'
+        '下滑试试删除？'
       ]
       return titles[this.ggStage] || '引导完成！'
     },
     ggOverlaySub() {
       const subs = [
         '按住下方菜品，往上滑动试试',
-        '按住下方菜品，往下滑动试试',
-        '点击下方菜品试试看'
+        '按住下方菜品，往下滑动试试'
       ]
       return subs[this.ggStage] || ''
     },
@@ -352,17 +349,17 @@ export default {
       return ''
     },
     ggHintIcon() {
-      return this.ggStage === 0 ? '✨' : this.ggStage === 1 ? '✕' : '👆'
+      return this.ggStage === 0 ? '✨' : this.ggStage === 1 ? '✕' : ''
     },
     ggHintText() {
-      return this.ggStage === 0 ? '换一道' : this.ggStage === 1 ? '删除' : '查看'
+      return this.ggStage === 0 ? '换一道' : this.ggStage === 1 ? '删除' : ''
     },
     ggActIcon() {
-      const icons = ['↻', '✕', '✓']
+      const icons = ['↻', '✕']
       return icons[this.ggStage] || '✓'
     },
     ggActText() {
-      const texts = ['上滑换菜 ↑', '下滑删除 ↓', '点击查看详情']
+      const texts = ['上滑换菜 ↑', '下滑删除 ↓']
       return texts[this.ggStage] || '知道了'
     }
   },
@@ -577,12 +574,6 @@ export default {
         this.ggSwipeOffset = 0
       }
     },
-    ggDemoCardTap() {
-      if (this.ggLocked) return
-      if (this.ggStage === 2) {
-        this.ggCompleteStage2()
-      }
-    },
     ggCompleteStage0() {
       this.ggLocked = true
       this.ggShowSparkle = true
@@ -608,26 +599,16 @@ export default {
         this.ggDemoFood = pool[Math.floor(Math.random() * pool.length)]
         this.ggSwipeOffset = 0
         this.ggDemoCardAnim = 'slide-in'
-        this.ggStage = 2
         setTimeout(() => {
           this.ggDemoCardAnim = ''
-          this.ggLocked = false
+          this.closeGestureGuide()
         }, 400)
       }, 400)
-    },
-    ggCompleteStage2() {
-      this.ggLocked = true
-      this.ggDemoCardAnim = 'tap-pop'
-      setTimeout(() => {
-        this.ggDemoCardAnim = ''
-        this.closeGestureGuide()
-      }, 500)
     },
     ggAct() {
       if (this.ggLocked) return
       if (this.ggStage === 0) { this.ggSwipeOffset = 100; this.ggCompleteStage0() }
       else if (this.ggStage === 1) { this.ggSwipeOffset = -100; this.ggCompleteStage1() }
-      else if (this.ggStage === 2) { this.ggDemoCardTap() }
     },
     closeGestureGuide() {
       this.showGestureGuide = false
