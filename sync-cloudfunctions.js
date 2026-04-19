@@ -1,0 +1,85 @@
+/**
+ * sync-cloudfunctions.js
+ * 
+ * 用途：将源码级云函数 (cloudfunctions/) 自动复制到编译输出目录 (dist/build/mp-weixin/cloudfunctions/)
+ * 
+ * 使用方式：
+ *   1. 手动运行：node sync-cloudfunctions.js
+ *   2. 编译后自动运行（package.json postbuild 钩子）
+ */
+
+const fs = require('fs')
+const path = require('path')
+
+const SOURCE_DIR = path.join(__dirname, 'cloudfunctions')
+const TARGET_DIR = path.join(__dirname, 'dist', 'build', 'mp-weixin', 'cloudfunctions')
+
+function sync() {
+  console.log('')
+  console.log('🔄 同步云函数到编译输出目录...')
+  console.log(`   源码: ${SOURCE_DIR}`)
+  console.log(`   目标: ${TARGET_DIR}`)
+  console.log('')
+
+  if (!fs.existsSync(SOURCE_DIR)) {
+    console.log('❌ 源码目录不存在:', SOURCE_DIR)
+    process.exit(1)
+  }
+
+  if (!fs.existsSync(TARGET_DIR)) {
+    fs.mkdirSync(TARGET_DIR, { recursive: true })
+    console.log('✅ 创建目标目录')
+  }
+
+  const functions = fs.readdirSync(SOURCE_DIR).filter(f => 
+    fs.statSync(path.join(SOURCE_DIR, f)).isDirectory()
+  )
+
+  let successCount = 0
+  let failCount = 0
+
+  for (const funcName of functions) {
+    const srcPath = path.join(SOURCE_DIR, funcName)
+    const tgtPath = path.join(TARGET_DIR, funcName)
+
+    try {
+      if (!fs.existsSync(tgtPath)) {
+        fs.mkdirSync(tgtPath, { recursive: true })
+      }
+
+      const files = ['index.js', 'package.json']
+      
+      for (const file of files) {
+        const srcFile = path.join(srcPath, file)
+        const tgtFile = path.join(tgtPath, file)
+
+        if (fs.existsSync(srcFile)) {
+          fs.copyFileSync(srcFile, tgtFile)
+        } else {
+          console.log(`  ⚠️  ${funcName}/${file} 不存在，跳过`)
+        }
+      }
+
+      successCount++
+      console.log(`  ✅ ${funcName}`)
+    } catch (err) {
+      failCount++
+      console.log(`  ❌ ${funcName}: ${err.message}`)
+    }
+  }
+
+  console.log('')
+  console.log(`📊 同步完成: ${successCount} 成功, ${failCount} 失败`)
+  
+  if (failCount > 0) {
+    process.exit(1)
+  }
+
+  return { success: successCount, failed: failCount }
+}
+
+if (require.main === module) {
+  sync()
+}
+
+module.exports = sync
