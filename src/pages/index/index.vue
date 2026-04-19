@@ -117,6 +117,38 @@
           <view class="dm-btn confirm" @click="confirmDelete"><text class="dmb-text">确认删除</text></view>
         </view>
       </view>
+
+      <view class="gesture-guide-mask" :class="{ show: showGestureGuide }">
+        <view class="gesture-guide-card">
+          <text class="gg-title">试试手势操作</text>
+          <view class="gg-body">
+            <view class="gg-demo" :class="ggStage >= 1 ? 'done' : ''">
+              <text class="gg-arrow up">↑</text>
+              <text class="gg-hint">上滑卡片</text>
+              <text class="gg-result">✨ 换一道新菜</text>
+            </view>
+            <view class="gg-divider"></view>
+            <view class="gg-demo" :class="ggStage >= 2 ? 'done' : ''">
+              <text class="gg-arrow down">↓</text>
+              <text class="gg-hint">下滑卡片</text>
+              <text class="gg-result">✕ 删除这道菜</text>
+            </view>
+            <view class="gg-divider"></view>
+            <view class="gg-demo" :class="ggStage >= 3 ? 'done' : ''">
+              <text class="gg-arrow click">👆</text>
+              <text class="gg-hint">点击卡片</text>
+              <text class="gg-result">📖 查看详情做法</text>
+            </view>
+          </view>
+          <text class="gg-prompt">{{ ggPrompt }}</text>
+          <view class="gg-btn" @click="ggNext" v-if="ggStage < 3">
+            <text class="ggb-text">{{ ggBtnText }}</text>
+          </view>
+          <view class="gg-btn skip" @click="closeGestureGuide">
+            <text class="ggb-text">跳过引导</text>
+          </view>
+        </view>
+      </view>
     </template>
 
     <!-- ===== 不做饭模式（分享模式）===== -->
@@ -208,7 +240,9 @@ export default {
       sparkleCardId: null,
       showDeleteModal: false,
       deleteTargetFood: null,
-      deleteTargetMealKey: ''
+      deleteTargetMealKey: '',
+      showGestureGuide: false,
+      ggStage: 0
     }
   },
   computed: {
@@ -263,13 +297,30 @@ export default {
       if (!this.dailyMeals) return 0; let cb = 0
       ;['breakfast','lunch','dinner'].forEach(k => { (this.dailyMeals[k]||[]).forEach(r => cb += r.nutrition?.carbs||0) })
       return Math.round(cb)
+    },
+    ggPrompt() {
+      const prompts = [
+        '按住卡片往上滑，可以换一道新菜',
+        '按住卡片往下滑，可以删除这道菜',
+        '轻点卡片，可以查看菜品详情做法'
+      ]
+      return prompts[this.ggStage] || ''
+    },
+    ggBtnText() {
+      const texts = ['我试试，上滑换菜 ↑', '我试试，下滑删除 ↓', '我试试，点击查看']
+      return texts[this.ggStage] || '知道了'
     }
   },
   onShow() {
     setTimeout(() => { this.pageEnter = false }, 400)
     this.loadMode()
     if (this.noCookMode) { this.loadFeed() }
-    else { this.loadMeals(); this.recordAppOpen(); this.loadTodayCheckIn() }
+    else {
+      this.loadMeals()
+      this.recordAppOpen()
+      this.loadTodayCheckIn()
+      this.checkGestureGuide()
+    }
   },
   methods: {
     getSwipeOpacity() {
@@ -434,6 +485,24 @@ export default {
         const m = String(d.getMinutes()).padStart(2,'0')
         return `${h}:${m}`
       } catch(e) { return '' }
+    },
+    checkGestureGuide() {
+      const done = uni.getStorageSync('foodfind_gesture_guide')
+      if (!done) {
+        setTimeout(() => { this.showGestureGuide = true }, 500)
+      }
+    },
+    ggNext() {
+      if (this.ggStage < 2) {
+        this.ggStage++
+      } else {
+        this.closeGestureGuide()
+      }
+    },
+    closeGestureGuide() {
+      this.showGestureGuide = false
+      this.ggStage = 0
+      uni.setStorageSync('foodfind_gesture_guide', true)
     },
 
     onSwipeStart(food, mealKey, e) {
@@ -885,4 +954,44 @@ export default {
   0% { opacity: 1; transform: translate(0, 0) scale(0.3) rotate(0deg); }
   100% { opacity: 0; transform: translate(var(--sx, 30rpx), var(--sy, -60rpx)) scale(1.2) rotate(180deg); }
 }
+
+.gesture-guide-mask {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0); z-index:1000; transition:background .4s ease;
+  display:flex; align-items:center; justify-content:center; pointer-events:none;
+  &.show { background:rgba(0,0,0,.65); pointer-events:auto; }
+}
+.gesture-guide-card {
+  width:600rpx; background:#fff; border-radius:32rpx;
+  padding:40rpx 32rpx 28rpx; transform:scale(.85) translateY(30rpx);
+  opacity:0; transition:all .4s cubic-bezier(.175,.885,.32,1.275);
+  display:flex; flex-direction:column; align-items:center;
+  .gesture-guide-mask.show & { transform:scale(1) translateY(0); opacity:1; }
+}
+.gg-title { font-size:34rpx; font-weight:800; color:#1a1a1a; margin-bottom:24rpx; }
+.gg-body { width:100%; display:flex; flex-direction:column; gap:0; margin-bottom:20rpx; }
+.gg-demo {
+  display:flex; flex-direction:column; align-items:center; gap:10rpx;
+  padding:20rpx 0; transition:all .3s ease;
+  &.done { opacity:.5; }
+}
+.gg-arrow {
+  font-size:48rpx; line-height:1;
+  &.up { color:#07c160; }
+  &.down { color:#666; }
+  &.click { color:#059a4b; }
+}
+.gg-hint { font-size:26rpx; color:#333; font-weight:600; }
+.gg-result { font-size:22rpx; color:#999; }
+.gg-divider { width:80%; height:2rpx; background:#f0f0f0; }
+.gg-prompt { font-size:24rpx; color:#666; text-align:center; margin-bottom:24rpx; min-height:32rpx; }
+.gg-btn {
+  width:100%; padding:22rpx 0; border-radius:48rpx; text-align:center; margin-bottom:12rpx;
+  background:linear-gradient(135deg,#07c160,#059a4b);
+  transition:all .25s ease;
+  &:active { transform:scale(.95); }
+  &.skip { background:#f5f5f5; }
+}
+.ggb-text { font-size:28rpx; font-weight:600; color:#fff; }
+.skip .ggb-text { color:#666; }
 </style>
