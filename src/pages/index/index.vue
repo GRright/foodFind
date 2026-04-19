@@ -118,34 +118,38 @@
         </view>
       </view>
 
-      <view class="gesture-guide-mask" :class="{ show: showGestureGuide }">
-        <view class="gesture-guide-card">
-          <text class="gg-title">试试手势操作</text>
-          <view class="gg-body">
-            <view class="gg-demo" :class="ggStage >= 1 ? 'done' : ''">
-              <text class="gg-arrow up">↑</text>
-              <text class="gg-hint">上滑卡片</text>
-              <text class="gg-result">✨ 换一道新菜</text>
-            </view>
-            <view class="gg-divider"></view>
-            <view class="gg-demo" :class="ggStage >= 2 ? 'done' : ''">
-              <text class="gg-arrow down">↓</text>
-              <text class="gg-hint">下滑卡片</text>
-              <text class="gg-result">✕ 删除这道菜</text>
-            </view>
-            <view class="gg-divider"></view>
-            <view class="gg-demo" :class="ggStage >= 3 ? 'done' : ''">
-              <text class="gg-arrow click">👆</text>
-              <text class="gg-hint">点击卡片</text>
-              <text class="gg-result">📖 查看详情做法</text>
-            </view>
+      <view class="gesture-guide-mask" :class="{ show: showGestureGuide }" @click="closeGestureGuide">
+        <view class="gesture-overlay">
+          <text class="go-title">{{ ggOverlayTitle }}</text>
+          <text class="go-subtitle">{{ ggOverlaySub }}</text>
+        </view>
+
+        <view class="gg-demo-card" :class="ggDemoCardAnim">
+          <view class="ggdc-inner">
+            <view class="ggdc-icon-wrap"><text class="ggdc-icon">{{ ggDemoFood?.image || '🍽️' }}</text></view>
+            <text class="ggdc-name">{{ ggDemoFood?.name || '示例菜品' }}</text>
           </view>
-          <text class="gg-prompt">{{ ggPrompt }}</text>
-          <view class="gg-btn" @click="ggNext" v-if="ggStage < 3">
-            <text class="ggb-text">{{ ggBtnText }}</text>
+          <view class="ggdc-swipe-hint" :class="ggHintClass">
+            <text class="ggsh-icon">{{ ggHintIcon }}</text>
+            <text class="ggsh-text">{{ ggHintText }}</text>
           </view>
-          <view class="gg-btn skip" @click="closeGestureGuide">
-            <text class="ggb-text">跳过引导</text>
+          <view class="ggdc-sparkle-layer" v-if="ggShowSparkle">
+            <text class="ggdc-sparkle gs1">✦</text>
+            <text class="ggdc-sparkle gs2">★</text>
+            <text class="ggdc-sparkle gs3">✧</text>
+            <text class="ggdc-sparkle gs4">✦</text>
+            <text class="ggdc-sparkle gs5">★</text>
+            <text class="ggdc-sparkle gs6">✧</text>
+          </view>
+        </view>
+
+        <view class="gg-actions" @click.stop>
+          <view class="gg-act-btn" @click="ggAct" :class="{ 'gg-act-btn-disabled': ggLocked }">
+            <text class="gga-icon">{{ ggActIcon }}</text>
+            <text class="gga-text">{{ ggActText }}</text>
+          </view>
+          <view class="gg-skip-btn" @click="closeGestureGuide">
+            <text class="ggs-text">跳过引导</text>
           </view>
         </view>
       </view>
@@ -242,7 +246,12 @@ export default {
       deleteTargetFood: null,
       deleteTargetMealKey: '',
       showGestureGuide: false,
-      ggStage: 0
+      ggStage: 0,
+      ggDemoFood: null,
+      ggSwipeOffset: 0,
+      ggDemoCardAnim: '',
+      ggShowSparkle: false,
+      ggLocked: false
     }
   },
   computed: {
@@ -298,16 +307,40 @@ export default {
       ;['breakfast','lunch','dinner'].forEach(k => { (this.dailyMeals[k]||[]).forEach(r => cb += r.nutrition?.carbs||0) })
       return Math.round(cb)
     },
-    ggPrompt() {
-      const prompts = [
-        '按住卡片往上滑，可以换一道新菜',
-        '按住卡片往下滑，可以删除这道菜',
-        '轻点卡片，可以查看菜品详情做法'
+    ggOverlayTitle() {
+      const titles = [
+        '上滑试试换菜？',
+        '下滑试试删除？',
+        '点击试试查看详情？'
       ]
-      return prompts[this.ggStage] || ''
+      return titles[this.ggStage] || '引导完成！'
     },
-    ggBtnText() {
-      const texts = ['我试试，上滑换菜 ↑', '我试试，下滑删除 ↓', '我试试，点击查看']
+    ggOverlaySub() {
+      const subs = [
+        '按住下方菜品，往上滑动试试',
+        '按住下方菜品，往下滑动试试',
+        '点击下方菜品试试看'
+      ]
+      return subs[this.ggStage] || ''
+    },
+    ggHintClass() {
+      const off = this.ggSwipeOffset
+      if (this.ggStage === 0 && off > 30) return 'show-up'
+      if (this.ggStage === 1 && off < -30) return 'show-down'
+      return ''
+    },
+    ggHintIcon() {
+      return this.ggStage === 0 ? '✨' : this.ggStage === 1 ? '✕' : '👆'
+    },
+    ggHintText() {
+      return this.ggStage === 0 ? '换一道' : this.ggStage === 1 ? '删除' : '查看'
+    },
+    ggActIcon() {
+      const icons = ['↻', '✕', '✓']
+      return icons[this.ggStage] || '✓'
+    },
+    ggActText() {
+      const texts = ['上滑换菜 ↑', '下滑删除 ↓', '点击查看详情']
       return texts[this.ggStage] || '知道了'
     }
   },
@@ -489,19 +522,98 @@ export default {
     checkGestureGuide() {
       const done = uni.getStorageSync('foodfind_gesture_guide')
       if (!done) {
-        setTimeout(() => { this.showGestureGuide = true }, 500)
+        this.ggStage = 0
+        this.ggLocked = false
+        this.ggSwipeOffset = 0
+        this.ggShowSparkle = false
+        this.ggDemoCardAnim = ''
+        const pool = ALL_RECIPES.breakfast || []
+        this.ggDemoFood = pool[Math.floor(Math.random() * pool.length)]
+        setTimeout(() => { this.showGestureGuide = true }, 800)
       }
     },
-    ggNext() {
-      if (this.ggStage < 2) {
-        this.ggStage++
+    ggDemoCardTouchStart(e) {
+      if (this.ggLocked) return
+      this._ggTouchStartY = e.touches[0].clientY
+      this._ggTouchStartX = e.touches[0].clientX
+      this.ggSwipeOffset = 0
+      this.ggDemoCardAnim = 'active'
+    },
+    ggDemoCardTouchMove(e) {
+      if (this.ggLocked) return
+      const currentY = e.touches[0].clientY
+      this.ggSwipeOffset = this._ggTouchStartY - currentY
+    },
+    ggDemoCardTouchEnd() {
+      if (this.ggLocked) return
+      this.ggDemoCardAnim = ''
+      if (this.ggStage === 0 && this.ggSwipeOffset > 50) {
+        this.ggCompleteStage0()
+      } else if (this.ggStage === 1 && this.ggSwipeOffset < -50) {
+        this.ggCompleteStage1()
       } else {
-        this.closeGestureGuide()
+        this.ggSwipeOffset = 0
       }
+    },
+    ggDemoCardTap() {
+      if (this.ggLocked) return
+      if (this.ggStage === 2) {
+        this.ggCompleteStage2()
+      }
+    },
+    ggCompleteStage0() {
+      this.ggLocked = true
+      this.ggShowSparkle = true
+      this.ggDemoCardAnim = 'flip-out'
+      setTimeout(() => {
+        const pool = ALL_RECIPES.breakfast || []
+        this.ggDemoFood = pool[Math.floor(Math.random() * pool.length)]
+        this.ggDemoCardAnim = 'flip-in'
+        this.ggSwipeOffset = 0
+        setTimeout(() => {
+          this.ggShowSparkle = false
+          this.ggDemoCardAnim = ''
+          this.ggStage = 1
+          this.ggLocked = false
+        }, 400)
+      }, 350)
+    },
+    ggCompleteStage1() {
+      this.ggLocked = true
+      this.ggDemoCardAnim = 'swipe-away'
+      setTimeout(() => {
+        const pool = ALL_RECIPES.lunch || []
+        this.ggDemoFood = pool[Math.floor(Math.random() * pool.length)]
+        this.ggSwipeOffset = 0
+        this.ggDemoCardAnim = 'slide-in'
+        this.ggStage = 2
+        setTimeout(() => {
+          this.ggDemoCardAnim = ''
+          this.ggLocked = false
+        }, 400)
+      }, 400)
+    },
+    ggCompleteStage2() {
+      this.ggLocked = true
+      this.ggDemoCardAnim = 'tap-pop'
+      setTimeout(() => {
+        this.ggDemoCardAnim = ''
+        this.closeGestureGuide()
+      }, 500)
+    },
+    ggAct() {
+      if (this.ggLocked) return
+      if (this.ggStage === 0) { this.ggSwipeOffset = 100; this.ggCompleteStage0() }
+      else if (this.ggStage === 1) { this.ggSwipeOffset = -100; this.ggCompleteStage1() }
+      else if (this.ggStage === 2) { this.ggDemoCardTap() }
     },
     closeGestureGuide() {
       this.showGestureGuide = false
       this.ggStage = 0
+      this.ggLocked = false
+      this.ggSwipeOffset = 0
+      this.ggShowSparkle = false
+      this.ggDemoCardAnim = ''
       uni.setStorageSync('foodfind_gesture_guide', true)
     },
 
@@ -957,41 +1069,109 @@ export default {
 
 .gesture-guide-mask {
   position:fixed; top:0; left:0; right:0; bottom:0;
-  background:rgba(0,0,0,0); z-index:1000; transition:background .4s ease;
-  display:flex; align-items:center; justify-content:center; pointer-events:none;
-  &.show { background:rgba(0,0,0,.65); pointer-events:auto; }
+  background:rgba(0,0,0,0); z-index:1000;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  pointer-events:none; transition:background .4s ease;
+  &.show { background:rgba(0,0,0,.7); pointer-events:auto; }
 }
-.gesture-guide-card {
-  width:600rpx; background:#fff; border-radius:32rpx;
-  padding:40rpx 32rpx 28rpx; transform:scale(.85) translateY(30rpx);
-  opacity:0; transition:all .4s cubic-bezier(.175,.885,.32,1.275);
-  display:flex; flex-direction:column; align-items:center;
-  .gesture-guide-mask.show & { transform:scale(1) translateY(0); opacity:1; }
+.gesture-overlay {
+  position:absolute; top:120rpx; left:0; right:0;
+  display:flex; flex-direction:column; align-items:center; gap:12rpx; z-index:5;
 }
-.gg-title { font-size:34rpx; font-weight:800; color:#1a1a1a; margin-bottom:24rpx; }
-.gg-body { width:100%; display:flex; flex-direction:column; gap:0; margin-bottom:20rpx; }
-.gg-demo {
-  display:flex; flex-direction:column; align-items:center; gap:10rpx;
-  padding:20rpx 0; transition:all .3s ease;
-  &.done { opacity:.5; }
+.go-title { font-size:42rpx; font-weight:900; color:#fff; text-shadow:0 2rpx 12rpx rgba(0,0,0,.3); }
+.go-subtitle { font-size:26rpx; color:rgba(255,255,255,.75); }
+
+.gg-demo-card {
+  position:relative; width:220rpx; padding:24rpx 16rpx 18rpx;
+  background:#fff; border-radius:20rpx; z-index:10;
+  box-shadow:0 8rpx 40rpx rgba(7,193,96,.25);
+  transition:transform .3s ease, opacity .3s ease;
+  &.active { transform: translateY(var(--gg-offset, 0rpx)) rotateX(var(--gg-rotate, 0deg)); }
+  &.flip-out { animation: ggFlipOut .35s ease-in forwards; }
+  &.flip-in { animation: ggFlipIn .4s ease-out both; }
+  &.swipe-away { animation: ggSwipeAway .4s ease-in forwards; }
+  &.slide-in { animation: ggSlideIn .4s cubic-bezier(.175,.885,.32,1.275) both; }
+  &.tap-pop { animation: ggTapPop .5s ease forwards; }
 }
-.gg-arrow {
-  font-size:48rpx; line-height:1;
-  &.up { color:#07c160; }
-  &.down { color:#666; }
-  &.click { color:#059a4b; }
+.ggdc-inner {
+  display:flex; flex-direction:column; align-items:center; gap:8rpx;
 }
-.gg-hint { font-size:26rpx; color:#333; font-weight:600; }
-.gg-result { font-size:22rpx; color:#999; }
-.gg-divider { width:80%; height:2rpx; background:#f0f0f0; }
-.gg-prompt { font-size:24rpx; color:#666; text-align:center; margin-bottom:24rpx; min-height:32rpx; }
-.gg-btn {
-  width:100%; padding:22rpx 0; border-radius:48rpx; text-align:center; margin-bottom:12rpx;
-  background:linear-gradient(135deg,#07c160,#059a4b);
-  transition:all .25s ease;
-  &:active { transform:scale(.95); }
-  &.skip { background:#f5f5f5; }
+.ggdc-icon-wrap {
+  width:96rpx; height:96rpx; background:#f7f8fa; border-radius:22rpx;
+  display:flex; align-items:center; justify-content:center;
 }
-.ggb-text { font-size:28rpx; font-weight:600; color:#fff; }
-.skip .ggb-text { color:#666; }
+.ggdc-icon { font-size:48rpx; }
+.ggdc-name { font-size:24rpx; font-weight:600; color:#333; text-align:center; }
+
+.ggdc-swipe-hint {
+  position:absolute; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:4rpx; padding:6rpx 16rpx;
+  background:linear-gradient(135deg,#07c160,#059a4b); border-radius:20rpx;
+  white-space:nowrap; opacity:0; transition:opacity .2s ease;
+  &.show-up { top:-12rpx; opacity:1; }
+  &.show-down { bottom:-12rpx; opacity:1; }
+}
+.ggsh-icon { font-size:18rpx; color:#fff; }
+.ggsh-text { font-size:18rpx; color:#fff; font-weight:600; }
+
+.ggdc-sparkle-layer {
+  position:absolute; top:0; left:0; right:0; bottom:0;
+  pointer-events:none; z-index:20; border-radius:20rpx; overflow:hidden;
+}
+.ggdc-sparkle {
+  position:absolute; font-size:28rpx; color:#FFD700;
+  animation: ggSparkleFly .6s ease-out forwards;
+  text-shadow:0 0 8rpx rgba(255,215,0,.8), 0 0 20rpx rgba(255,215,0,.4);
+  &.gs1 { left:5%; top:15%; animation-delay:0s; }
+  &.gs2 { left:75%; top:10%; animation-delay:.08s; font-size:32rpx; }
+  &.gs3 { left:25%; top:75%; animation-delay:.12s; }
+  &.gs4 { left:85%; top:60%; animation-delay:.04s; font-size:24rpx; }
+  &.gs5 { left:45%; top:5%; animation-delay:.16s; font-size:26rpx; }
+  &.gs6 { left:10%; top:50%; animation-delay:.2s; font-size:30rpx; }
+}
+
+.gg-actions {
+  position:absolute; bottom:120rpx; left:0; right:0;
+  display:flex; flex-direction:column; align-items:center; gap:16rpx; z-index:5;
+}
+.gg-act-btn {
+  display:flex; align-items:center; gap:10rpx;
+  padding:20rpx 44rpx; background:linear-gradient(135deg,#07c160,#059a4b);
+  border-radius:48rpx; transition:all .25s ease;
+  &:active:not(.gg-act-btn-disabled) { transform:scale(.95); }
+  &.gg-act-btn-disabled { opacity:.5; }
+}
+.gga-icon { font-size:26rpx; color:#fff; }
+.gga-text { font-size:26rpx; color:#fff; font-weight:600; }
+.gg-skip-btn { padding:16rpx; }
+.ggs-text { font-size:24rpx; color:rgba(255,255,255,.5); }
+
+@keyframes ggFlipOut {
+  0% { transform:rotateX(0) scale(1); opacity:1; }
+  50% { transform:rotateX(90deg) scale(.8); opacity:.5; }
+  100% { transform:rotateX(180deg) scale(.6); opacity:0; }
+}
+@keyframes ggFlipIn {
+  0% { transform:rotateX(-90deg) scale(.6); opacity:0; }
+  60% { transform:rotateX(15deg) scale(1.05); opacity:1; }
+  100% { transform:rotateX(0) scale(1); opacity:1; }
+}
+@keyframes ggSwipeAway {
+  0% { transform:translateY(0) rotate(-15deg); opacity:1; }
+  100% { transform:translateY(120rpx) rotate(-25deg) scale(.7); opacity:0; }
+}
+@keyframes ggSlideIn {
+  0% { transform:translateY(-80rpx) scale(.5); opacity:0; }
+  100% { transform:translateY(0) scale(1); opacity:1; }
+}
+@keyframes ggTapPop {
+  0% { transform:scale(1); opacity:1; }
+  30% { transform:scale(1.2); }
+  60% { transform:scale(1.1); }
+  100% { transform:scale(1); opacity:1; }
+}
+@keyframes ggSparkleFly {
+  0% { opacity:1; transform:translate(0,0) scale(.3) rotate(0); }
+  100% { opacity:0; transform:translate(var(--sx,30rpx),var(--sy,-60rpx)) scale(1.2) rotate(180deg); }
+}
 </style>
