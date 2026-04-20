@@ -3,11 +3,6 @@ export default {
   onLaunch() {
     console.log('[App] 吃点啥 - 启动中...')
     
-    if (wx.cloud) {
-      wx.cloud.init({ env: 'foodfind-cloud', traceUser: true })
-      console.log('[App] 云开发已初始化')
-    }
-    
     this.globalData = {
       userInfo: { nickname: '美食爱好者', avatar: '' },
       partnerInfo: null,

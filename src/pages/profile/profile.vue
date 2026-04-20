@@ -580,17 +580,7 @@ export default {
       this.myWeeklyMeals = meals
     },
     loadPairStats() {
-      const pairId = this.currentPairId || (this.partnerInfo || {}).pairId
-      if (!pairId) return
-
-      wx.cloud.callFunction({
-        name: 'getPairStats',
-        data: { pairId }
-      }).then(res => {
-        if (res.result && res.result.code === 0 && res.result.data) {
-          this.pairStats = res.result.data
-        }
-      }).catch(() => {})
+      return
     },
     openReport() {
       this.showReportModal = true
@@ -599,22 +589,7 @@ export default {
     },
     closeReport() { this.showReportModal = false },
     loadWeeklyReport() {
-      const pairId = this.currentPairId || (this.partnerInfo || {}).pairId
-      if (!pairId) {
-        this.generateLocalWeekData()
-        return
-      }
-
-      wx.cloud.callFunction({
-        name: 'getDailyStatus',
-        data: { pairId, range: 'week' }
-      }).then(res => {
-        if (res.result && res.result.code === 0) {
-          this.weeklyReportData = res.result.data || []
-        } else {
-          this.generateLocalWeekData()
-        }
-      }).catch(() => { this.generateLocalWeekData() })
+      this.generateLocalWeekData()
     },
     generateLocalWeekData() {
       const checks = uni.getStorageSync('foodfind_personal_checks') || {}
@@ -672,34 +647,12 @@ export default {
         this.partnerInfo = cached
         this.currentPairId = cached.pairId || ''
       } else {
-        wx.cloud.callFunction({ name: 'getPairInfo', data: {} }).then(res => {
-          if (res.result && res.result.code === 0) {
-            this.hasPartner = true
-            this.pairStatus = res.result.data.status
-            this.partnerInfo = res.result.data
-            this.currentPairId = res.result.data.pairId
-            uni.setStorageSync('foodfind_partner', { ...this.partnerInfo, status: this.pairStatus, pairId: this.currentPairId })
-            const app = getApp()
-            if (app?.globalData) app.globalData.partnerInfo = this.partnerInfo
-          } else { this.hasPartner = false; uni.removeStorageSync('foodfind_partner') }
-        }).catch(() => {})
+        this.hasPartner = false
       }
     },
 
     startInvite() {
-      wx.cloud.callFunction({
-        name: 'createPairInvite',
-        data: { relationType: 'friend', inviterName: this.userInfo.nickname || '我' }
-      }).then(res => {
-        wx.hideLoading()
-        if (res.result && res.result.code === 0) {
-          this.currentPairId = res.result.pairId
-          this.hasPartner = true
-          this.pairStatus = 'pending'
-          uni.setStorageSync('foodfind_partner', { nickname: '(待接受)', relationType: 'friend', status: 'pending', pairId: this.currentPairId })
-          setTimeout(() => { this.sendInviteMessage() }, 300)
-        } else { uni.showToast({ title: res.result.error || '创建失败', icon: 'none' }) }
-      }).catch(() => { wx.hideLoading(); uni.showToast({ title: '创建失败', icon: 'none' }) })
+      uni.showToast({ title: '配对功能暂时不可用', icon: 'none' })
     },
 
     sendInviteMessage() {
@@ -768,6 +721,7 @@ export default {
       if (!data) { uni.showToast({ title: '暂无分享记录', icon: 'none' }); return }
       uni.navigateTo({ url: '/pages/share/share?mode=view' })
     },
+
     clearCache() {
       uni.showModal({
         title: '清除缓存', content: '将清除所有缓存数据，重新开始？', confirmColor: '#ff4757',

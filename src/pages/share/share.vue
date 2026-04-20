@@ -121,31 +121,9 @@ export default {
   methods: {
     loadFromCloud(sid) {
       this.shareId = sid
-      this.loading = true
-
-      wx.cloud.callFunction({
-        name: 'getShareMenu',
-        data: { shareId: sid }
-      }).then(res => {
-        if (res.result && res.result.code === 0) {
-          const data = res.result.data
-          this.dailyMeals = data.meals || { breakfast: [], lunch: [], dinner: [] }
-          this.fromName = data.fromName || 'TA'
-          this.partnerName = data.toName || '我'
-          this.isReceiver = true
-          this.isSender = false
-          this.status = data.status || 'pending'
-          this.shareTime = data.time || new Date().toLocaleString()
-        } else {
-          uni.showToast({ title: '分享已过期或不存在', icon: 'none' })
-          setTimeout(() => { uni.switchTab({ url: '/pages/index/index' }) }, 1500)
-        }
-      }).catch(err => {
-        console.error('loadFromCloud error:', err)
-        uni.showToast({ title: '加载失败，请重试', icon: 'none' })
-      }).finally(() => {
-        this.loading = false
-      })
+      this.loading = false
+      uni.showToast({ title: '云功能暂时不可用', icon: 'none' })
+      setTimeout(() => { uni.switchTab({ url: '/pages/index/index' }) }, 1500)
     },
 
     loadFromLocal() {
@@ -166,30 +144,7 @@ export default {
     },
 
     refreshStatus() {
-      if (!this.shareId) return
-      wx.showLoading({ title: '刷新中...' })
-      wx.cloud.callFunction({
-        name: 'getShareMenu',
-        data: { shareId: this.shareId }
-      }).then(res => {
-        if (res.result && res.result.code === 0) {
-          const oldStatus = this.status
-          const data = res.result.data
-          this.dailyMeals = data.meals || this.dailyMeals
-          this.status = data.status || 'pending'
-          if (oldStatus !== this.status && this.status === 'confirmed') {
-            uni.showToast({ title: '✨ TA已经确认啦！', icon: 'success' })
-          } else if (oldStatus !== this.status && this.status === 'modified') {
-            uni.showToast({ title: 'TA做了些调整~', icon: 'none' })
-          } else {
-            uni.showToast({ title: '已是最新状态', icon: 'none' })
-          }
-        }
-      }).catch(() => {
-        uni.showToast({ title: '刷新失败', icon: 'none' })
-      }).finally(() => {
-        wx.hideLoading()
-      })
+      uni.showToast({ title: '已是最新状态', icon: 'none' })
     },
 
     viewRecipe(r) { uni.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${r.id}` }) },
@@ -233,26 +188,13 @@ export default {
     },
 
     updateCloudStatus(status, meals) {
-      const dataToUpdate = { shareId: this.shareId, status }
-      if (meals) { dataToUpdate.meals = meals }
-
-      wx.showLoading({ title: '同步中...' })
-      wx.cloud.callFunction({
-        name: 'updateShareStatus',
-        data: dataToUpdate
-      }).then(res => {
-        this.status = status
-        if (meals) { this.dailyMeals = meals }
-        uni.setStorageSync('foodfind_meals', this.dailyMeals)
-        uni.setStorageSync('foodfind_meals_date', new Date().toDateString())
-        const app = getApp()
-        if (app?.globalData) app.globalData.dailyMeals = this.dailyMeals
-        uni.showToast({ title: status === 'confirmed' ? '已确认 ✨' : '已调整', icon: 'success' })
-      }).catch(() => {
-        uni.showToast({ title: '同步失败', icon: 'none' })
-      }).finally(() => {
-        wx.hideLoading()
-      })
+      this.status = status
+      if (meals) { this.dailyMeals = meals }
+      uni.setStorageSync('foodfind_meals', this.dailyMeals)
+      uni.setStorageSync('foodfind_meals_date', new Date().toDateString())
+      const app = getApp()
+      if (app?.globalData) app.globalData.dailyMeals = this.dailyMeals
+      uni.showToast({ title: status === 'confirmed' ? '已确认 ✨' : '已调整', icon: 'success' })
     },
 
     shareBack() {
@@ -271,24 +213,7 @@ export default {
         dinner: this.balanceMeal(ALL_RECIPES.dinner, n)
       }
       this.dailyMeals = newMeals
-
-      wx.cloud.callFunction({
-        name: 'saveShareMenu',
-        data: {
-          meals: newMeals,
-          fromName: getApp()?.globalData?.userInfo?.nickname || '我',
-          toName: this.partnerName
-        }
-      }).then(res => {
-        if (res.result && res.result.shareId) {
-          this.shareId = res.result.shareId
-          this.status = 'pending'
-          this.shareTime = new Date().toLocaleString()
-          uni.showToast({ title: '已重新生成，请再次转发', icon: 'none' })
-        }
-      }).catch(() => {
-        uni.showToast({ title: '操作失败', icon: 'none' })
-      })
+      uni.showToast({ title: '已重新生成', icon: 'none' })
     }
   }
 }

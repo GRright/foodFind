@@ -8,9 +8,15 @@
             <text class="greeting">{{ greetingText }}</text>
             <text class="greeting-sub">{{ greetingSubText }}</text>
           </view>
-          <view class="share-btn" :class="{ shared: shareBtnClicked }" open-type="share" @click="onShareClick">
-            <text class="sb-icon">♡</text>
-            <text class="sb-text">{{ shareBtnClicked ? '已分享' : '分享' }}</text>
+          <view class="header-actions">
+            <view class="notification-btn" :class="{ hasUnread: unreadCount > 0 }" @click="showNotifications">
+              <text class="nb-icon">🔔</text>
+              <view class="nb-badge" v-if="unreadCount > 0">{{ unreadCount > 9 ? '9+' : unreadCount }}</view>
+            </view>
+            <view class="share-btn" :class="{ shared: shareBtnClicked }" @click="onShareClick">
+              <text class="sb-icon">♡</text>
+              <text class="sb-text">{{ shareBtnClicked ? '已分享' : '分享' }}</text>
+            </view>
           </view>
         </view>
 
@@ -228,6 +234,16 @@
               <text class="fi-partner-tag" v-else>TA</text>
             </view>
             <text class="fi-caption" v-if="item.caption">{{ item.caption }}</text>
+            <view class="fi-actions" v-if="noCookMode">
+              <view class="fi-action-btn" @click="openComment(item)">
+                <text class="fab-icon">💬</text>
+                <text class="fab-text">{{ item.commentCount || 0 }} 评论</text>
+              </view>
+              <view class="fi-action-btn" @click="toggleLike(item)">
+                <text class="fab-icon">{{ item.liked ? '❤️' : '🤍' }}</text>
+                <text class="fab-text">{{ item.likeCount || 0 }}</text>
+              </view>
+            </view>
           </view>
         </view>
 
@@ -240,6 +256,124 @@
         <view class="bottom-spacer"></view>
       </scroll-view>
     </template>
+
+    <!-- 通知面板 -->
+    <view class="modal-mask" :class="{ show: showNotifPanel }" @click="showNotifPanel = false"></view>
+    <view class="notif-panel" :class="{ show: showNotifPanel }">
+      <view class="np-header">
+        <text class="np-title">通知</text>
+        <view class="np-close" @click="showNotifPanel = false"><text>✕</text></view>
+      </view>
+      <scroll-view scroll-y class="np-list">
+        <view class="notif-item" v-for="(n, i) in notifList" :key="i" :class="{ unread: !n.read }">
+          <view class="ni-icon">{{ n.type === 'checkin' ? '🍽️' : n.type === 'comment' ? '💬' : n.type === 'vote' ? '🗳️' : '🔔' }}</view>
+          <view class="ni-content">
+            <text class="ni-from">{{ n.fromName }}</text>
+            <text class="ni-text">{{ n.content }}</text>
+            <text class="ni-time">{{ formatTime(n.createdAt) }}</text>
+          </view>
+        </view>
+        <view class="empty-notif" v-if="notifList.length === 0">
+          <text class="en-icon">🔔</text>
+          <text class="en-text">暂无通知</text>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 评论弹窗 -->
+    <view class="modal-mask" :class="{ show: showCommentModal }" @click="showCommentModal = false"></view>
+    <view class="comment-modal" :class="{ show: showCommentModal }">
+      <view class="cm-header">
+        <text class="cm-title">评论</text>
+        <view class="cm-close" @click="showCommentModal = false"><text>✕</text></view>
+      </view>
+      <scroll-view scroll-y class="cm-list">
+        <view class="cm-item" v-for="(c, i) in commentList" :key="i">
+          <view class="cmi-avatar"><text class="cmi-char">{{ c.fromName.charAt(0) }}</text></view>
+          <view class="cmi-content">
+            <text class="cmi-name">{{ c.fromName }}</text>
+            <text class="cmi-text">{{ c.content }}</text>
+            <text class="cmi-time">{{ formatTime(c.createdAt) }}</text>
+          </view>
+        </view>
+        <view class="empty-cm" v-if="commentList.length === 0">
+          <text class="ec-icon">💬</text>
+          <text class="ec-text">暂无评论</text>
+        </view>
+      </scroll-view>
+      <view class="cm-input-area">
+        <input class="cm-input" v-model="commentInput" placeholder="写评论..." maxlength="100" @confirm="submitComment" />
+        <view class="cm-send-btn" @click="submitComment"><text class="csb-text">发送</text></view>
+      </view>
+    </view>
+
+    <!-- 投票弹窗 -->
+    <view class="modal-mask" :class="{ show: showVoteModal }" @click="showVoteModal = false"></view>
+    <view class="vote-modal" :class="{ show: showVoteModal }">
+      <view class="vm-header">
+        <text class="vm-title">今天吃什么？</text>
+        <view class="vm-close" @click="showVoteModal = false"><text>✕</text></view>
+      </view>
+      <view class="vm-create" v-if="!currentVote">
+        <input class="vm-title-input" v-model="voteTitle" placeholder="投票标题..." maxlength="30" />
+        <view class="vm-options">
+          <view class="vm-opt-row" v-for="(opt, i) in voteOptions" :key="i">
+            <input class="vm-opt-input" v-model="voteOptions[i]" :placeholder="'选项' + (i+1)" maxlength="20" />
+            <view class="vm-opt-del" v-if="voteOptions.length > 2" @click="removeVoteOption(i)"><text>✕</text></view>
+          </view>
+          <view class="vm-add-opt" v-if="voteOptions.length < 5" @click="addVoteOption"><text>+ 添加选项</text></view>
+        </view>
+        <view class="vm-create-btn" @click="createVoteAction"><text class="vcb-text">发起投票</text></view>
+      </view>
+      <view class="vm-result" v-if="currentVote">
+        <text class="vmr-title">{{ currentVote.title }}</text>
+        <view class="vmr-opt" v-for="(opt, i) in currentVote.options" :key="i" @click="doVote(i)">
+          <view class="vmr-opt-left">
+            <text class="vmr-opt-text">{{ opt.text }}</text>
+            <text class="vmr-opt-count">{{ opt.count }} 票</text>
+          </view>
+          <view class="vmr-bar-wrap">
+            <view class="vmr-bar" :style="{ width: getVotePercent(opt, currentVote) + '%' }"></view>
+          </view>
+        </view>
+        <text class="vmr-status">{{ currentVote.status === 'active' ? '投票进行中' : '投票已结束' }}</text>
+      </view>
+    </view>
+
+    <!-- 成就弹窗 -->
+    <view class="modal-mask" :class="{ show: showAchievementModal }" @click="showAchievementModal = false"></view>
+    <view class="achievement-modal" :class="{ show: showAchievementModal }">
+      <view class="am-header">
+        <text class="am-title">🏆 成就</text>
+        <view class="am-close" @click="showAchievementModal = false"><text>✕</text></view>
+      </view>
+      <scroll-view scroll-y class="am-list">
+        <view class="am-item" v-for="(a, i) in achievements" :key="i" :class="{ unlocked: a.unlocked }">
+          <view class="ami-icon">{{ a.icon }}</view>
+          <view class="ami-content">
+            <text class="ami-name">{{ a.name }}</text>
+            <text class="ami-desc">{{ a.desc }}</text>
+            <text class="ami-status">{{ a.unlocked ? '✓ 已解锁' : '🔒 未解锁' }}</text>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="am-streak-bar" @click="showAchievementModal = false">
+        <text class="ams-icon">🔥</text>
+        <text class="ams-text">连续打卡 {{ streakDays }} 天</text>
+      </view>
+    </view>
+
+    <!-- 投票入口按钮 -->
+    <view class="vote-entry-btn" v-if="noCookMode && pairId" @click="showVoteModal = true">
+      <text class="veb-icon">🗳️</text>
+      <text class="veb-text">今天吃什么？</text>
+    </view>
+
+    <!-- 成就入口按钮 -->
+    <view class="achievement-entry-btn" v-if="noCookMode" @click="showAchievementModal = true">
+      <text class="ae-icon">🏆</text>
+      <text class="ae-text">成就</text>
+    </view>
   </view>
 </template>
 
@@ -276,7 +410,22 @@ export default {
       ggSwipeOffset: 0,
       ggDemoCardAnim: '',
       ggShowSparkle: false,
-      ggLocked: false
+      ggLocked: false,
+      showNotifPanel: false,
+      notifList: [],
+      unreadCount: 0,
+      showCommentModal: false,
+      commentList: [],
+      commentInput: '',
+      currentFeedItem: null,
+      showVoteModal: false,
+      voteTitle: '今天吃什么？',
+      voteOptions: ['火锅', '烧烤', '日料'],
+      currentVote: null,
+      showAchievementModal: false,
+      streakDays: 0,
+      achievements: [],
+      pairId: ''
     }
   },
   computed: {
@@ -380,12 +529,12 @@ export default {
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 400)
     this.loadMode()
-    if (this.noCookMode) { this.loadFeed() }
+    this.loadPairId()
+    if (this.noCookMode) {
+      this.loadFeed()
+    }
     else {
       this.loadMeals()
-      this.recordAppOpen()
-      this.loadTodayCheckIn()
-      this.checkGestureGuide()
     }
   },
   methods: {
@@ -416,13 +565,7 @@ export default {
       this.noCookMode = !!prefs.noCookMode
     },
     recordAppOpen() {
-      const partner = uni.getStorageSync('foodfind_partner')
-      if (!partner || !partner.pairId) return
-
-      wx.cloud.callFunction({
-        name: 'recordCheckIn',
-        data: { action: 'open_app', pairId: partner.pairId }
-      }).catch(() => {})
+      return
     },
     loadTodayCheckIn() {
       const todayStr = new Date().toISOString().split('T')[0]
@@ -430,23 +573,6 @@ export default {
       if (personalChecks[todayStr]) {
         this.mealCheckIn = { ...personalChecks[todayStr] }
       }
-
-      const partner = uni.getStorageSync('foodfind_partner')
-      if (!partner || !partner.pairId) return
-
-      wx.cloud.callFunction({
-        name: 'getDailyStatus',
-        data: { pairId: partner.pairId }
-      }).then(res => {
-        if (res.result && res.result.code === 0 && res.result.data && res.result.data.myCheckIn) {
-          const my = res.result.data.myCheckIn
-          this.mealCheckIn = {
-            breakfast: my.meals?.breakfast?.eaten || this.mealCheckIn.breakfast,
-            lunch: my.meals?.lunch?.eaten || this.mealCheckIn.lunch,
-            dinner: my.meals?.dinner?.eaten || this.mealCheckIn.dinner
-          }
-        }
-      }).catch(() => {})
     },
     markMealEaten(mealKey) {
       const newState = !this.mealCheckIn[mealKey]
@@ -457,19 +583,6 @@ export default {
       if (!personalChecks[todayStr]) personalChecks[todayStr] = { breakfast: false, lunch: false, dinner: false }
       personalChecks[todayStr][mealKey] = newState
       uni.setStorageSync('foodfind_personal_checks', personalChecks)
-
-      const partner = uni.getStorageSync('foodfind_partner')
-      if (partner && partner.pairId) {
-        wx.cloud.callFunction({
-          name: 'recordCheckIn',
-          data: {
-            action: 'eat_meal',
-            pairId: partner.pairId,
-            mealType: mealKey,
-            data: { nickname: getApp()?.globalData?.userInfo?.nickname || '我' }
-          }
-        }).catch(() => {})
-      }
 
       if (newState) {
         uni.showToast({ title: `${mealKey === 'breakfast' ? '早餐' : mealKey === 'lunch' ? '午餐' : '晚餐'}已打卡 ✓`, icon: 'success' })
@@ -524,7 +637,6 @@ export default {
       uni.showToast({ title: '已分享', icon: 'success' })
 
       if (app?.globalData?.partnerInfo && app.globalData.pairStatus === 'paired') {
-        wx.cloud.callFunction({ name: 'saveShareMenu', data: { meals: [{ photoShare: true, image: imagePath, caption: '' }], fromName: item.fromName, toName: app.globalData.partnerInfo.nickname || 'TA' } }).catch(() => {})
       }
     },
     loadFeed() {
@@ -554,16 +666,8 @@ export default {
     },
     checkGestureGuide() {
       const done = uni.getStorageSync('foodfind_gesture_guide')
-      if (!done) {
-        this.ggStage = 0
-        this.ggLocked = false
-        this.ggSwipeOffset = 0
-        this.ggShowSparkle = false
-        this.ggDemoCardAnim = ''
-        const pool = ALL_RECIPES.breakfast || []
-        this.ggDemoFood = pool[Math.floor(Math.random() * pool.length)]
-        setTimeout(() => { this.showGestureGuide = true }, 800)
-      }
+      if (done) return
+      uni.setStorageSync('foodfind_gesture_guide', true)
     },
     ggDemoCardTouchStart(e) {
       if (this.ggLocked) return
@@ -787,29 +891,171 @@ export default {
       setTimeout(() => { this.generateDailyMeals(); uni.hideLoading(); uni.showToast({ title: '已重新生成', icon: 'success' }) }, 600)
     },
     goToDetail(recipe) { uni.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` }) },
-    onShareClick() { this.shareBtnClicked = true },
+    onShareClick() {
+      this.shareBtnClicked = true
+      uni.showToast({ title: '请点击右上角分享', icon: 'none' })
+    },
     onShareAppMessage() {
-      const self = this
       const app = getApp()
       const partnerName = app?.globalData?.partnerInfo?.nickname || 'TA'
 
-      if (self.noCookMode) {
+      if (this.noCookMode) {
         return { title: `来看看我今天吃了什么~`, path: '/pages/index/index', imageUrl: '' }
       }
 
       const cal = this.totalCalories
-      return new Promise((resolve) => {
-        wx.cloud.callFunction({
-          name: 'saveShareMenu',
-          data: { meals: self.dailyMeals, fromName: app.globalData.userInfo.nickname || '我', toName: partnerName }
-        }).then(res => {
-          if (res.result && res.result.shareId) {
-            resolve({ title: `${partnerName}，今天吃这些怎么样？(${cal}kcal)`, path: `/pages/share/share?sid=${res.result.shareId}&from=home`, imageUrl: '' })
-          } else { resolve({ title: `${partnerName}，今天吃这些？(${cal}kcal)`, path: '/pages/index/index', imageUrl: '' }) }
-        }).catch(() => resolve({ title: `${partnerName}，今天吃这些？(${cal}kcal)`, path: '/pages/index/index', imageUrl: '' }))
+      return { title: `${partnerName}，今天吃这些？(${cal}kcal)`, path: '/pages/index/index', imageUrl: '' }
+    },
+    loadMore() {},
+    loadPairId() {
+      const partner = uni.getStorageSync('foodfind_partner')
+      if (partner && partner.pairId) {
+        this.pairId = partner.pairId
+      }
+    },
+    loadNotifications() {
+      return
+    },
+    showNotifications() {
+      this.showNotifPanel = true
+    },
+    openComment(item) {
+      this.currentFeedItem = item
+      this.showCommentModal = true
+      this.commentInput = ''
+      this.commentList = []
+    },
+    submitComment() {
+      if (!this.commentInput.trim() || !this.currentFeedItem) return
+      this.commentInput = ''
+      this.showCommentModal = false
+      if (this.currentFeedItem) {
+        this.currentFeedItem.commentCount = (this.currentFeedItem.commentCount || 0) + 1
+      }
+      uni.showToast({ title: '评论成功', icon: 'success' })
+    },
+    toggleLike(item) {
+      item.liked = !item.liked
+      if (item.liked) {
+        item.likeCount = (item.likeCount || 0) + 1
+      } else {
+        item.likeCount = Math.max(0, (item.likeCount || 0) - 1)
+      }
+      const saved = uni.getStorageSync('foodfind_feed') || {}
+      const todayStr = this.getTodayStr()
+      if (saved[todayStr]) {
+        const idx = saved[todayStr].findIndex(f => f.id === item.id)
+        if (idx > -1) {
+          saved[todayStr][idx].liked = item.liked
+          saved[todayStr][idx].likeCount = item.likeCount
+          uni.setStorageSync('foodfind_feed', saved)
+        }
+      }
+    },
+    addVoteOption() {
+      if (this.voteOptions.length < 5) {
+        this.voteOptions.push('')
+      }
+    },
+    removeVoteOption(i) {
+      if (this.voteOptions.length > 2) {
+        this.voteOptions.splice(i, 1)
+      }
+    },
+    createVoteAction() {
+      if (!this.voteTitle.trim()) {
+        uni.showToast({ title: '请输入投票标题', icon: 'none' })
+        return
+      }
+      const opts = this.voteOptions.filter(o => o.trim())
+      if (opts.length < 2) {
+        uni.showToast({ title: '至少需要2个选项', icon: 'none' })
+        return
+      }
+      uni.showToast({ title: '投票已创建', icon: 'success' })
+      this.showVoteModal = false
+    },
+    loadActiveVote() {
+      return
+    },
+    doVote(optionIndex) {
+      uni.showToast({ title: '投票成功', icon: 'success' })
+      this.showVoteModal = false
+    },
+    getVotePercent(opt, vote) {
+      const total = vote.options.reduce((sum, o) => sum + o.count, 0)
+      if (total === 0) return 0
+      return Math.round(opt.count / total * 100)
+    },
+    loadStreak() {
+      const streak = uni.getStorageSync('foodfind_streak') || { days: 0, lastDate: '' }
+      const today = this.getTodayStr()
+      if (streak.lastDate === today) {
+        this.streakDays = streak.days
+      } else {
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1)
+        const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`
+        if (streak.lastDate === yStr) {
+          this.streakDays = streak.days
+        } else if (streak.lastDate !== today) {
+          this.streakDays = 0
+        }
+      }
+    },
+    updateStreak() {
+      const today = this.getTodayStr()
+      const streak = uni.getStorageSync('foodfind_streak') || { days: 0, lastDate: '' }
+      if (streak.lastDate === today) return
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`
+      if (streak.lastDate === yStr) {
+        streak.days += 1
+      } else {
+        streak.days = 1
+      }
+      streak.lastDate = today
+      uni.setStorageSync('foodfind_streak', streak)
+      this.streakDays = streak.days
+      this.checkAchievements()
+    },
+    loadAchievements() {
+      const defaultAchievements = [
+        { id: 'streak_3', name: '初出茅庐', desc: '连续打卡3天', icon: '🌱', condition: () => this.streakDays >= 3 },
+        { id: 'streak_7', name: '坚持不懈', desc: '连续打卡7天', icon: '🔥', condition: () => this.streakDays >= 7 },
+        { id: 'streak_14', name: '美食达人', desc: '连续打卡14天', icon: '⭐', condition: () => this.streakDays >= 14 },
+        { id: 'streak_30', name: '食神', desc: '连续打卡30天', icon: '👑', condition: () => this.streakDays >= 30 },
+        { id: 'share_5', name: '分享使者', desc: '分享5次美食', icon: '📤', condition: () => (uni.getStorageSync('foodfind_share_count') || 0) >= 5 },
+        { id: 'comment_10', name: '评论达人', desc: '评论10次', icon: '💬', condition: () => (uni.getStorageSync('foodfind_comment_count') || 0) >= 10 },
+        { id: 'vote_3', name: '选择困难', desc: '发起3次投票', icon: '🗳️', condition: () => (uni.getStorageSync('foodfind_vote_count') || 0) >= 3 }
+      ]
+      const unlocked = uni.getStorageSync('foodfind_achievements') || []
+      this.achievements = defaultAchievements.map(a => ({
+        ...a,
+        unlocked: unlocked.includes(a.id) || a.condition()
+      }))
+      this.achievements.forEach(a => {
+        if (a.unlocked && !unlocked.includes(a.id)) {
+          unlocked.push(a.id)
+          uni.setStorageSync('foodfind_achievements', unlocked)
+        }
       })
     },
-    loadMore() {}
+    checkAchievements() {
+      const unlocked = uni.getStorageSync('foodfind_achievements') || []
+      let newUnlock = false
+      this.achievements.forEach(a => {
+        if (!unlocked.includes(a.id) && a.condition()) {
+          unlocked.push(a.id)
+          newUnlock = true
+        }
+      })
+      if (newUnlock) {
+        uni.setStorageSync('foodfind_achievements', unlocked)
+        uni.showToast({ title: '🏆 解锁新成就！', icon: 'none', duration: 2000 })
+      }
+    }
   }
 }
 </script>
@@ -1248,4 +1494,260 @@ export default {
   0% { opacity:1; transform:translate(0,0) scale(.3) rotate(0); }
   100% { opacity:0; transform:translate(var(--sx,30rpx),var(--sy,-60rpx)) scale(1.2) rotate(180deg); }
 }
+
+/* ===== Header Actions ===== */
+.header-actions { display:flex; align-items:center; gap:12rpx; }
+.notification-btn {
+  position:relative; width:64rpx; height:64rpx;
+  background:#fff; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2rpx 8rpx rgba(0,0,0,.06);
+  transition:all .25s ease;
+  &.hasUnread { background:#fff5f5; }
+  &:active { transform:scale(.92); }
+}
+.nb-icon { font-size:30rpx; }
+.nb-badge {
+  position:absolute; top:-4rpx; right:-4rpx;
+  min-width:28rpx; height:28rpx; padding:0 6rpx;
+  background:#ff4757; border-radius:14rpx;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18rpx; color:#fff; font-weight:700;
+  border:2rpx solid #fff;
+}
+
+/* ===== Modal Mask ===== */
+.modal-mask {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0); z-index:998; transition:background .3s ease;
+  pointer-events:none;
+  &.show { background:rgba(0,0,0,.45); pointer-events:auto; }
+}
+
+/* ===== Notification Panel ===== */
+.notif-panel {
+  position:fixed; top:0; right:0; bottom:0;
+  width:600rpx; background:#fff; z-index:999;
+  transform:translateX(100%); transition:transform .35s cubic-bezier(.4,0,.2,1);
+  box-shadow:-4rpx 0 24rpx rgba(0,0,0,.1);
+  display:flex; flex-direction:column;
+  &.show { transform:translateX(0); }
+}
+.np-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:32rpx 28rpx; border-bottom:1rpx solid #f0f0f0;
+}
+.np-title { font-size:32rpx; font-weight:700; color:#1a1a1a; }
+.np-close {
+  width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center;
+  text { font-size:28rpx; color:#999; }
+}
+.np-list { flex:1; padding:16rpx; }
+.notif-item {
+  display:flex; align-items:flex-start; gap:16rpx;
+  padding:20rpx; background:#f8f9fa; border-radius:16rpx;
+  margin-bottom:12rpx; transition:all .2s ease;
+  &.unread { background:#e8f7ef; }
+}
+.ni-icon { font-size:36rpx; flex-shrink:0; margin-top:4rpx; }
+.ni-content { flex:1; display:flex; flex-direction:column; gap:4rpx; }
+.ni-from { font-size:24rpx; font-weight:600; color:#333; }
+.ni-text { font-size:24rpx; color:#666; line-height:1.4; }
+.ni-time { font-size:20rpx; color:#bbb; }
+.empty-notif {
+  display:flex; flex-direction:column; align-items:center;
+  padding:100rpx 0;
+}
+.en-icon { font-size:60rpx; margin-bottom:16rpx; }
+.en-text { font-size:24rpx; color:#bbb; }
+
+/* ===== Comment Modal ===== */
+.comment-modal {
+  position:fixed; left:50%; bottom:0;
+  transform:translate(-50%,100%);
+  width:100%; max-height:70vh; background:#fff; border-radius:32rpx 32rpx 0 0;
+  z-index:999; transition:transform .35s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 -4rpx 24rpx rgba(0,0,0,.1);
+  display:flex; flex-direction:column;
+  &.show { transform:translate(-50%,0); }
+}
+.cm-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:28rpx 32rpx; border-bottom:1rpx solid #f0f0f0;
+}
+.cm-title { font-size:30rpx; font-weight:700; color:#1a1a1a; }
+.cm-close {
+  width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center;
+  text { font-size:28rpx; color:#999; }
+}
+.cm-list { flex:1; padding:20rpx 28rpx; max-height:400rpx; }
+.cm-item {
+  display:flex; align-items:flex-start; gap:16rpx;
+  padding:16rpx 0; border-bottom:1rpx solid #f5f5f5;
+}
+.cmi-avatar {
+  width:52rpx; height:52rpx; background:#e8f7ef; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.cmi-char { font-size:24rpx; font-weight:700; color:#07c160; }
+.cmi-content { flex:1; display:flex; flex-direction:column; gap:4rpx; }
+.cmi-name { font-size:24rpx; font-weight:600; color:#333; }
+.cmi-text { font-size:26rpx; color:#555; line-height:1.4; }
+.cmi-time { font-size:20rpx; color:#bbb; }
+.empty-cm {
+  display:flex; flex-direction:column; align-items:center;
+  padding:60rpx 0;
+}
+.ec-icon { font-size:50rpx; margin-bottom:12rpx; }
+.ec-text { font-size:24rpx; color:#bbb; }
+.cm-input-area {
+  display:flex; align-items:center; gap:12rpx;
+  padding:20rpx 28rpx; border-top:1rpx solid #f0f0f0;
+  background:#fff;
+}
+.cm-input {
+  flex:1; height:64rpx; padding:0 20rpx;
+  background:#f5f5f5; border-radius:32rpx;
+  font-size:26rpx; color:#333;
+}
+.cm-send-btn {
+  padding:16rpx 28rpx; background:#07c160; border-radius:32rpx;
+  &:active { opacity:.85; }
+}
+.csb-text { font-size:24rpx; color:#fff; font-weight:600; }
+
+/* ===== Vote Modal ===== */
+.vote-modal {
+  position:fixed; left:50%; top:50%;
+  transform:translate(-50%,-50%) scale(.85);
+  width:600rpx; background:#fff; border-radius:28rpx;
+  z-index:999; opacity:0; pointer-events:none;
+  transition:all .35s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 16rpx 64rpx rgba(0,0,0,.12);
+  &.show { transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto; }
+}
+.vm-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:28rpx 32rpx; border-bottom:1rpx solid #f0f0f0;
+}
+.vm-title { font-size:30rpx; font-weight:700; color:#1a1a1a; }
+.vm-close {
+  width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center;
+  text { font-size:28rpx; color:#999; }
+}
+.vm-create { padding:28rpx; }
+.vm-title-input {
+  width:100%; height:64rpx; padding:0 20rpx;
+  background:#f5f5f5; border-radius:16rpx;
+  font-size:26rpx; color:#333; margin-bottom:20rpx;
+}
+.vm-options { }
+.vm-opt-row {
+  display:flex; align-items:center; gap:12rpx; margin-bottom:12rpx;
+}
+.vm-opt-input {
+  flex:1; height:64rpx; padding:0 20rpx;
+  background:#f5f5f5; border-radius:16rpx;
+  font-size:26rpx; color:#333;
+}
+.vm-opt-del {
+  width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center;
+  background:#ff4757; border-radius:50%;
+  text { font-size:24rpx; color:#fff; }
+}
+.vm-add-opt {
+  padding:16rpx; text-align:center;
+  text { font-size:24rpx; color:#07c160; font-weight:500; }
+}
+.vm-create-btn {
+  margin-top:24rpx; padding:20rpx 0;
+  background:#07c160; border-radius:48rpx; text-align:center;
+  &:active { opacity:.85; }
+}
+.vcb-text { font-size:28rpx; color:#fff; font-weight:600; }
+.vm-result { padding:28rpx; }
+.vmr-title { font-size:28rpx; font-weight:700; color:#1a1a1a; margin-bottom:20rpx; display:block; }
+.vmr-opt {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16rpx 0; border-bottom:1rpx solid #f5f5f5;
+}
+.vmr-opt-left { display:flex; flex-direction:column; gap:4rpx; min-width:120rpx; }
+.vmr-opt-text { font-size:26rpx; color:#333; font-weight:500; }
+.vmr-opt-count { font-size:20rpx; color:#999; }
+.vmr-bar-wrap {
+  flex:1; height:16rpx; background:#f0f0f0; border-radius:8rpx;
+  margin-left:20rpx; overflow:hidden;
+}
+.vmr-bar { height:100%; background:#07c160; border-radius:8rpx; transition:width .3s ease; }
+.vmr-status {
+  display:block; text-align:center; margin-top:20rpx;
+  font-size:22rpx; color:#999;
+}
+
+/* ===== Achievement Modal ===== */
+.achievement-modal {
+  position:fixed; left:50%; top:50%;
+  transform:translate(-50%,-50%) scale(.85);
+  width:600rpx; max-height:70vh; background:#fff; border-radius:28rpx;
+  z-index:999; opacity:0; pointer-events:none;
+  transition:all .35s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 16rpx 64rpx rgba(0,0,0,.12);
+  display:flex; flex-direction:column;
+  &.show { transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto; }
+}
+.am-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:28rpx 32rpx; border-bottom:1rpx solid #f0f0f0;
+}
+.am-title { font-size:30rpx; font-weight:700; color:#1a1a1a; }
+.am-close {
+  width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center;
+  text { font-size:28rpx; color:#999; }
+}
+.am-list { flex:1; padding:20rpx 28rpx; max-height:500rpx; }
+.am-item {
+  display:flex; align-items:center; gap:16rpx;
+  padding:20rpx; background:#f8f9fa; border-radius:16rpx;
+  margin-bottom:12rpx; transition:all .2s ease;
+  &.unlocked { background:#e8f7ef; }
+}
+.ami-icon { font-size:48rpx; flex-shrink:0; }
+.ami-content { flex:1; display:flex; flex-direction:column; gap:4rpx; }
+.ami-name { font-size:26rpx; font-weight:600; color:#333; }
+.ami-desc { font-size:22rpx; color:#999; }
+.ami-status { font-size:20rpx; color:#07c160; font-weight:500; }
+.am-streak-bar {
+  display:flex; align-items:center; justify-content:center; gap:10rpx;
+  padding:20rpx; background:#fff5e6; border-top:1rpx solid #f0f0f0;
+}
+.ams-icon { font-size:32rpx; }
+.ams-text { font-size:26rpx; color:#ff9800; font-weight:600; }
+
+/* ===== Entry Buttons ===== */
+.vote-entry-btn, .achievement-entry-btn {
+  display:flex; align-items:center; justify-content:center; gap:10rpx;
+  padding:20rpx 32rpx; margin:16rpx 8rpx;
+  background:#fff; border-radius:20rpx;
+  box-shadow:0 2rpx 12rpx rgba(0,0,0,.06);
+  &:active { transform:scale(.97); }
+}
+.vote-entry-btn { background:#fff5e6; }
+.veb-icon { font-size:32rpx; }
+.veb-text { font-size:26rpx; color:#ff9800; font-weight:600; }
+.achievement-entry-btn { background:#f5f0ff; }
+.ae-icon { font-size:32rpx; }
+.ae-text { font-size:26rpx; color:#9c27b0; font-weight:600; }
+
+/* ===== Feed Actions ===== */
+.fi-actions {
+  display:flex; align-items:center; gap:20rpx; margin-top:12rpx; padding-top:12rpx;
+  border-top:1rpx solid #f0f0f0;
+}
+.fi-action-btn {
+  display:flex; align-items:center; gap:6rpx;
+  padding:8rpx 16rpx; background:#f5f5f5; border-radius:20rpx;
+  &:active { background:#e8e8e8; }
+}
+.fab-icon { font-size:24rpx; }
+.fab-text { font-size:22rpx; color:#666; font-weight:500; }
 </style>

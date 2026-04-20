@@ -93,85 +93,14 @@ export default {
   },
   methods: {
     loadInvite() {
-      this.loading = true
-      this.error = false
-
-      wx.cloud.callFunction({
-        name: 'getPairInfo',
-        data: { pairId: this.pairId }
-      }).then(res => {
-        if (res.result && res.result.hasPair) {
-          const data = res.result.data
-          this.inviterName = data.partnerName || 'TA'
-          this.relationType = data.relationType || 'couple'
-          this.createTime = data.createdAt || ''
-          
-          if (data.status === 'paired') {
-            this.isAccepted = true
-            this.savePartnerToLocal(data)
-          } else if (data.status === 'pending') {
-            const app = getApp()
-            if (app?.globalData && data.isInviter === undefined) {
-              this.isAccepted = false
-            } else if (data.isInviter === false) {
-              this.isAccepted = false
-            } else {
-              this.isAccepted = false
-            }
-          }
-        } else {
-          this.error = true
-          this.errorTitle = '邀请不存在'
-          this.errorMsg = '该邀请可能已被取消或已过期'
-        }
-      }).catch(err => {
-        console.error('loadInvite error:', err)
-        this.error = true
-        this.errorTitle = '加载失败'
-        this.errorMsg = '请检查网络后重试'
-      }).finally(() => {
-        this.loading = false
-      })
+      this.loading = false
+      this.error = true
+      this.errorTitle = '云功能暂时不可用'
+      this.errorMsg = '配对功能需要云端支持，请稍后重试'
     },
 
     acceptInvite() {
-      uni.showModal({
-        title: '接受邀请',
-        content: `确定要和 ${this.inviterName} 成为${this.relationLabel}吗？`,
-        confirmText: '接受',
-        success: (res) => {
-          if (res.confirm) {
-            wx.showLoading({ title: '配对中...' })
-            wx.cloud.callFunction({
-              name: 'acceptPairInvite',
-              data: {
-                pairId: this.pairId,
-                myName: getApp()?.globalData?.userInfo?.nickname || '我'
-              }
-            }).then(res => {
-              wx.hideLoading()
-              if (res.result && res.result.code === 0) {
-                this.isAccepted = true
-                this.savePartnerToLocal({
-                  ...res.result.data,
-                  status: 'paired',
-                  pairId: this.pairId
-                })
-                uni.showToast({ title: '配对成功 ✨', icon: 'success', duration: 2000 })
-              } else {
-                let msg = res.result.msg || '操作失败'
-                if (res.result.code === -3) msg = '不能接受自己的邀请哦~'
-                if (res.result.code === -4) msg = '该邀请已被其他人接受了'
-                if (res.result.code === -5) msg = '该邀请已经被接受过了'
-                uni.showToast({ title: msg, icon: 'none' })
-              }
-            }).catch(() => {
-              wx.hideLoading()
-              uni.showToast({ title: '网络错误', icon: 'none' })
-            })
-          }
-        }
-      })
+      uni.showToast({ title: '配对功能暂时不可用', icon: 'none' })
     },
 
     savePartnerToLocal(data) {

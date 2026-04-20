@@ -264,30 +264,10 @@ export default {
       if (cached) this.weeklyData = cached
     },
     loadSparkData() {
-      const partner = uni.getStorageSync('foodfind_partner')
-      if (!partner || !partner.pairId) return
-
-      wx.cloud.callFunction({
-        name: 'getDailyStatus',
-        data: { pairId: partner.pairId, range: 'week' }
-      }).then(res => {
-        if (res.result && res.result.code === 0) {
-          this.sparkData = res.result.data || []
-        }
-      }).catch(() => {})
+      return
     },
     loadPairStats() {
-      const partner = uni.getStorageSync('foodfind_partner')
-      if (!partner || !partner.pairId) return
-
-      wx.cloud.callFunction({
-        name: 'getPairStats',
-        data: { pairId: partner.pairId }
-      }).then(res => {
-        if (res.result && res.result.code === 0 && res.result.data) {
-          this.pairStats = res.result.data
-        }
-      }).catch(() => {})
+      return
     },
     getRecipeCount() {
       const c = this.userCount
