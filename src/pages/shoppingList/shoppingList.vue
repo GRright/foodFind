@@ -38,15 +38,22 @@
         </view>
 
         <view class="dc-custom" v-else>
-          <view class="dcc-slider">
-            <text class="dcc-min">1天</text>
-            <view class="dcc-track">
-              <view class="dcc-progress" :style="{ width: ((config.customDays - 1) / 13) * 100 + '%' }"></view>
-              <input type="range" :min="1" :max="14" :value="config.customDays" @input="onCustomDaysChange" class="dcc-input"/>
+          <view class="dc-custom-input-row">
+            <text class="dc-custom-label">准备</text>
+            <view class="dc-custom-number-box">
+              <view class="dc-custom-minus" @click="adjustDays(-1)">−</view>
+              <input 
+                class="dc-custom-input" 
+                type="number" 
+                v-model="config.customDays" 
+                @blur="onDaysInputBlur"
+                @confirm="onDaysInputConfirm"
+              />
+              <view class="dc-custom-plus" @click="adjustDays(1)">+</view>
             </view>
-            <text class="dcc-max">14天</text>
+            <text class="dc-custom-unit">天</text>
           </view>
-          <text class="dcc-value">{{ config.customDays }}天</text>
+          <text class="dc-custom-hint">可输入 1-14 天</text>
         </view>
       </view>
 
@@ -70,14 +77,14 @@
 
     <scroll-view scroll-y class="list-scroll">
       <view class="category-list" v-if="categorizedItems.length > 0">
-        <view class="category-section" v-for="(cat, ci) in categorizedItems" :key="cat.category" :style="{ animationDelay: (ci * 80) + 'ms' }" style="animation: slideUp .4s ease forwards; opacity: 0;">
-          <view class="cat-header">
-            <text class="cat-icon">{{ cat.icon }}</text>
-            <text class="cat-name">{{ cat.name }}</text>
-            <text class="cat-count">{{ cat.items.filter(i => !i.checked).length }}/{{ cat.items.length }}</text>
-          </view>
-          <view class="item-list">
-            <view class="item-row" :class="{ checked: item.checked }" v-for="(item, ii) in cat.items" :key="item.id" @click="toggleItem(item)" :style="{ animationDelay: (ci * 80 + ii * 40) + 'ms' }" style="animation: popIn .35s ease forwards; opacity: 0;">
+        <view class="category-section" v-for="(cat, ci) in categorizedItems" :key="cat.category">
+        <view class="cat-header">
+          <text class="cat-icon">{{ cat.icon }}</text>
+          <text class="cat-name">{{ cat.name }}</text>
+          <text class="cat-count">{{ cat.items.filter(i => !i.checked).length }}/{{ cat.items.length }}</text>
+        </view>
+        <view class="item-list">
+          <view class="item-row" :class="{ checked: item.checked }" v-for="(item, ii) in cat.items" :key="item.id" @click="toggleItem(item)">
               <view class="item-check">
                 <view class="check-circle" :class="{ checked: item.checked }">
                   <text class="check-mark" v-if="item.checked">✓</text>
@@ -122,9 +129,8 @@ import { getFamilyGroup, getCurrentUserId, getFamilyShoppingList, saveFamilyShop
 const CATEGORY_MAP = {
   vegetable: { name: '蔬菜', icon: '🥬' },
   meat: { name: '肉蛋禽', icon: '🥩' },
-  seasoning: { name: '调料', icon: '🧂' },
   staple: { name: '主食', icon: '🍚' },
-  other: { name: '其他', icon: '📦' }
+  other: { name: '其他', icon: '🧃' }
 }
 
 const CATEGORY_KEYWORDS = {
@@ -171,13 +177,16 @@ export default {
     categorizedItems() {
       const cats = {}
       this.items.forEach(item => {
-        const cat = item.category || 'other'
+        let cat = item.category || 'other'
+        if (cat === 'seasoning') {
+          return
+        }
         if (!cats[cat]) {
           cats[cat] = { category: cat, ...CATEGORY_MAP[cat], items: [] }
         }
         cats[cat].items.push(item)
       })
-      const order = ['vegetable', 'meat', 'staple', 'seasoning', 'other']
+      const order = ['vegetable', 'meat', 'staple', 'other']
       return order.filter(k => cats[k]).map(k => cats[k])
     },
     mealConfigSummary() {
@@ -204,10 +213,6 @@ export default {
     
     if (this.isFamilyMode) {
       this.loadFamilyShoppingList()
-    } else if (this.items.length === 0) {
-      setTimeout(() => {
-        this.autoGenerateIfEmpty()
-      }, 500)
     }
   },
   methods: {
@@ -285,11 +290,26 @@ export default {
       this.loadShoppingList()
       setTimeout(() => { this.autoGenerateIfEmpty() }, 100)
     },
-    onCustomDaysChange(e) {
-      this.config.customDays = parseInt(e.detail.value)
+    adjustDays(delta) {
+      let newDays = this.config.customDays + delta
+      if (newDays < 1) newDays = 1
+      if (newDays > 14) newDays = 14
+      this.config.customDays = newDays
       this.saveConfig()
       this.loadShoppingList()
       setTimeout(() => { this.autoGenerateIfEmpty() }, 100)
+    },
+    onDaysInputBlur() {
+      let val = parseInt(this.config.customDays)
+      if (isNaN(val) || val < 1) val = 1
+      if (val > 14) val = 14
+      this.config.customDays = val
+      this.saveConfig()
+      this.loadShoppingList()
+      setTimeout(() => { this.autoGenerateIfEmpty() }, 100)
+    },
+    onDaysInputConfirm() {
+      this.onDaysInputBlur()
     },
     goToMealConfig() {
       uni.navigateTo({ url: '/pages/mealConfig/mealConfig' })
@@ -322,10 +342,8 @@ export default {
         const { dateStr, isWeekend, offset } = daysToProcess[i]
         let dayMeals = null
 
-        if (weeklyData && weeklyData[dateStr]) {
-          dayMeals = weeklyData[dateStr]
-        } else if (offset === 0 && dailyMeals) {
-          dayMeals = dailyMeals
+        if (weeklyData && weeklyData[dateStr]) { dayMeals = weeklyData[dateStr]
+        } else if (offset === 0 && dailyMeals) { dayMeals = dailyMeals
         }
 
         if (dayMeals) {
@@ -336,15 +354,28 @@ export default {
               const fullRecipe = allRecipes.find(r => r.id === recipe.id)
               if (fullRecipe && fullRecipe.ingredients) {
                 fullRecipe.ingredients.forEach(ing => {
+                  const cat = this.classifyIngredient(ing.name)
+                  if (cat === 'seasoning') {
+                    return
+                  }
                   const key = ing.name
                   if (ingredientMap.has(key)) {
                     const existing = ingredientMap.get(key)
                     existing.amount = this.mergeAmount(existing.amount, ing.amount)
                   } else {
+                    let displayAmount = ing.amount
+                    let displayName = ing.name
+                    if (cat === 'other') {
+                      if (displayAmount) {
+                        displayAmount = displayAmount + ' · 可选'
+                      } else {
+                        displayName = displayName + ' · 可选'
+                      }
+                    }
                     ingredientMap.set(key, {
-                      name: ing.name,
-                      amount: ing.amount,
-                      category: this.classifyIngredient(ing.name)
+                      name: displayName,
+                      amount: displayAmount,
+                      category: cat
                     })
                   }
                 })
@@ -597,14 +628,32 @@ export default {
 .dpi-label { font-size: 22rpx; color: #666; }
 
 .dc-custom { display: flex; flex-direction: column; gap: 12rpx; width: 100%; }
-.dcc-slider { display: flex; align-items: center; gap: 16rpx; width: 100%; }
-.dcc-min, .dcc-max { font-size: 20rpx; color: #999; width: 60rpx; text-align: center; flex-shrink: 0; }
-.dcc-track {
-  flex: 1; height: 4rpx; background: #f5f6f8; border-radius: 2rpx; position: relative; min-width: 0;
+.dc-custom-input-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16rpx; padding: 20rpx 0;
 }
-.dcc-progress { position: absolute; left: 0; top: 0; height: 100%; background: linear-gradient(90deg, #07c160 0%, #09e370 100%); border-radius: 2rpx; }
-.dcc-input { position: absolute; left: -40rpx; right: -40rpx; top: -20rpx; bottom: -20rpx; opacity: 0; }
-.dcc-value { text-align: center; font-size: 32rpx; font-weight: 700; color: #07c160; }
+.dc-custom-label { font-size: 28rpx; color: #333; }
+.dc-custom-unit { font-size: 28rpx; color: #333; }
+.dc-custom-number-box {
+  display: flex; align-items: center;
+  background: #f5f6f8; border-radius: 16rpx;
+  overflow: hidden;
+}
+.dc-custom-minus, .dc-custom-plus {
+  width: 80rpx; height: 80rpx;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32rpx; color: #07c160; font-weight: 600;
+  &:active { background: #e8f7ef; }
+}
+.dc-custom-input {
+  width: 100rpx; height: 80rpx;
+  text-align: center; font-size: 36rpx; font-weight: 700; color: #07c160;
+  background: #fff; border-radius: 12rpx;
+  margin: 0 8rpx;
+}
+.dc-custom-hint {
+  text-align: center; font-size: 22rpx; color: #999;
+}
 
 .meal-config-entry {
   display: flex; align-items: center; justify-content: space-between;

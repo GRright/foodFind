@@ -607,12 +607,8 @@ export default {
     this.shareBtnClicked = false
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
-    if (this.noCookMode) {
-      this.loadFeed()
-    } else {
-      this.loadMeals()
-      this.loadTodayCheckIn()
-    }
+    this.loadMeals()
+    this.loadTodayCheckIn()
   },
   methods: {
     getSwipeOpacity() {

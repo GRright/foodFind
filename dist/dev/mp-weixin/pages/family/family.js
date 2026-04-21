@@ -40,7 +40,6 @@ const _sfc_main = {
     setTimeout(() => {
       this.pageEnter = false;
     }, 300);
-    this.loadFamily();
   },
   methods: {
     loadFamily() {
@@ -65,7 +64,7 @@ const _sfc_main = {
     onCodeInput(e) {
       this.joinCode = e.detail.value.toUpperCase();
     },
-    createFamily() {
+    async createFamily() {
       if (!this.form.name.trim()) {
         common_vendor.index.showToast({ title: "请输入家庭名称", icon: "none" });
         return;
@@ -74,18 +73,22 @@ const _sfc_main = {
         common_vendor.index.showToast({ title: "请输入你的昵称", icon: "none" });
         return;
       }
-      const group = utils_family.createFamilyGroup(this.form.name.trim(), this.form.type, this.form.userName.trim());
-      this.hasFamily = true;
-      this.familyGroup = group;
-      this.showInviteCard = true;
-      common_vendor.index.showToast({ title: "家庭创建成功！", icon: "success" });
+      const result = await utils_family.createFamilyGroup(this.form.name.trim(), this.form.type, this.form.userName.trim());
+      if (result.success) {
+        this.hasFamily = true;
+        this.familyGroup = result.group;
+        this.showInviteCard = true;
+        common_vendor.index.showToast({ title: "家庭创建成功！", icon: "success" });
+      } else {
+        common_vendor.index.showToast({ title: result.error || "创建失败", icon: "none" });
+      }
     },
-    joinFamily() {
+    async joinFamily() {
       if (this.joinCode.length !== 6) {
         common_vendor.index.showToast({ title: "请输入6位邀请码", icon: "none" });
         return;
       }
-      const result = utils_family.joinFamilyGroup(this.joinCode, "新成员");
+      const result = await utils_family.joinFamilyGroup(this.joinCode, "新成员");
       if (result.success) {
         this.hasFamily = true;
         this.familyGroup = result.group;
@@ -243,14 +246,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     y: common_vendor.o((...args) => $options.goToFamilyShopping && $options.goToFamilyShopping(...args)),
     z: common_vendor.o((...args) => $options.goToFamilyCheckIn && $options.goToFamilyCheckIn(...args)),
     A: common_vendor.o((...args) => $options.goToFamilyWeeklyReport && $options.goToFamilyWeeklyReport(...args)),
-    B: $options.isAdmin
-  }, $options.isAdmin ? common_vendor.e({
-    C: common_vendor.o((...args) => $options.leaveFamily && $options.leaveFamily(...args)),
-    D: $options.isAdmin
+    B: common_vendor.o((...args) => $options.leaveFamily && $options.leaveFamily(...args)),
+    C: $options.isAdmin
   }, $options.isAdmin ? {
-    E: common_vendor.o((...args) => $options.deleteFamily && $options.deleteFamily(...args))
-  } : {}) : {}), {
-    F: $data.pageEnter ? 1 : ""
+    D: common_vendor.o((...args) => $options.deleteFamily && $options.deleteFamily(...args))
+  } : {}), {
+    E: $data.pageEnter ? 1 : ""
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-81db192c"]]);

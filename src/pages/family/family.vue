@@ -153,7 +153,7 @@
         </view>
       </view>
 
-      <view class="danger-zone slide-up" style="animation-delay:0.25s;opacity:0" v-if="isAdmin">
+      <view class="danger-zone slide-up" style="animation-delay:0.25s;opacity:0">
         <text class="danger-title">危险操作</text>
         <view class="danger-btns">
           <view class="danger-btn leave" @click="leaveFamily">
@@ -219,7 +219,6 @@ export default {
   onShow() {
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
-    this.loadFamily()
   },
   methods: {
     loadFamily() {
@@ -244,7 +243,7 @@ export default {
     onCodeInput(e) {
       this.joinCode = e.detail.value.toUpperCase()
     },
-    createFamily() {
+    async createFamily() {
       if (!this.form.name.trim()) {
         uni.showToast({ title: '请输入家庭名称', icon: 'none' })
         return
@@ -253,18 +252,22 @@ export default {
         uni.showToast({ title: '请输入你的昵称', icon: 'none' })
         return
       }
-      const group = createFamilyGroup(this.form.name.trim(), this.form.type, this.form.userName.trim())
-      this.hasFamily = true
-      this.familyGroup = group
-      this.showInviteCard = true
-      uni.showToast({ title: '家庭创建成功！', icon: 'success' })
+      const result = await createFamilyGroup(this.form.name.trim(), this.form.type, this.form.userName.trim())
+      if (result.success) {
+        this.hasFamily = true
+        this.familyGroup = result.group
+        this.showInviteCard = true
+        uni.showToast({ title: '家庭创建成功！', icon: 'success' })
+      } else {
+        uni.showToast({ title: result.error || '创建失败', icon: 'none' })
+      }
     },
-    joinFamily() {
+    async joinFamily() {
       if (this.joinCode.length !== 6) {
         uni.showToast({ title: '请输入6位邀请码', icon: 'none' })
         return
       }
-      const result = joinFamilyGroup(this.joinCode, '新成员')
+      const result = await joinFamilyGroup(this.joinCode, '新成员')
       if (result.success) {
         this.hasFamily = true
         this.familyGroup = result.group

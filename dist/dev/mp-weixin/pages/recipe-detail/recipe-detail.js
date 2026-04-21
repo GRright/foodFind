@@ -13,10 +13,10 @@ const _sfc_main = {
         difficulty: "简单",
         cooking_time: 15,
         nutrition: { calories: 180, protein: 12, fat: 12, carbs: 8 },
-        ingredients: [{ name: "番茄", amount: "2个约200g" }, { name: "鸡蛋", amount: "3个约165g" }],
+        ingredients: [{ name: "番茄", amount: "2 个约 200g" }, { name: "鸡蛋", amount: "3 个约 165g" }],
         steps: ["番茄切块", "鸡蛋打散炒熟", "放入番茄一起炒", "加盐调味即可"]
       },
-      detailHeight: "calc(100vh - 360rpx)",
+      detailHeight: "calc(100vh - 420rpx)",
       selectedRating: 0,
       feedbackText: "",
       showRatingPanel: false,
@@ -31,6 +31,9 @@ const _sfc_main = {
     }
   },
   methods: {
+    goBack() {
+      common_vendor.index.navigateBack();
+    },
     loadRecipe(id) {
       const allRecipes = [...utils_constants.ALL_RECIPES.breakfast, ...utils_constants.ALL_RECIPES.lunch, ...utils_constants.ALL_RECIPES.dinner];
       const found = allRecipes.find((r) => r.id === id);
@@ -82,55 +85,56 @@ const _sfc_main = {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   var _a, _b, _c, _d;
   return common_vendor.e({
-    a: common_vendor.t($data.recipe.image || "🍽️"),
-    b: common_vendor.t($data.recipe.name),
-    c: common_vendor.t($data.recipe.cuisine_type),
-    d: common_vendor.t($data.recipe.difficulty || "简单"),
-    e: common_vendor.t($data.recipe.cooking_time || 15),
-    f: common_vendor.t($data.isFavorited ? "♥" : "♡"),
-    g: common_vendor.t($data.isFavorited ? "已收藏" : "收藏"),
-    h: $data.isFavorited ? 1 : "",
-    i: common_vendor.o((...args) => $options.toggleFavorite && $options.toggleFavorite(...args)),
-    j: common_vendor.t(((_a = $data.recipe.nutrition) == null ? void 0 : _a.calories) || 0),
-    k: common_vendor.t(((_b = $data.recipe.nutrition) == null ? void 0 : _b.protein) || 0),
-    l: common_vendor.t(((_c = $data.recipe.nutrition) == null ? void 0 : _c.fat) || 0),
-    m: common_vendor.t(((_d = $data.recipe.nutrition) == null ? void 0 : _d.carbs) || 0),
-    n: common_vendor.f($data.recipe.ingredients, (ing, idx, i0) => {
+    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
+    b: common_vendor.t($data.recipe.image || "🍽️"),
+    c: common_vendor.t($data.recipe.name),
+    d: common_vendor.t($data.recipe.cuisine_type),
+    e: common_vendor.t($data.recipe.difficulty || "简单"),
+    f: common_vendor.t($data.recipe.cooking_time || 15),
+    g: common_vendor.t($data.isFavorited ? "♥" : "♡"),
+    h: common_vendor.t($data.isFavorited ? "已收藏" : "收藏"),
+    i: $data.isFavorited ? 1 : "",
+    j: common_vendor.o((...args) => $options.toggleFavorite && $options.toggleFavorite(...args)),
+    k: common_vendor.t(((_a = $data.recipe.nutrition) == null ? void 0 : _a.calories) || 0),
+    l: common_vendor.t(((_b = $data.recipe.nutrition) == null ? void 0 : _b.protein) || 0),
+    m: common_vendor.t(((_c = $data.recipe.nutrition) == null ? void 0 : _c.fat) || 0),
+    n: common_vendor.t(((_d = $data.recipe.nutrition) == null ? void 0 : _d.carbs) || 0),
+    o: common_vendor.f($data.recipe.ingredients, (ing, idx, i0) => {
       return {
         a: common_vendor.t(ing.name),
         b: common_vendor.t(ing.amount),
         c: idx
       };
     }),
-    o: common_vendor.f($data.recipe.steps, (step, idx, i0) => {
+    p: common_vendor.f($data.recipe.steps, (step, idx, i0) => {
       return {
         a: common_vendor.t(idx + 1),
         b: common_vendor.t(step),
         c: idx
       };
     }),
-    p: $data.selectedRating === 0
+    q: $data.selectedRating === 0
   }, $data.selectedRating === 0 ? {
-    q: common_vendor.o(($event) => $data.showRatingPanel = true)
+    r: common_vendor.o(($event) => $data.showRatingPanel = true)
   } : {
-    r: common_vendor.t($data.selectedRating)
+    s: common_vendor.t($data.selectedRating)
   }, {
-    s: $data.detailHeight,
-    t: common_vendor.f(5, (s, k0, i0) => {
+    t: $data.detailHeight,
+    v: common_vendor.f(5, (s, k0, i0) => {
       return {
         a: $data.selectedRating >= s ? 1 : "",
         b: s,
         c: common_vendor.o(($event) => $options.selectStar(s), s)
       };
     }),
-    v: $data.feedbackText,
-    w: common_vendor.o((e) => $data.feedbackText = e.detail.value),
-    x: common_vendor.o((...args) => $options.submitFeedback && $options.submitFeedback(...args)),
-    y: $data.showRatingPanel ? 1 : "",
-    z: common_vendor.o(() => {
+    w: $data.feedbackText,
+    x: common_vendor.o((e) => $data.feedbackText = e.detail.value),
+    y: common_vendor.o((...args) => $options.submitFeedback && $options.submitFeedback(...args)),
+    z: $data.showRatingPanel ? 1 : "",
+    A: common_vendor.o(() => {
     }),
-    A: $data.showRatingPanel ? 1 : "",
-    B: common_vendor.o(($event) => $data.showRatingPanel = false)
+    B: $data.showRatingPanel ? 1 : "",
+    C: common_vendor.o(($event) => $data.showRatingPanel = false)
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-7fd6fa8e"]]);

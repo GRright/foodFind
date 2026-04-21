@@ -29,6 +29,12 @@
     { "name": "saveShareMenu", "timeout": 20, "runtime": "Nodejs10.15", "memorySize": 256, "handler": "index.main" },
     { "name": "sendNotification", "timeout": 20, "runtime": "Nodejs10.15", "memorySize": 256, "handler": "index.main" },
     { "name": "updateShareStatus", "timeout": 20, "runtime": "Nodejs10.15", "memorySize": 256, "handler": "index.main" },
-    { "name": "voteOption", "timeout": 20, "runtime": "Nodejs10.15", "memorySize": 256, "handler": "index.main" }
+    { "name": "voteOption", "timeout": 20, "runtime": "Nodejs10.15", "memorySize": 256, "handler": "index.main" },
+    { "name": "createFamilyGroup", "timeout": 60, "runtime": "Nodejs18.15", "memorySize": 256, "handler": "index.main" },
+    { "name": "joinFamilyGroup", "timeout": 60, "runtime": "Nodejs18.15", "memorySize": 256, "handler": "index.main" },
+    { "name": "getFamilyCheckIns", "timeout": 60, "runtime": "Nodejs18.15", "memorySize": 256, "handler": "index.main" },
+    { "name": "sendFamilyNotification", "timeout": 60, "runtime": "Nodejs18.15", "memorySize": 256, "handler": "index.main" },
+    { "name": "syncFamilyShopping", "timeout": 60, "runtime": "Nodejs18.15", "memorySize": 256, "handler": "index.main" },
+    { "name": "updateFamilyMember", "timeout": 60, "runtime": "Nodejs18.15", "memorySize": 256, "handler": "index.main" }
   ]
 }

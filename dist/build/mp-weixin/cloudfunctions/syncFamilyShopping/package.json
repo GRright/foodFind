@@ -1,0 +1,6 @@
+{
+  "name": "syncFamilyShopping",
+  "version": "1.0.0",
+  "description": "同步家庭购物清单",
+  "main": "index.js"
+}

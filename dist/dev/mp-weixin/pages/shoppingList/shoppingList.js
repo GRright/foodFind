@@ -5,9 +5,8 @@ const utils_family = require("../../utils/family.js");
 const CATEGORY_MAP = {
   vegetable: { name: "蔬菜", icon: "🥬" },
   meat: { name: "肉蛋禽", icon: "🥩" },
-  seasoning: { name: "调料", icon: "🧂" },
   staple: { name: "主食", icon: "🍚" },
-  other: { name: "其他", icon: "📦" }
+  other: { name: "其他", icon: "🧃" }
 };
 const CATEGORY_KEYWORDS = {
   vegetable: ["菜", "豆", "茄", "瓜", "菇", "笋", "藕", "椒", "蒜", "葱", "姜", "花", "叶", "生菜", "萝卜", "番茄", "西兰", "四季"],
@@ -52,13 +51,16 @@ const _sfc_main = {
     categorizedItems() {
       const cats = {};
       this.items.forEach((item) => {
-        const cat = item.category || "other";
+        let cat = item.category || "other";
+        if (cat === "seasoning") {
+          return;
+        }
         if (!cats[cat]) {
           cats[cat] = { category: cat, ...CATEGORY_MAP[cat], items: [] };
         }
         cats[cat].items.push(item);
       });
-      const order = ["vegetable", "meat", "staple", "seasoning", "other"];
+      const order = ["vegetable", "meat", "staple", "other"];
       return order.filter((k) => cats[k]).map((k) => cats[k]);
     },
     mealConfigSummary() {
@@ -83,10 +85,6 @@ const _sfc_main = {
     }, 300);
     if (this.isFamilyMode) {
       this.loadFamilyShoppingList();
-    } else if (this.items.length === 0) {
-      setTimeout(() => {
-        this.autoGenerateIfEmpty();
-      }, 500);
     }
   },
   methods: {
@@ -168,13 +166,34 @@ const _sfc_main = {
         this.autoGenerateIfEmpty();
       }, 100);
     },
-    onCustomDaysChange(e) {
-      this.config.customDays = parseInt(e.detail.value);
+    adjustDays(delta) {
+      let newDays = this.config.customDays + delta;
+      if (newDays < 1)
+        newDays = 1;
+      if (newDays > 14)
+        newDays = 14;
+      this.config.customDays = newDays;
       this.saveConfig();
       this.loadShoppingList();
       setTimeout(() => {
         this.autoGenerateIfEmpty();
       }, 100);
+    },
+    onDaysInputBlur() {
+      let val = parseInt(this.config.customDays);
+      if (isNaN(val) || val < 1)
+        val = 1;
+      if (val > 14)
+        val = 14;
+      this.config.customDays = val;
+      this.saveConfig();
+      this.loadShoppingList();
+      setTimeout(() => {
+        this.autoGenerateIfEmpty();
+      }, 100);
+    },
+    onDaysInputConfirm() {
+      this.onDaysInputBlur();
     },
     goToMealConfig() {
       common_vendor.index.navigateTo({ url: "/pages/mealConfig/mealConfig" });
@@ -215,15 +234,28 @@ const _sfc_main = {
               const fullRecipe = allRecipes.find((r) => r.id === recipe.id);
               if (fullRecipe && fullRecipe.ingredients) {
                 fullRecipe.ingredients.forEach((ing) => {
+                  const cat = this.classifyIngredient(ing.name);
+                  if (cat === "seasoning") {
+                    return;
+                  }
                   const key = ing.name;
                   if (ingredientMap.has(key)) {
                     const existing = ingredientMap.get(key);
                     existing.amount = this.mergeAmount(existing.amount, ing.amount);
                   } else {
+                    let displayAmount = ing.amount;
+                    let displayName = ing.name;
+                    if (cat === "other") {
+                      if (displayAmount) {
+                        displayAmount = displayAmount + " · 可选";
+                      } else {
+                        displayName = displayName + " · 可选";
+                      }
+                    }
                     ingredientMap.set(key, {
-                      name: ing.name,
-                      amount: ing.amount,
-                      category: this.classifyIngredient(ing.name)
+                      name: displayName,
+                      amount: displayAmount,
+                      category: cat
                     });
                   }
                 });
@@ -431,27 +463,29 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     p: $data.config.mode === "week" ? 1 : "",
     q: common_vendor.o(($event) => $options.setPreset("week"))
   } : {
-    r: ($data.config.customDays - 1) / 13 * 100 + "%",
-    s: $data.config.customDays,
-    t: common_vendor.o((...args) => $options.onCustomDaysChange && $options.onCustomDaysChange(...args)),
-    v: common_vendor.t($data.config.customDays)
+    r: common_vendor.o(($event) => $options.adjustDays(-1)),
+    s: common_vendor.o((...args) => $options.onDaysInputBlur && $options.onDaysInputBlur(...args)),
+    t: common_vendor.o((...args) => $options.onDaysInputConfirm && $options.onDaysInputConfirm(...args)),
+    v: $data.config.customDays,
+    w: common_vendor.o(($event) => $data.config.customDays = $event.detail.value),
+    x: common_vendor.o(($event) => $options.adjustDays(1))
   }) : {}, {
-    w: !$data.isFamilyMode
+    y: !$data.isFamilyMode
   }, !$data.isFamilyMode ? {
-    x: common_vendor.t($options.mealConfigSummary),
-    y: common_vendor.o((...args) => $options.goToMealConfig && $options.goToMealConfig(...args))
+    z: common_vendor.t($options.mealConfigSummary),
+    A: common_vendor.o((...args) => $options.goToMealConfig && $options.goToMealConfig(...args))
   } : {}, {
-    z: !$data.isFamilyMode
+    B: !$data.isFamilyMode
   }, !$data.isFamilyMode ? {
-    A: common_vendor.o((...args) => $options.generateFromMenu && $options.generateFromMenu(...args))
+    C: common_vendor.o((...args) => $options.generateFromMenu && $options.generateFromMenu(...args))
   } : {}, {
-    B: $options.completedCount > 0
+    D: $options.completedCount > 0
   }, $options.completedCount > 0 ? {
-    C: common_vendor.o((...args) => $options.clearCompleted && $options.clearCompleted(...args))
+    E: common_vendor.o((...args) => $options.clearCompleted && $options.clearCompleted(...args))
   } : {}, {
-    D: $options.categorizedItems.length > 0
+    F: $options.categorizedItems.length > 0
   }, $options.categorizedItems.length > 0 ? {
-    E: common_vendor.f($options.categorizedItems, (cat, ci, i0) => {
+    G: common_vendor.f($options.categorizedItems, (cat, ci, i0) => {
       return {
         a: common_vendor.t(cat.icon),
         b: common_vendor.t(cat.name),
@@ -475,24 +509,22 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
             i: common_vendor.o(($event) => $options.deleteItem(item.id), item.id),
             j: item.checked ? 1 : "",
             k: item.id,
-            l: common_vendor.o(($event) => $options.toggleItem(item), item.id),
-            m: ci * 80 + ii * 40 + "ms"
+            l: common_vendor.o(($event) => $options.toggleItem(item), item.id)
           });
         }),
-        f: cat.category,
-        g: ci * 80 + "ms"
+        f: cat.category
       };
     })
   } : {}, {
-    F: common_vendor.o((...args) => $options.addItem && $options.addItem(...args)),
-    G: $data.newItemName,
-    H: common_vendor.o(($event) => $data.newItemName = $event.detail.value),
-    I: common_vendor.o((...args) => $options.addItem && $options.addItem(...args)),
-    J: $data.newItemAmount,
-    K: common_vendor.o(($event) => $data.newItemAmount = $event.detail.value),
-    L: !$data.newItemName.trim() ? 1 : "",
-    M: common_vendor.o((...args) => $options.addItem && $options.addItem(...args)),
-    N: $data.pageEnter ? 1 : ""
+    H: common_vendor.o((...args) => $options.addItem && $options.addItem(...args)),
+    I: $data.newItemName,
+    J: common_vendor.o(($event) => $data.newItemName = $event.detail.value),
+    K: common_vendor.o((...args) => $options.addItem && $options.addItem(...args)),
+    L: $data.newItemAmount,
+    M: common_vendor.o(($event) => $data.newItemAmount = $event.detail.value),
+    N: !$data.newItemName.trim() ? 1 : "",
+    O: common_vendor.o((...args) => $options.addItem && $options.addItem(...args)),
+    P: $data.pageEnter ? 1 : ""
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-b8f4481c"]]);

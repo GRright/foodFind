@@ -274,6 +274,32 @@
   opacity: 0.85;
   transform: scale(0.95);
 }
+.partner-empty-card.data-v-04d37cba {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  box-shadow: 0 1rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+.pe-action.data-v-04d37cba {
+  padding: 14rpx 22rpx;
+  background: #07c160;
+  border-radius: 24rpx;
+  font-size: 23rpx;
+  color: #fff;
+  font-weight: 600;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.pe-action.data-v-04d37cba:active {
+  opacity: 0.85;
+  transform: scale(0.95);
+}
+.pe-action-text.data-v-04d37cba {
+  color: #fff;
+}
 
 /* ===== Preference Modal ===== */
 .pref-modal-mask.data-v-04d37cba {
@@ -766,6 +792,79 @@
   border-radius: 24rpx;
   padding: 28rpx 24rpx 24rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+.rm-pie-card.data-v-04d37cba {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+.rm-pie-row.data-v-04d37cba {
+  display: flex;
+  align-items: center;
+  gap: 28rpx;
+}
+.rm-pie-chart.data-v-04d37cba {
+  flex-shrink: 0;
+}
+.rm-pie-outer.data-v-04d37cba {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+.rm-pie-inner.data-v-04d37cba {
+  width: 110rpx;
+  height: 110rpx;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.rm-pie-center-val.data-v-04d37cba {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+.rm-pie-center-label.data-v-04d37cba {
+  font-size: 18rpx;
+  color: #999;
+}
+.rm-pie-legend.data-v-04d37cba {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+.rm-legend-item.data-v-04d37cba {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+.rm-legend-dot.data-v-04d37cba {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 6rpx;
+  flex-shrink: 0;
+}
+.rm-legend-info.data-v-04d37cba {
+  display: flex;
+  flex-direction: column;
+  gap: 2rpx;
+}
+.rm-legend-name.data-v-04d37cba {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+.rm-legend-val.data-v-04d37cba {
+  font-size: 21rpx;
+  color: #999;
 }
 .rm-chart-bars.data-v-04d37cba {
   display: flex;

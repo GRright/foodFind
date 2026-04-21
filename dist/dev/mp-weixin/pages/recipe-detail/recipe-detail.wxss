@@ -12,7 +12,7 @@
 }
 .like-btn.data-v-7fd6fa8e {
   position: absolute;
-  top: calc(env(safe-area-inset-top) + 20rpx);
+  top: calc(env(safe-area-inset-top) + 16rpx);
   right: 24rpx;
   display: flex;
   align-items: center;
@@ -21,6 +21,7 @@
   background: rgba(255, 255, 255, 0.2);
   border-radius: 40rpx;
   transition: all 0.3s ease;
+  z-index: 20;
 }
 .like-btn.data-v-7fd6fa8e:active {
   transform: scale(0.92);
@@ -44,6 +45,35 @@
 .hero-emoji.data-v-7fd6fa8e {
   font-size: 140rpx;
 }
+.hero-nav.data-v-7fd6fa8e {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-top: calc(env(safe-area-inset-top) + 8rpx);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top) + 8rpx) 24rpx 16rpx;
+  z-index: 20;
+}
+.nav-back.data-v-7fd6fa8e {
+  font-size: 56rpx;
+  color: #fff;
+  font-weight: 300;
+  width: 48rpx;
+  text-align: center;
+  line-height: 1;
+}
+.nav-back.data-v-7fd6fa8e:active {
+  opacity: 0.7;
+}
+.nav-title.data-v-7fd6fa8e {
+  font-size: 32rpx;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+}
 .hero-overlay.data-v-7fd6fa8e {
   position: absolute;
   bottom: 0;
@@ -51,6 +81,7 @@
   right: 0;
   padding: 32rpx;
   background: rgba(0, 0, 0, 0.2);
+  padding-top: calc(48rpx + env(safe-area-inset-top));
 }
 .hero-title.data-v-7fd6fa8e {
   font-size: 40rpx;

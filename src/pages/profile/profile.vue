@@ -62,11 +62,22 @@
             </view>
           </template>
           <template v-else>
-            <view class="menu-item" @click="startInvite">
+            <view class="menu-item partner-empty-card">
               <view class="menu-icon-wrap pink"><text class="menu-emoji">♡</text></view>
               <view class="mi-center">
-                <text class="menu-label">添加我的吃饭搭子</text>
-                <text class="menu-desc">分享给TA，一起决定今天吃什么</text>
+                <text class="menu-label">暂时还没吃饭搭子</text>
+                <text class="menu-desc">点击分享给TA，一起决定今天吃什么</text>
+              </view>
+              <view class="pe-action" @click.stop="startInvite">
+                <text class="pe-action-text">邀请</text>
+              </view>
+            </view>
+
+            <view class="menu-item" @click="goToFamily">
+              <view class="menu-icon-wrap green"><text class="menu-emoji">🏠</text></view>
+              <view class="mi-center">
+                <text class="menu-label">家庭群组</text>
+                <text class="menu-desc">{{ familySummary }}</text>
               </view>
               <text class="menu-arrow">›</text>
             </view>
@@ -113,15 +124,6 @@
       <view class="menu-group slide-up" style="animation-delay:0.1s;opacity:0">
         <text class="group-title">我的</text>
         <view class="menu-list">
-          <view class="menu-item" @click="goToFamily">
-            <view class="menu-icon-wrap green"><text class="menu-emoji">🏠</text></view>
-            <view class="mi-center">
-              <text class="menu-label">家庭群组</text>
-              <text class="menu-desc">{{ familySummary }}</text>
-            </view>
-            <text class="menu-arrow">›</text>
-          </view>
-
           <view class="menu-item" @click="openPrefModal">
             <view class="mi-center">
               <text class="menu-label">偏好设置</text>
@@ -1045,6 +1047,19 @@ export default {
   &::after { display:none; }
   &:active { opacity:.85; transform:scale(.95); }
 }
+
+.partner-empty-card {
+  background:#fff; border-radius:20rpx; padding:24rpx;
+  display: flex; align-items: center; gap: 14rpx;
+  box-shadow:0 1rpx 8rpx rgba(0,0,0,.04);
+}
+.pe-action {
+  padding: 14rpx 22rpx; background: #07c160;
+  border-radius: 24rpx; font-size: 23rpx; color: #fff; font-weight:600;
+  line-height:1; flex-shrink:0;
+  &:active { opacity:.85; transform:scale(.95); }
+}
+.pe-action-text { color: #fff; }
 
 /* ===== Preference Modal ===== */
 .pref-modal-mask {

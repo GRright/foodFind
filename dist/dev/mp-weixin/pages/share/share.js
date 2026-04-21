@@ -118,7 +118,7 @@ const _sfc_main = {
         this.dailyMeals = meals;
       }
       common_vendor.index.setStorageSync("foodfind_meals", this.dailyMeals);
-      common_vendor.index.setStorageSync("foodfind_meals_date", (/* @__PURE__ */ new Date()).toDateString());
+      common_vendor.index.setStorageSync("foodfind_meals_date", (/* @__PURE__ */ new Date()).toISOString().split("T")[0]);
       const app = getApp();
       if (app == null ? void 0 : app.globalData)
         app.globalData.dailyMeals = this.dailyMeals;
@@ -126,7 +126,7 @@ const _sfc_main = {
     },
     shareBack() {
       common_vendor.index.setStorageSync("foodfind_meals", this.dailyMeals);
-      common_vendor.index.setStorageSync("foodfind_meals_date", (/* @__PURE__ */ new Date()).toDateString());
+      common_vendor.index.setStorageSync("foodfind_meals_date", (/* @__PURE__ */ new Date()).toISOString().split("T")[0]);
       const app = getApp();
       if (app == null ? void 0 : app.globalData)
         app.globalData.dailyMeals = this.dailyMeals;

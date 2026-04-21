@@ -111,10 +111,12 @@ export default {
   },
   onLoad(options) {
     this.viewMode = !!options.viewDiary
-  },
-  onShow() {
     this.loadDiaryList()
     this.loadTodayDiary()
+  },
+  onShow() {
+    this.pageEnter = true
+    setTimeout(() => { this.pageEnter = false }, 300)
   },
   onShareAppMessage() {
     if (this.todayDiary) {

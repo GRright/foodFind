@@ -121,7 +121,7 @@ const _sfc_main = {
     },
     prefSummaryText() {
       const parts = [];
-      const ut = this.userTypeOptions.find((o) => o.value === this.prefs.userCount);
+      const ut = this.userTypeOptions.find((o) => o.value === this.prefs.userType);
       if (ut)
         parts.push(ut.label);
       const tt = this.tasteOptions.find((o) => o.value === this.prefs.taste);
@@ -154,11 +154,58 @@ const _sfc_main = {
       }
       return this._weeklyNutritionCache.protein;
     },
+    weeklyFat() {
+      if (!this._weeklyNutritionCache) {
+        this._weeklyNutritionCache = this.calcWeeklyNutrition();
+      }
+      return this._weeklyNutritionCache.fat;
+    },
+    weeklyCarbs() {
+      if (!this._weeklyNutritionCache) {
+        this._weeklyNutritionCache = this.calcWeeklyNutrition();
+      }
+      return this._weeklyNutritionCache.carbs;
+    },
+    nutritionTotal() {
+      return this.weeklyProtein + this.weeklyFat + this.weeklyCarbs;
+    },
+    proteinPercent() {
+      const t = this.nutritionTotal;
+      return t > 0 ? Math.round(this.weeklyProtein / t * 100) : 33;
+    },
+    fatPercent() {
+      const t = this.nutritionTotal;
+      return t > 0 ? Math.round(this.weeklyFat / t * 100) : 33;
+    },
+    carbsPercent() {
+      const t = this.nutritionTotal;
+      return t > 0 ? 100 - this.proteinPercent - this.fatPercent : 34;
+    },
+    pieChartStyle() {
+      const p = this.proteinPercent;
+      const f = this.fatPercent;
+      this.carbsPercent;
+      return `background: conic-gradient(#07c160 0% ${p}%, #ff9f43 ${p}% ${p + f}%, #5b9bd5 ${p + f}% 100%)`;
+    },
     myMealCount() {
       return this._myMealCount;
     },
     partnerMealCount() {
-      return Math.max(0, this.myMealCount + Math.floor(Math.random() * 3));
+      const partnerChecks = common_vendor.index.getStorageSync("foodfind_partner_checks");
+      if (partnerChecks) {
+        let count = 0;
+        Object.keys(partnerChecks).forEach((date) => {
+          const day = partnerChecks[date];
+          if (day.breakfast)
+            count++;
+          if (day.lunch)
+            count++;
+          if (day.dinner)
+            count++;
+        });
+        return count;
+      }
+      return 0;
     },
     myMealPercent() {
       const total = this.myMealCount + this.partnerMealCount;
@@ -231,15 +278,15 @@ const _sfc_main = {
     loadMyWeeklyMeals() {
       const meals = [];
       const allRecipes = [...utils_constants.ALL_RECIPES.breakfast, ...utils_constants.ALL_RECIPES.lunch, ...utils_constants.ALL_RECIPES.dinner];
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date(Date.now() - i * 864e5).toISOString().split("T")[0];
-        const daily = common_vendor.index.getStorageSync("foodfind_meals_date");
-        if (daily === d) {
-          const cached = common_vendor.index.getStorageSync("foodfind_meals");
-          if (cached) {
+      const cachedDate = common_vendor.index.getStorageSync("foodfind_meals_date");
+      const cachedMeals = common_vendor.index.getStorageSync("foodfind_meals");
+      if (cachedDate && cachedMeals) {
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(Date.now() - i * 864e5).toISOString().split("T")[0];
+          if (cachedDate === d) {
             ["breakfast", "lunch", "dinner"].forEach((mealType) => {
-              if (cached[mealType]) {
-                cached[mealType].forEach((food) => {
+              if (cachedMeals[mealType]) {
+                cachedMeals[mealType].forEach((food) => {
                   const recipe = allRecipes.find((r) => r.id === food.id);
                   if (recipe)
                     meals.push({ ...recipe, mealType, date: d });
@@ -254,11 +301,13 @@ const _sfc_main = {
     },
     calcWeeklyNutrition() {
       return this.myWeeklyMeals.reduce((acc, m) => {
-        var _a, _b;
+        var _a, _b, _c, _d;
         acc.calories += ((_a = m.nutrition) == null ? void 0 : _a.calories) || 0;
         acc.protein += ((_b = m.nutrition) == null ? void 0 : _b.protein) || 0;
+        acc.fat += ((_c = m.nutrition) == null ? void 0 : _c.fat) || 0;
+        acc.carbs += ((_d = m.nutrition) == null ? void 0 : _d.carbs) || 0;
         return acc;
-      }, { calories: 0, protein: 0 });
+      }, { calories: 0, protein: 0, fat: 0, carbs: 0 });
     },
     loadPairStats() {
       return;
@@ -426,6 +475,9 @@ const _sfc_main = {
       }
       common_vendor.index.navigateTo({ url: "/pages/share/share?mode=view" });
     },
+    openSpecialDates() {
+      common_vendor.index.navigateTo({ url: "/pages/index/index?openSpecial=1" });
+    },
     clearCache() {
       common_vendor.index.showModal({
         title: "清除缓存",
@@ -443,8 +495,8 @@ const _sfc_main = {
     },
     showAbout() {
       common_vendor.index.showModal({
-        title: "关于吃点啥 v1.5",
-        content: "为情侣/家人打造的共同决策吃什么的小工具\n\n✅ 智能一周菜单规划\n✅ 荤素营养均衡算法\n✅ 云端配对，跨设备同步\n✅ 分享菜单+双向确认\n✅ 互动打卡+火花系统\n✅ 本周饮食报告\n✅ 收藏喜欢的菜品\n\n每次交互约4次云函数调用",
+        title: "关于吃点啥 v2.4",
+        content: "为情侣/家人打造的共同决策吃什么的小工具\n\n✅ 智能一周菜单规划\n✅ 荤素营养均衡算法\n✅ 云端配对，跨设备同步\n✅ 分享菜单+双向确认\n✅ 互动打卡+火花系统\n✅ 本周饮食报告+营养饼图\n✅ 收藏喜欢的菜品\n✅ 生日/纪念日特别菜单",
         showCancel: false,
         confirmText: "知道了"
       });
@@ -514,24 +566,25 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     p: common_vendor.o((...args) => $options.onResendInvite && $options.onResendInvite(...args))
   } : {
     q: common_vendor.o((...args) => $options.startInvite && $options.startInvite(...args)),
-    r: common_vendor.o((...args) => $options.openReport && $options.openReport(...args))
+    r: common_vendor.t($options.familySummary),
+    s: common_vendor.o((...args) => $options.goToFamily && $options.goToFamily(...args)),
+    t: common_vendor.o((...args) => $options.openReport && $options.openReport(...args))
   }, {
     o: $data.hasPartner && $data.pairStatus === "pending",
-    s: common_vendor.t($data.favorites.length > 0 ? `已收藏 ${$data.favorites.length} 道菜` : "收藏喜欢的菜品"),
-    t: common_vendor.o((...args) => $options.openFavorites && $options.openFavorites(...args)),
-    v: common_vendor.o((...args) => $options.goToShare && $options.goToShare(...args)),
-    w: common_vendor.t($options.familySummary),
-    x: common_vendor.o((...args) => $options.goToFamily && $options.goToFamily(...args)),
-    y: common_vendor.t($options.prefSummaryText),
-    z: common_vendor.o((...args) => $options.openPrefModal && $options.openPrefModal(...args)),
-    A: common_vendor.o((...args) => $options.clearCache && $options.clearCache(...args)),
-    B: common_vendor.o((...args) => $options.showAbout && $options.showAbout(...args)),
-    C: $data.showPrefModal ? 1 : "",
-    D: common_vendor.o((...args) => $options.closePrefModal && $options.closePrefModal(...args)),
+    v: common_vendor.t($data.favorites.length > 0 ? `已收藏 ${$data.favorites.length} 道菜` : "收藏喜欢的菜品"),
+    w: common_vendor.o((...args) => $options.openFavorites && $options.openFavorites(...args)),
+    x: common_vendor.o((...args) => $options.goToShare && $options.goToShare(...args)),
+    y: common_vendor.o((...args) => $options.openSpecialDates && $options.openSpecialDates(...args)),
+    z: common_vendor.t($options.prefSummaryText),
+    A: common_vendor.o((...args) => $options.openPrefModal && $options.openPrefModal(...args)),
+    B: common_vendor.o((...args) => $options.clearCache && $options.clearCache(...args)),
+    C: common_vendor.o((...args) => $options.showAbout && $options.showAbout(...args)),
+    D: $data.showPrefModal ? 1 : "",
     E: common_vendor.o((...args) => $options.closePrefModal && $options.closePrefModal(...args)),
-    F: $data.prefs.noCookMode ? 1 : "",
-    G: common_vendor.o(($event) => $data.prefs.noCookMode = !$data.prefs.noCookMode),
-    H: common_vendor.f($data.userTypeOptions, (opt, k0, i0) => {
+    F: common_vendor.o((...args) => $options.closePrefModal && $options.closePrefModal(...args)),
+    G: $data.prefs.noCookMode ? 1 : "",
+    H: common_vendor.o(($event) => $data.prefs.noCookMode = !$data.prefs.noCookMode),
+    I: common_vendor.f($data.userTypeOptions, (opt, k0, i0) => {
       return {
         a: common_vendor.t(opt.label),
         b: $data.prefs.userType === opt.value ? 1 : "",
@@ -539,7 +592,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $data.prefs.userType = opt.value, opt.value)
       };
     }),
-    I: common_vendor.f($data.userCountOptions, (opt, k0, i0) => {
+    J: common_vendor.f($data.userCountOptions, (opt, k0, i0) => {
       return {
         a: common_vendor.t(opt.label),
         b: String($data.prefs.userCount) === opt.value ? 1 : "",
@@ -547,7 +600,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $data.prefs.userCount = Number(opt.value), opt.value)
       };
     }),
-    J: common_vendor.f($data.tasteOptions, (opt, k0, i0) => {
+    K: common_vendor.f($data.tasteOptions, (opt, k0, i0) => {
       return {
         a: common_vendor.t(opt.label),
         b: $data.prefs.taste === opt.value ? 1 : "",
@@ -555,7 +608,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $data.prefs.taste = opt.value, opt.value)
       };
     }),
-    K: common_vendor.f($data.allergyOptions, (opt, k0, i0) => {
+    L: common_vendor.f($data.allergyOptions, (opt, k0, i0) => {
       return {
         a: common_vendor.t(opt.label),
         b: $data.prefs.allergies.includes(opt.value) ? 1 : "",
@@ -563,7 +616,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.toggleMulti("allergies", opt.value), opt.value)
       };
     }),
-    L: common_vendor.f($data.restrictionOptions, (opt, k0, i0) => {
+    M: common_vendor.f($data.restrictionOptions, (opt, k0, i0) => {
       return {
         a: common_vendor.t(opt.label),
         b: $data.prefs.restrictions.includes(opt.value) ? 1 : "",
@@ -571,7 +624,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.toggleMulti("restrictions", opt.value), opt.value)
       };
     }),
-    M: common_vendor.f($data.cuisineOptions, (opt, k0, i0) => {
+    N: common_vendor.f($data.cuisineOptions, (opt, k0, i0) => {
       return {
         a: common_vendor.t(opt.label),
         b: $data.prefs.cuisines.includes(opt.value) ? 1 : "",
@@ -579,9 +632,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.toggleMulti("cuisines", opt.value), opt.value)
       };
     }),
-    N: $options.hasFamily
+    O: $options.hasFamily
   }, $options.hasFamily ? {
-    O: common_vendor.f($data.healthTagCategories, (category, k0, i0) => {
+    P: common_vendor.f($data.healthTagCategories, (category, k0, i0) => {
       return {
         a: common_vendor.t(category),
         b: common_vendor.f($options.getTagsByCategory(category), (tag, k1, i1) => {
@@ -597,34 +650,42 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       };
     })
   } : {}, {
-    P: common_vendor.o((...args) => $options.savePrefs && $options.savePrefs(...args)),
-    Q: $data.showPrefModal ? 1 : "",
-    R: $data.showReportModal ? 1 : "",
-    S: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args)),
-    T: common_vendor.t($options.formatWeekDateRange()),
-    U: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args)),
-    V: $options.reportMode === "solo"
+    Q: common_vendor.o((...args) => $options.savePrefs && $options.savePrefs(...args)),
+    R: $data.showPrefModal ? 1 : "",
+    S: $data.showReportModal ? 1 : "",
+    T: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args)),
+    U: common_vendor.t($options.formatWeekDateRange()),
+    V: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args)),
+    W: $options.reportMode === "solo"
   }, $options.reportMode === "solo" ? {
-    W: common_vendor.t(($data.userInfo.nickname || "我").charAt(0)),
-    X: common_vendor.t($options.reportStreakDays),
-    Y: common_vendor.t($options.reportMotto)
+    X: common_vendor.t(($data.userInfo.nickname || "我").charAt(0)),
+    Y: common_vendor.t($options.reportStreakDays),
+    Z: common_vendor.t($options.reportMotto)
   } : $options.reportMode === "pair" ? {
-    aa: common_vendor.t(($data.userInfo.nickname || "我").charAt(0)),
-    ab: common_vendor.t($options.relationLabel),
-    ac: common_vendor.t(($data.partnerInfo.nickname || "TA").charAt(0)),
-    ad: common_vendor.t($options.reportStreakDays)
+    ab: common_vendor.t(($data.userInfo.nickname || "我").charAt(0)),
+    ac: common_vendor.t($options.relationLabel),
+    ad: common_vendor.t(($data.partnerInfo.nickname || "TA").charAt(0)),
+    ae: common_vendor.t($options.reportStreakDays)
   } : {
-    ae: common_vendor.t(($data.userInfo.nickname || "我").charAt(0)),
-    af: common_vendor.t($data.prefs.userCount),
-    ag: common_vendor.t(($data.partnerInfo.nickname || "TA").charAt(0)),
-    ah: common_vendor.t($options.reportStreakDays)
+    af: common_vendor.t(($data.userInfo.nickname || "我").charAt(0)),
+    ag: common_vendor.t($data.prefs.userCount),
+    ah: common_vendor.t(($data.partnerInfo.nickname || "TA").charAt(0)),
+    ai: common_vendor.t($options.reportStreakDays)
   }, {
-    Z: $options.reportMode === "pair",
-    ai: common_vendor.t($options.weeklyCalories),
-    aj: common_vendor.t($options.myMealCount),
-    ak: common_vendor.t($options.weeklyCheckInDays),
-    al: common_vendor.t($options.weeklyProtein),
-    am: common_vendor.f($data.weeklyReportData, (day, idx, i0) => {
+    aa: $options.reportMode === "pair",
+    aj: common_vendor.t($options.weeklyCalories),
+    ak: common_vendor.t($options.myMealCount),
+    al: common_vendor.t($options.weeklyCheckInDays),
+    am: common_vendor.t($options.weeklyProtein),
+    an: common_vendor.t($options.nutritionTotal),
+    ao: common_vendor.s($options.pieChartStyle),
+    ap: common_vendor.t($options.weeklyProtein),
+    aq: common_vendor.t($options.proteinPercent),
+    ar: common_vendor.t($options.weeklyFat),
+    as: common_vendor.t($options.fatPercent),
+    at: common_vendor.t($options.weeklyCarbs),
+    av: common_vendor.t($options.carbsPercent),
+    aw: common_vendor.f($data.weeklyReportData, (day, idx, i0) => {
       return common_vendor.e({
         a: day.mealCount > 0
       }, day.mealCount > 0 ? {
@@ -635,23 +696,23 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: idx
       });
     }),
-    an: $data.hasPartner && $data.pairStatus === "paired"
+    ax: $data.hasPartner && $data.pairStatus === "paired"
   }, $data.hasPartner && $data.pairStatus === "paired" ? {
-    ao: common_vendor.t(($data.userInfo.nickname || "我").charAt(0)),
-    ap: Math.min(100, $options.myMealPercent) + "%",
-    aq: common_vendor.t($options.myMealCount),
-    ar: common_vendor.t(($data.partnerInfo.nickname || "TA").charAt(0)),
-    as: common_vendor.t(($data.partnerInfo.nickname || "TA").slice(0, 4)),
-    at: Math.min(100, $options.partnerMealPercent) + "%",
-    av: common_vendor.t($options.partnerMealCount)
+    ay: common_vendor.t(($data.userInfo.nickname || "我").charAt(0)),
+    az: Math.min(100, $options.myMealPercent) + "%",
+    aA: common_vendor.t($options.myMealCount),
+    aB: common_vendor.t(($data.partnerInfo.nickname || "TA").charAt(0)),
+    aC: common_vendor.t(($data.partnerInfo.nickname || "TA").slice(0, 4)),
+    aD: Math.min(100, $options.partnerMealPercent) + "%",
+    aE: common_vendor.t($options.partnerMealCount)
   } : {}, {
-    aw: $data.showReportModal ? 1 : "",
-    ax: $data.showFavoritesModal ? 1 : "",
-    ay: common_vendor.o((...args) => $options.closeFavorites && $options.closeFavorites(...args)),
-    az: common_vendor.o((...args) => $options.closeFavorites && $options.closeFavorites(...args)),
-    aA: $data.favorites.length === 0
+    aF: $data.showReportModal ? 1 : "",
+    aG: $data.showFavoritesModal ? 1 : "",
+    aH: common_vendor.o((...args) => $options.closeFavorites && $options.closeFavorites(...args)),
+    aI: common_vendor.o((...args) => $options.closeFavorites && $options.closeFavorites(...args)),
+    aJ: $data.favorites.length === 0
   }, $data.favorites.length === 0 ? {} : {}, {
-    aB: common_vendor.f($data.favorites, (item, idx, i0) => {
+    aK: common_vendor.f($data.favorites, (item, idx, i0) => {
       var _a;
       return {
         a: common_vendor.t(item.image || "🍽️"),
@@ -663,8 +724,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         g: common_vendor.o(($event) => $options.goToFavoriteDetail(item), item.id)
       };
     }),
-    aC: $data.showFavoritesModal ? 1 : "",
-    aD: $data.pageEnter ? 1 : ""
+    aL: $data.showFavoritesModal ? 1 : "",
+    aM: $data.pageEnter ? 1 : ""
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-04d37cba"]]);

@@ -1,6 +1,11 @@
 <template>
   <view class="page">
     <view class="recipe-hero">
+      <view class="hero-nav">
+        <text class="nav-back" @click="goBack">‹</text>
+        <text class="nav-title">菜品详情</text>
+        <text class="nav-placeholder" style="width: 48rpx;"></text>
+      </view>
       <text class="hero-emoji scale-in">{{ recipe.image || '🍽️' }}</text>
       <view class="hero-overlay">
         <text class="hero-title">{{ recipe.name }}</text>
@@ -11,11 +16,7 @@
         </view>
       </view>
 
-      <view
-        class="like-btn"
-        :class="{ liked: isFavorited }"
-        @click="toggleFavorite"
-      >
+      <view class="like-btn" :class="{ liked: isFavorited }" @click="toggleFavorite">
         <text class="lb-icon">{{ isFavorited ? '♥' : '♡' }}</text>
         <text class="lb-text">{{ isFavorited ? '已收藏' : '收藏' }}</text>
       </view>
@@ -128,10 +129,10 @@ export default {
         id: 1, name: '番茄炒蛋', image: '🍳', cuisine_type: '家常菜',
         difficulty: '简单', cooking_time: 15,
         nutrition: { calories: 180, protein: 12, fat: 12, carbs: 8 },
-        ingredients: [{ name: '番茄', amount: '2个约200g' }, { name: '鸡蛋', amount: '3个约165g' }],
+        ingredients: [{ name: '番茄', amount: '2 个约 200g' }, { name: '鸡蛋', amount: '3 个约 165g' }],
         steps: ['番茄切块', '鸡蛋打散炒熟', '放入番茄一起炒', '加盐调味即可']
       },
-      detailHeight: 'calc(100vh - 360rpx)',
+      detailHeight: 'calc(100vh - 420rpx)',
       selectedRating: 0,
       feedbackText: '',
       showRatingPanel: false,
@@ -146,11 +147,14 @@ export default {
     }
   },
   methods: {
-    loadRecipe(id) {
-      const allRecipes = [...ALL_RECIPES.breakfast, ...ALL_RECIPES.lunch, ...ALL_RECIPES.dinner]
-      const found = allRecipes.find(r => r.id === id)
-      if (found) { this.recipe = found }
-    },
+      goBack() {
+        uni.navigateBack()
+      },
+      loadRecipe(id) {
+        const allRecipes = [...ALL_RECIPES.breakfast, ...ALL_RECIPES.lunch, ...ALL_RECIPES.dinner]
+        const found = allRecipes.find(r => r.id === id)
+        if (found) { this.recipe = found }
+      },
     checkFavorite() {
       const favorites = uni.getStorageSync('foodfind_favorites') || []
       this.isFavorited = favorites.some(f => f.id === this.recipeId)
@@ -197,11 +201,11 @@ export default {
   display: flex; align-items: center; justify-content: center; position: relative;
 }
 .like-btn {
-  position:absolute; top:calc(env(safe-area-inset-top) + 20rpx); right:24rpx;
+  position:absolute; top:calc(env(safe-area-inset-top) + 16rpx); right:24rpx;
   display:flex; align-items:center; gap:6rpx;
   padding:12rpx 22rpx; background:rgba(255,255,255,.2);
   border-radius:40rpx;
-  transition:all .3s ease;
+  transition:all .3s ease; z-index: 20;
   &:active { transform:scale(.92); }
   &.liked { background:rgba(255,255,255,.35); }
 }
@@ -209,9 +213,26 @@ export default {
 .liked .lb-icon { color:#fff; animation: heartBeat .4s ease; }
 .lb-text { font-size:23rpx; color:#fff; font-weight:600; }
 .hero-emoji { font-size: 140rpx; }
+.hero-nav {
+  position: absolute; top: 0; left: 0; right: 0;
+  padding-top: calc(env(safe-area-inset-top) + 8rpx);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(env(safe-area-inset-top) + 8rpx) 24rpx 16rpx;
+  z-index: 20;
+}
+.nav-back {
+  font-size: 56rpx; color: #fff; font-weight: 300;
+  width: 48rpx; text-align: center; line-height: 1;
+  &:active { opacity: 0.7; }
+}
+.nav-title {
+  font-size: 32rpx; color: #fff; font-weight: 600;
+  letter-spacing: 2rpx;
+}
 .hero-overlay {
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 32rpx; background: rgba(0,0,0,.2);
+  padding-top: calc(48rpx + env(safe-area-inset-top));
 }
 .hero-title {
   font-size: 40rpx; font-weight: 800; color: #fff; display: block;

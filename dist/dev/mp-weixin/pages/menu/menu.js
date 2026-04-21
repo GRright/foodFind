@@ -12,7 +12,8 @@ const _sfc_main = {
       weeklyData: {},
       sparkData: [],
       pairStats: null,
-      pageEnter: true
+      pageEnter: true,
+      todayHomeMeals: null
     };
   },
   computed: {
@@ -58,10 +59,8 @@ const _sfc_main = {
       if (this.weeklyData[this.selectedDateStr])
         return this.weeklyData[this.selectedDateStr];
       const todayStr = this.getTodayStr();
-      if (this.selectedDateStr === todayStr) {
-        const homeMeals = common_vendor.index.getStorageSync("foodfind_meals");
-        if (homeMeals)
-          return homeMeals;
+      if (this.selectedDateStr === todayStr && this.todayHomeMeals) {
+        return this.todayHomeMeals;
       }
       return null;
     },
@@ -130,6 +129,7 @@ const _sfc_main = {
     setTimeout(() => {
       this.pageEnter = false;
     }, 300);
+    this.todayHomeMeals = common_vendor.index.getStorageSync("foodfind_meals") || null;
     if (this.currentMonday) {
       const cached = common_vendor.index.getStorageSync("foodfind_weekly");
       if (cached)
@@ -212,7 +212,7 @@ const _sfc_main = {
       const mc = Math.ceil(n * 0.55), vc = n - mc;
       return [...this.shuffle(meat, mc), ...this.shuffle(veg, vc)].sort(() => Math.random() - 0.5);
     },
-    nutritionBalanced(dayIndex, allDaysMeals) {
+    nutritionBalanced(dayIndex, allDaysMeals, cachedPrefs) {
       const usedRecipes = /* @__PURE__ */ new Set();
       allDaysMeals.forEach((dm) => {
         ["breakfast", "lunch", "dinner"].forEach((k) => {
@@ -220,7 +220,7 @@ const _sfc_main = {
         });
       });
       const familyTags = utils_family.getFamilyHealthTags();
-      const userPrefs = common_vendor.index.getStorageSync("foodfind_detailed_prefs") || {};
+      const userPrefs = cachedPrefs || {};
       const allHealthTags = [.../* @__PURE__ */ new Set([...familyTags, ...userPrefs.healthTags || []])];
       let availableBreakfast = utils_constants.ALL_RECIPES.breakfast.filter((r) => !usedRecipes.has(r.id));
       let availableLunch = utils_constants.ALL_RECIPES.lunch.filter((r) => !usedRecipes.has(r.id));
@@ -242,11 +242,12 @@ const _sfc_main = {
       setTimeout(() => {
         const data = {};
         const allDaysMeals = [];
+        const cachedPrefs = common_vendor.index.getStorageSync("foodfind_detailed_prefs") || {};
         for (let i = 0; i < 7; i++) {
           const d = new Date(this.currentMonday);
           d.setDate(d.getDate() + i);
           const ds = this.dateToStr(d);
-          const meals = this.nutritionBalanced(i, allDaysMeals);
+          const meals = this.nutritionBalanced(i, allDaysMeals, cachedPrefs);
           data[ds] = meals;
           allDaysMeals.push(meals);
         }
