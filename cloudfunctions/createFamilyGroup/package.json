@@ -1,0 +1,6 @@
+{
+  "name": "createFamilyGroup",
+  "version": "1.0.0",
+  "description": "创建家庭群组",
+  "main": "index.js"
+}

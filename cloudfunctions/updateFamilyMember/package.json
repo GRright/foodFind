@@ -1,0 +1,6 @@
+{
+  "name": "updateFamilyMember",
+  "version": "1.0.0",
+  "description": "更新家庭成员信息",
+  "main": "index.js"
+}
