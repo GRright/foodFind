@@ -41,7 +41,7 @@
             </view>
 
             <view class="menu-item report-card" @click="openReport">
-              <view class="menu-icon-wrap green"><text class="menu-emoji">📊</text></view>
+              <view class="menu-icon-wrap green"><text class="menu-icon">◈</text></view>
               <view class="mi-center">
                 <text class="menu-label">本周饮食报告</text>
                 <text class="menu-desc">查看营养数据与互动详情</text>
@@ -51,7 +51,7 @@
           </template>
           <template v-else-if="hasPartner && pairStatus === 'pending'">
             <view class="menu-item pending-card">
-              <view class="pending-icon-wrap"><text class="pending-icon">⌛</text></view>
+              <view class="pending-icon-wrap"><text class="pending-icon">◷</text></view>
               <view class="mi-center">
                 <text class="menu-label">等待对方接受邀请...</text>
                 <text class="menu-desc">已发送邀请，请分享给TA</text>
@@ -63,7 +63,7 @@
           </template>
           <template v-else>
             <view class="menu-item partner-empty-card">
-              <view class="menu-icon-wrap pink"><text class="menu-emoji">♡</text></view>
+              <view class="menu-icon-wrap pink"><text class="menu-icon">⌘</text></view>
               <view class="mi-center">
                 <text class="menu-label">暂时还没吃饭搭子</text>
                 <text class="menu-desc">点击分享给TA，一起决定今天吃什么</text>
@@ -74,7 +74,7 @@
             </view>
 
             <view class="menu-item" @click="goToFamily">
-              <view class="menu-icon-wrap green"><text class="menu-emoji">🏠</text></view>
+              <view class="menu-icon-wrap green"><text class="menu-icon">▣</text></view>
               <view class="mi-center">
                 <text class="menu-label">家庭群组</text>
                 <text class="menu-desc">{{ familySummary }}</text>
@@ -83,7 +83,7 @@
             </view>
 
             <view class="menu-item report-card" @click="openReport">
-              <view class="menu-icon-wrap green"><text class="menu-emoji">📊</text></view>
+              <view class="menu-icon-wrap green"><text class="menu-icon">◈</text></view>
               <view class="mi-center">
                 <text class="menu-label">本周饮食报告</text>
                 <text class="menu-desc">查看我的营养数据</text>
@@ -93,7 +93,7 @@
           </template>
 
           <view class="menu-item" @click="openFavorites">
-            <view class="menu-icon-wrap orange"><text class="menu-emoji">♥</text></view>
+            <view class="menu-icon-wrap orange"><text class="menu-icon">☆</text></view>
             <view class="mi-center">
               <text class="menu-label">我的收藏</text>
               <text class="menu-desc">{{ favorites.length > 0 ? `已收藏 ${favorites.length} 道菜` : '收藏喜欢的菜品' }}</text>
@@ -102,7 +102,7 @@
           </view>
 
           <view class="menu-item" @click="goToShare">
-            <view class="menu-icon-wrap red"><text class="menu-emoji">✉</text></view>
+            <view class="menu-icon-wrap red"><text class="menu-icon">↗</text></view>
             <view class="mi-center">
               <text class="menu-label">分享记录</text>
               <text class="menu-desc">查看发送和收到的菜单</text>
@@ -111,7 +111,7 @@
           </view>
 
           <view class="menu-item" @click="openSpecialDates">
-            <view class="menu-icon-wrap pink"><text class="menu-emoji">🎂</text></view>
+            <view class="menu-icon-wrap pink"><text class="menu-icon">✦</text></view>
             <view class="mi-center">
               <text class="menu-label">特别日子</text>
               <text class="menu-desc">生日、纪念日，特别菜单推荐</text>
@@ -125,6 +125,7 @@
         <text class="group-title">我的</text>
         <view class="menu-list">
           <view class="menu-item" @click="openPrefModal">
+            <view class="menu-icon-wrap gray"><text class="menu-icon">⚙</text></view>
             <view class="mi-center">
               <text class="menu-label">偏好设置</text>
               <text class="menu-desc">{{ prefSummaryText }}</text>
@@ -133,6 +134,7 @@
           </view>
 
           <view class="menu-item" @click="clearCache">
+            <view class="menu-icon-wrap gray"><text class="menu-icon">⟲</text></view>
             <view class="mi-center">
               <text class="menu-label">清除缓存</text>
               <text class="menu-desc">重新生成菜单数据</text>
@@ -141,6 +143,7 @@
           </view>
 
           <view class="menu-item" @click="showAbout">
+            <view class="menu-icon-wrap gray"><text class="menu-icon">ⓘ</text></view>
             <view class="mi-center">
               <text class="menu-label">关于我们</text>
               <text class="menu-desc">关于吃点啥</text>
@@ -977,6 +980,7 @@ export default {
   &.blue, &.red, &.orange, &.green, &.pink, &.purple { background:#f5f6f8; }
   &.gray { background:#f0f1f3; }
 }
+.menu-icon { font-size:32rpx; font-weight:400; letter-spacing:-2rpx; }
 .menu-emoji { font-size:34rpx; }
 .mi-center { flex:1; display:flex; flex-direction:column; min-width:0; }
 .menu-label { font-size:28rpx; color:#1a1a1a; font-weight:600; line-height:1.3; }
