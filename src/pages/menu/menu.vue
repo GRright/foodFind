@@ -47,6 +47,10 @@
         <text class="gen-icon">✦</text>
         <text class="gen-text">生成本周菜单</text>
       </view>
+      <view class="shopping-btn" @click="goToShoppingList">
+        <text class="shopping-icon">🛒</text>
+        <text class="shopping-text">购物清单</text>
+      </view>
       <text class="gen-hint" v-if="weeklyData && weeklyData[selectedDateStr]">已生成 · {{ weekNutriSummary }}</text>
     </view>
 
@@ -220,6 +224,9 @@ export default {
     getTodayStr() {
       const d = new Date()
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+    },
+    goToShoppingList() {
+      uni.navigateTo({ url: '/pages/shoppingList/shoppingList' })
     },
     loadUserPrefs() {
       const prefs = uni.getStorageSync('foodfind_detailed_prefs')
@@ -457,6 +464,18 @@ export default {
 .gen-icon { font-size:28rpx; color:#fff; }
 .gen-text { font-size:27rpx; font-weight:600; color:#fff; }
 .gen-hint { font-size:23rpx; color:#999; font-weight:500; }
+.shopping-btn {
+  display:flex; align-items:center; gap:8rpx;
+  padding:16rpx 28rpx;
+  background:#fff;
+  border-radius:48rpx;
+  box-shadow:0 2rpx 12rpx rgba(0,0,0,.08);
+  border:2rpx solid #e8e8e8;
+  transition:all .25s ease;
+  &:active { background:#f5f5f5; transform:scale(.97); }
+}
+.shopping-icon { font-size:26rpx; }
+.shopping-text { font-size:25rpx; font-weight:600; color:#1a1a1a; }
 
 /* ===== Meal List ===== */
 .meal-scroll { }

@@ -7,7 +7,8 @@
     "pages/recipe-detail/recipe-detail",
     "pages/share/share",
     "pages/invite/invite",
-    "pages/foodDiary/foodDiary"
+    "pages/foodDiary/foodDiary",
+    "pages/shoppingList/shoppingList"
   ],
   "window": {
     "navigationBarTextStyle": "black",

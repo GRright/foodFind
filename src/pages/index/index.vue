@@ -9,6 +9,9 @@
             <text class="greeting-sub">{{ greetingSubText }}</text>
           </view>
           <view class="header-actions">
+            <view class="shopping-btn" @click="goToShoppingList">
+              <text class="sb-icon-cart">🛒</text>
+            </view>
             <view class="notification-btn" :class="{ hasUnread: unreadCount > 0 }" @click="showNotifications">
               <text class="nb-icon">🔔</text>
               <view class="nb-badge" v-if="unreadCount > 0">{{ unreadCount > 9 ? '9+' : unreadCount }}</view>
@@ -916,6 +919,7 @@ export default {
       setTimeout(() => { this.generateDailyMeals(); uni.hideLoading(); uni.showToast({ title: '已重新生成', icon: 'success' }) }, 600)
     },
     goToDetail(recipe) { uni.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` }) },
+    goToShoppingList() { uni.navigateTo({ url: '/pages/shoppingList/shoppingList' }) },
     onShareClick() {
       this.shareBtnClicked = true
       uni.showToast({ title: '请点击右上角分享', icon: 'none' })
@@ -1522,6 +1526,15 @@ export default {
 
 /* ===== Header Actions ===== */
 .header-actions { display:flex; align-items:center; gap:12rpx; }
+.shopping-btn {
+  width:64rpx; height:64rpx;
+  background:#fff; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2rpx 8rpx rgba(0,0,0,.06);
+  transition:all .25s ease;
+  &:active { transform:scale(.92); }
+}
+.sb-icon-cart { font-size:30rpx; }
 .notification-btn {
   position:relative; width:64rpx; height:64rpx;
   background:#fff; border-radius:50%;
