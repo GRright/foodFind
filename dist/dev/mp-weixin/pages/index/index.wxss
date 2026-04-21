@@ -1122,6 +1122,23 @@ to {
   align-items: center;
   gap: 12rpx;
 }
+.shopping-btn.data-v-83a5a03c {
+  width: 64rpx;
+  height: 64rpx;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+  transition: all 0.25s ease;
+}
+.shopping-btn.data-v-83a5a03c:active {
+  transform: scale(0.92);
+}
+.sb-icon-cart.data-v-83a5a03c {
+  font-size: 30rpx;
+}
 .notification-btn.data-v-83a5a03c {
   position: relative;
   width: 64rpx;

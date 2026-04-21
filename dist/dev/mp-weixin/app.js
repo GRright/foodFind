@@ -10,6 +10,8 @@ if (!Math) {
   "./pages/share/share.js";
   "./pages/invite/invite.js";
   "./pages/foodDiary/foodDiary.js";
+  "./pages/shoppingList/shoppingList.js";
+  "./pages/mealConfig/mealConfig.js";
 }
 const _sfc_main = {
   onLaunch() {

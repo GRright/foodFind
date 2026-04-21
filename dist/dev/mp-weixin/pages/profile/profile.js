@@ -19,6 +19,9 @@ const _sfc_main = {
       pageEnter: true,
       showFavoritesModal: false,
       favorites: [],
+      _weeklyCheckInDays: 0,
+      _myMealCount: 0,
+      _weeklyNutritionCache: null,
       prefs: {
         noCookMode: false,
         userType: "adult",
@@ -101,14 +104,7 @@ const _sfc_main = {
       return `连续${days}天好好吃饭，太棒了！继续加油！`;
     },
     weeklyCheckInDays() {
-      const checks = common_vendor.index.getStorageSync("foodfind_personal_checks") || {};
-      let days = 0;
-      Object.keys(checks).forEach((date) => {
-        const day = checks[date];
-        if (day.breakfast || day.lunch || day.dinner)
-          days++;
-      });
-      return days;
+      return this._weeklyCheckInDays;
     },
     prefSummaryText() {
       const parts = [];
@@ -134,30 +130,19 @@ const _sfc_main = {
       return this.myWeeklyMeals.filter((m) => m.type === "vegetarian").length;
     },
     weeklyCalories() {
-      return this.myWeeklyMeals.reduce((sum, m) => {
-        var _a;
-        return sum + (((_a = m.nutrition) == null ? void 0 : _a.calories) || 0);
-      }, 0);
+      if (!this._weeklyNutritionCache) {
+        this._weeklyNutritionCache = this.calcWeeklyNutrition();
+      }
+      return this._weeklyNutritionCache.calories;
     },
     weeklyProtein() {
-      return Math.round(this.myWeeklyMeals.reduce((sum, m) => {
-        var _a;
-        return sum + (((_a = m.nutrition) == null ? void 0 : _a.protein) || 0);
-      }, 0));
+      if (!this._weeklyNutritionCache) {
+        this._weeklyNutritionCache = this.calcWeeklyNutrition();
+      }
+      return this._weeklyNutritionCache.protein;
     },
     myMealCount() {
-      const checks = common_vendor.index.getStorageSync("foodfind_personal_checks") || {};
-      let count = 0;
-      Object.keys(checks).forEach((date) => {
-        const day = checks[date];
-        if (day.breakfast)
-          count++;
-        if (day.lunch)
-          count++;
-        if (day.dinner)
-          count++;
-      });
-      return count;
+      return this._myMealCount;
     },
     partnerMealCount() {
       return Math.max(0, this.myMealCount + Math.floor(Math.random() * 3));
@@ -192,20 +177,37 @@ const _sfc_main = {
       return `全家本周打卡${days}天，一起吃饭才是最温暖的时光~ 👨‍‍👧👦`;
     }
   },
+  onLoad() {
+    this.loadPairInfo();
+    this.loadPrefs();
+    this.loadCachedStats();
+    this.loadFavorites();
+  },
   onShow() {
     this.pageEnter = true;
     setTimeout(() => {
       this.pageEnter = false;
-    }, 400);
-    this.loadPairInfo();
-    this.loadPrefs();
-    this.loadMyWeeklyMeals();
-    this.loadFavorites();
-    if (this.hasPartner && this.pairStatus === "paired") {
-      this.loadPairStats();
-    }
+    }, 300);
   },
   methods: {
+    loadCachedStats() {
+      const checks = common_vendor.index.getStorageSync("foodfind_personal_checks") || {};
+      let days = 0;
+      let count = 0;
+      Object.keys(checks).forEach((date) => {
+        const day = checks[date];
+        if (day.breakfast || day.lunch || day.dinner)
+          days++;
+        if (day.breakfast)
+          count++;
+        if (day.lunch)
+          count++;
+        if (day.dinner)
+          count++;
+      });
+      this._weeklyCheckInDays = days;
+      this._myMealCount = count;
+    },
     loadPrefs() {
       const cached = common_vendor.index.getStorageSync("foodfind_detailed_prefs");
       if (cached) {
@@ -234,6 +236,15 @@ const _sfc_main = {
         }
       }
       this.myWeeklyMeals = meals;
+      this._weeklyNutritionCache = null;
+    },
+    calcWeeklyNutrition() {
+      return this.myWeeklyMeals.reduce((acc, m) => {
+        var _a, _b;
+        acc.calories += ((_a = m.nutrition) == null ? void 0 : _a.calories) || 0;
+        acc.protein += ((_b = m.nutrition) == null ? void 0 : _b.protein) || 0;
+        return acc;
+      }, { calories: 0, protein: 0 });
     },
     loadPairStats() {
       return;
@@ -242,6 +253,7 @@ const _sfc_main = {
       this.showReportModal = true;
       this.loadWeeklyReport();
       this.loadMyWeeklyMeals();
+      this.loadCachedStats();
     },
     closeReport() {
       this.showReportModal = false;

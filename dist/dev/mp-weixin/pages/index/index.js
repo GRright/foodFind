@@ -46,7 +46,9 @@ const _sfc_main = {
       showAchievementModal: false,
       streakDays: 0,
       achievements: [],
-      pairId: ""
+      pairId: "",
+      pageReady: false,
+      _nutritionCache: null
     };
   },
   computed: {
@@ -105,52 +107,37 @@ const _sfc_main = {
       ];
     },
     totalCalories() {
+      if (this._nutritionCache)
+        return this._nutritionCache.calories;
       if (!this.dailyMeals)
         return 0;
-      let c = 0;
+      let c = 0, p = 0, f = 0, cb = 0;
       ["breakfast", "lunch", "dinner"].forEach((k) => {
         (this.dailyMeals[k] || []).forEach((r) => {
-          var _a;
-          return c += ((_a = r.nutrition) == null ? void 0 : _a.calories) || 0;
+          var _a, _b, _c, _d;
+          c += ((_a = r.nutrition) == null ? void 0 : _a.calories) || 0;
+          p += ((_b = r.nutrition) == null ? void 0 : _b.protein) || 0;
+          f += ((_c = r.nutrition) == null ? void 0 : _c.fat) || 0;
+          cb += ((_d = r.nutrition) == null ? void 0 : _d.carbs) || 0;
         });
       });
-      return Math.round(c * this.userCount);
+      this._nutritionCache = { calories: Math.round(c * this.userCount), protein: Math.round(p), fat: Math.round(f), carbs: Math.round(cb) };
+      return this._nutritionCache.calories;
     },
     totalProtein() {
-      if (!this.dailyMeals)
-        return 0;
-      let p = 0;
-      ["breakfast", "lunch", "dinner"].forEach((k) => {
-        (this.dailyMeals[k] || []).forEach((r) => {
-          var _a;
-          return p += ((_a = r.nutrition) == null ? void 0 : _a.protein) || 0;
-        });
-      });
-      return Math.round(p);
+      if (this._nutritionCache)
+        return this._nutritionCache.protein;
+      return 0;
     },
     totalFat() {
-      if (!this.dailyMeals)
-        return 0;
-      let f = 0;
-      ["breakfast", "lunch", "dinner"].forEach((k) => {
-        (this.dailyMeals[k] || []).forEach((r) => {
-          var _a;
-          return f += ((_a = r.nutrition) == null ? void 0 : _a.fat) || 0;
-        });
-      });
-      return Math.round(f);
+      if (this._nutritionCache)
+        return this._nutritionCache.fat;
+      return 0;
     },
     totalCarbs() {
-      if (!this.dailyMeals)
-        return 0;
-      let cb = 0;
-      ["breakfast", "lunch", "dinner"].forEach((k) => {
-        (this.dailyMeals[k] || []).forEach((r) => {
-          var _a;
-          return cb += ((_a = r.nutrition) == null ? void 0 : _a.carbs) || 0;
-        });
-      });
-      return Math.round(cb);
+      if (this._nutritionCache)
+        return this._nutritionCache.carbs;
+      return 0;
     },
     ggOverlayTitle() {
       const titles = [
@@ -189,18 +176,31 @@ const _sfc_main = {
       return texts[this.ggStage] || "知道了";
     }
   },
+  onLoad() {
+    this.loadMode();
+    this.loadPairId();
+    this.preloadMeals();
+    this.$nextTick(() => {
+      this.loadTodayCheckIn();
+      this.loadStreak();
+      this.loadAchievements();
+      this.checkGestureGuide();
+    });
+  },
+  onReady() {
+    this.pageReady = true;
+  },
   onShow() {
     this.shareBtnClicked = false;
     this.pageEnter = true;
     setTimeout(() => {
       this.pageEnter = false;
-    }, 400);
-    this.loadMode();
-    this.loadPairId();
+    }, 300);
     if (this.noCookMode) {
       this.loadFeed();
     } else {
       this.loadMeals();
+      this.loadTodayCheckIn();
     }
   },
   methods: {
@@ -343,7 +343,7 @@ const _sfc_main = {
       const done = common_vendor.index.getStorageSync("foodfind_gesture_guide");
       if (done)
         return;
-      common_vendor.index.setStorageSync("foodfind_gesture_guide", true);
+      this.showGestureGuide = false;
     },
     ggDemoCardTouchStart(e) {
       if (this.ggLocked)
@@ -508,7 +508,7 @@ const _sfc_main = {
       }
       common_vendor.index.showToast({ title: `已更换「${food.name}」`, icon: "none" });
     },
-    loadMeals() {
+    preloadMeals() {
       const cached = common_vendor.index.getStorageSync("foodfind_meals");
       const cachedDate = common_vendor.index.getStorageSync("foodfind_meals_date");
       if (cached && cachedDate && cachedDate === this.getTodayStr()) {
@@ -529,6 +529,12 @@ const _sfc_main = {
         return;
       }
       this.generateDailyMeals();
+    },
+    loadMeals() {
+      this._nutritionCache = null;
+      if (!this.dailyMeals) {
+        this.preloadMeals();
+      }
     },
     getTodayStr() {
       const d = /* @__PURE__ */ new Date();
@@ -592,15 +598,16 @@ const _sfc_main = {
       }, 400);
     },
     regenerateAll() {
-      common_vendor.index.showLoading({ title: "重新生成中..." });
+      common_vendor.index.showToast({ title: "已重新生成", icon: "success" });
       setTimeout(() => {
         this.generateDailyMeals();
-        common_vendor.index.hideLoading();
-        common_vendor.index.showToast({ title: "已重新生成", icon: "success" });
-      }, 600);
+      }, 300);
     },
     goToDetail(recipe) {
       common_vendor.index.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` });
+    },
+    goToShoppingList() {
+      common_vendor.index.navigateTo({ url: "/pages/shoppingList/shoppingList" });
     },
     onShareClick() {
       this.shareBtnClicked = true;
@@ -779,23 +786,24 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, !$data.noCookMode ? common_vendor.e({
     b: common_vendor.t($options.greetingText),
     c: common_vendor.t($options.greetingSubText),
-    d: $data.unreadCount > 0
+    d: common_vendor.o((...args) => $options.goToShoppingList && $options.goToShoppingList(...args)),
+    e: $data.unreadCount > 0
   }, $data.unreadCount > 0 ? {
-    e: common_vendor.t($data.unreadCount > 9 ? "9+" : $data.unreadCount)
+    f: common_vendor.t($data.unreadCount > 9 ? "9+" : $data.unreadCount)
   } : {}, {
-    f: $data.unreadCount > 0 ? 1 : "",
-    g: common_vendor.o((...args) => $options.showNotifications && $options.showNotifications(...args)),
-    h: common_vendor.t($data.shareBtnClicked ? "已分享" : "分享"),
-    i: $data.shareBtnClicked ? 1 : "",
-    j: common_vendor.o((...args) => $options.onShareClick && $options.onShareClick(...args)),
-    k: $options.totalCalories > 0
+    g: $data.unreadCount > 0 ? 1 : "",
+    h: common_vendor.o((...args) => $options.showNotifications && $options.showNotifications(...args)),
+    i: common_vendor.t($data.shareBtnClicked ? "已分享" : "分享"),
+    j: $data.shareBtnClicked ? 1 : "",
+    k: common_vendor.o((...args) => $options.onShareClick && $options.onShareClick(...args)),
+    l: $options.totalCalories > 0
   }, $options.totalCalories > 0 ? {
-    l: common_vendor.t($options.totalCalories),
-    m: common_vendor.t($options.totalProtein),
-    n: common_vendor.t($options.totalFat),
-    o: common_vendor.t($options.totalCarbs)
+    m: common_vendor.t($options.totalCalories),
+    n: common_vendor.t($options.totalProtein),
+    o: common_vendor.t($options.totalFat),
+    p: common_vendor.t($options.totalCarbs)
   } : {}, {
-    p: common_vendor.f($options.mealSections, (section, si, i0) => {
+    q: common_vendor.f($options.mealSections, (section, si, i0) => {
       return {
         a: common_vendor.t(section.icon),
         b: common_vendor.t(section.title),
@@ -818,7 +826,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
             g: $data.showSparkle && $data.sparkleCardId === food.id
           }, $data.showSparkle && $data.sparkleCardId === food.id ? {} : {}, {
             h: common_vendor.n($options.getCardClass(food.id)),
-            i: common_vendor.s($options.getCardStyle(food.id)),
+            i: common_vendor.s($options.getCardStyle(food.id) + ";animation-delay:" + (150 + si * 60 + fi * 50) + "ms"),
             j: food.id,
             k: common_vendor.o(($event) => $options.goToDetail(food), food.id),
             l: common_vendor.o(($event) => $options.onSwipeStart(food, section.key, $event), food.id),
@@ -826,49 +834,50 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
             n: common_vendor.o(($event) => $options.onSwipeEnd(food, section.key), food.id)
           });
         }),
-        j: si
+        j: si,
+        k: si * 80 + "ms"
       };
     }),
-    q: common_vendor.o((...args) => $options.regenerateAll && $options.regenerateAll(...args)),
-    r: $data.scrollHeight,
-    s: common_vendor.o((...args) => $options.loadMore && $options.loadMore(...args)),
-    t: $data.showDeleteModal ? 1 : "",
-    v: common_vendor.o(($event) => $data.showDeleteModal = false),
-    w: common_vendor.t((_a = $data.deleteTargetFood) == null ? void 0 : _a.name),
-    x: common_vendor.o(($event) => $data.showDeleteModal = false),
-    y: common_vendor.o((...args) => $options.confirmDelete && $options.confirmDelete(...args)),
-    z: $data.showDeleteModal ? 1 : "",
-    A: common_vendor.o((...args) => $options.closeGestureGuide && $options.closeGestureGuide(...args)),
-    B: ($data.ggStage + 1) / 2 * 100 + "%",
-    C: common_vendor.t($data.ggStage + 1),
-    D: common_vendor.t($options.ggOverlayTitle),
-    E: common_vendor.t($options.ggOverlaySub),
-    F: common_vendor.t($options.ggHintIcon),
-    G: common_vendor.t($options.ggHintText),
-    H: common_vendor.n($options.ggHintClass),
-    I: common_vendor.t(((_b = $data.ggDemoFood) == null ? void 0 : _b.image) || "🍽️"),
-    J: common_vendor.t(((_c = $data.ggDemoFood) == null ? void 0 : _c.name) || "示例菜品"),
-    K: $data.ggShowSparkle
+    r: common_vendor.o((...args) => $options.regenerateAll && $options.regenerateAll(...args)),
+    s: $data.scrollHeight,
+    t: common_vendor.o((...args) => $options.loadMore && $options.loadMore(...args)),
+    v: $data.showDeleteModal ? 1 : "",
+    w: common_vendor.o(($event) => $data.showDeleteModal = false),
+    x: common_vendor.t((_a = $data.deleteTargetFood) == null ? void 0 : _a.name),
+    y: common_vendor.o(($event) => $data.showDeleteModal = false),
+    z: common_vendor.o((...args) => $options.confirmDelete && $options.confirmDelete(...args)),
+    A: $data.showDeleteModal ? 1 : "",
+    B: common_vendor.o((...args) => $options.closeGestureGuide && $options.closeGestureGuide(...args)),
+    C: ($data.ggStage + 1) / 2 * 100 + "%",
+    D: common_vendor.t($data.ggStage + 1),
+    E: common_vendor.t($options.ggOverlayTitle),
+    F: common_vendor.t($options.ggOverlaySub),
+    G: common_vendor.t($options.ggHintIcon),
+    H: common_vendor.t($options.ggHintText),
+    I: common_vendor.n($options.ggHintClass),
+    J: common_vendor.t(((_b = $data.ggDemoFood) == null ? void 0 : _b.image) || "🍽️"),
+    K: common_vendor.t(((_c = $data.ggDemoFood) == null ? void 0 : _c.name) || "示例菜品"),
+    L: $data.ggShowSparkle
   }, $data.ggShowSparkle ? {} : {}, {
-    L: common_vendor.n($data.ggDemoCardAnim),
-    M: common_vendor.o((...args) => $options.ggDemoCardTouchStart && $options.ggDemoCardTouchStart(...args)),
-    N: common_vendor.o((...args) => $options.ggDemoCardTouchMove && $options.ggDemoCardTouchMove(...args)),
-    O: common_vendor.o((...args) => $options.ggDemoCardTouchEnd && $options.ggDemoCardTouchEnd(...args)),
-    P: common_vendor.t($options.ggActIcon),
-    Q: common_vendor.t($options.ggActText),
-    R: common_vendor.o((...args) => $options.ggAct && $options.ggAct(...args)),
-    S: $data.ggLocked ? 1 : "",
-    T: common_vendor.o((...args) => $options.closeGestureGuide && $options.closeGestureGuide(...args)),
-    U: $data.showGestureGuide ? 1 : ""
+    M: common_vendor.n($data.ggDemoCardAnim),
+    N: common_vendor.o((...args) => $options.ggDemoCardTouchStart && $options.ggDemoCardTouchStart(...args)),
+    O: common_vendor.o((...args) => $options.ggDemoCardTouchMove && $options.ggDemoCardTouchMove(...args)),
+    P: common_vendor.o((...args) => $options.ggDemoCardTouchEnd && $options.ggDemoCardTouchEnd(...args)),
+    Q: common_vendor.t($options.ggActIcon),
+    R: common_vendor.t($options.ggActText),
+    S: common_vendor.o((...args) => $options.ggAct && $options.ggAct(...args)),
+    T: $data.ggLocked ? 1 : "",
+    U: common_vendor.o((...args) => $options.closeGestureGuide && $options.closeGestureGuide(...args)),
+    V: $data.showGestureGuide ? 1 : ""
   }) : common_vendor.e({
-    V: common_vendor.t($options.greetingTextNoCook),
-    W: common_vendor.o((...args) => $options.takePhoto && $options.takePhoto(...args)),
-    X: common_vendor.o((...args) => $options.choosePhoto && $options.choosePhoto(...args)),
-    Y: $data.feedList.length > 0
+    W: common_vendor.t($options.greetingTextNoCook),
+    X: common_vendor.o((...args) => $options.takePhoto && $options.takePhoto(...args)),
+    Y: common_vendor.o((...args) => $options.choosePhoto && $options.choosePhoto(...args)),
+    Z: $data.feedList.length > 0
   }, $data.feedList.length > 0 ? {
-    Z: common_vendor.t($options.todayLabel)
+    aa: common_vendor.t($options.todayLabel)
   } : {}, {
-    aa: common_vendor.f($data.feedList, (item, idx, i0) => {
+    ab: common_vendor.f($data.feedList, (item, idx, i0) => {
       return common_vendor.e({
         a: item.image,
         b: common_vendor.o(($event) => $options.previewImage(item.image), item.id),
@@ -890,16 +899,16 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         n: item.id
       });
     }),
-    ab: $data.noCookMode,
-    ac: $data.feedList.length === 0
+    ac: $data.noCookMode,
+    ad: $data.feedList.length === 0
   }, $data.feedList.length === 0 ? {} : {}, {
-    ad: $data.feedScrollHeight,
-    ae: common_vendor.o((...args) => $options.loadMoreFeed && $options.loadMoreFeed(...args))
+    ae: $data.feedScrollHeight,
+    af: common_vendor.o((...args) => $options.loadMoreFeed && $options.loadMoreFeed(...args))
   }), {
-    af: $data.showNotifPanel ? 1 : "",
-    ag: common_vendor.o(($event) => $data.showNotifPanel = false),
+    ag: $data.showNotifPanel ? 1 : "",
     ah: common_vendor.o(($event) => $data.showNotifPanel = false),
-    ai: common_vendor.f($data.notifList, (n, i, i0) => {
+    ai: common_vendor.o(($event) => $data.showNotifPanel = false),
+    aj: common_vendor.f($data.notifList, (n, i, i0) => {
       return {
         a: common_vendor.t(n.type === "checkin" ? "🍽️" : n.type === "comment" ? "💬" : n.type === "vote" ? "🗳️" : "🔔"),
         b: common_vendor.t(n.fromName),
@@ -909,13 +918,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         f: !n.read ? 1 : ""
       };
     }),
-    aj: $data.notifList.length === 0
+    ak: $data.notifList.length === 0
   }, $data.notifList.length === 0 ? {} : {}, {
-    ak: $data.showNotifPanel ? 1 : "",
-    al: $data.showCommentModal ? 1 : "",
-    am: common_vendor.o(($event) => $data.showCommentModal = false),
+    al: $data.showNotifPanel ? 1 : "",
+    am: $data.showCommentModal ? 1 : "",
     an: common_vendor.o(($event) => $data.showCommentModal = false),
-    ao: common_vendor.f($data.commentList, (c, i, i0) => {
+    ao: common_vendor.o(($event) => $data.showCommentModal = false),
+    ap: common_vendor.f($data.commentList, (c, i, i0) => {
       return {
         a: common_vendor.t(c.fromName.charAt(0)),
         b: common_vendor.t(c.fromName),
@@ -924,21 +933,21 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: i
       };
     }),
-    ap: $data.commentList.length === 0
+    aq: $data.commentList.length === 0
   }, $data.commentList.length === 0 ? {} : {}, {
-    aq: common_vendor.o((...args) => $options.submitComment && $options.submitComment(...args)),
-    ar: $data.commentInput,
-    as: common_vendor.o(($event) => $data.commentInput = $event.detail.value),
-    at: common_vendor.o((...args) => $options.submitComment && $options.submitComment(...args)),
-    av: $data.showCommentModal ? 1 : "",
-    aw: $data.showVoteModal ? 1 : "",
-    ax: common_vendor.o(($event) => $data.showVoteModal = false),
+    ar: common_vendor.o((...args) => $options.submitComment && $options.submitComment(...args)),
+    as: $data.commentInput,
+    at: common_vendor.o(($event) => $data.commentInput = $event.detail.value),
+    av: common_vendor.o((...args) => $options.submitComment && $options.submitComment(...args)),
+    aw: $data.showCommentModal ? 1 : "",
+    ax: $data.showVoteModal ? 1 : "",
     ay: common_vendor.o(($event) => $data.showVoteModal = false),
-    az: !$data.currentVote
+    az: common_vendor.o(($event) => $data.showVoteModal = false),
+    aA: !$data.currentVote
   }, !$data.currentVote ? common_vendor.e({
-    aA: $data.voteTitle,
-    aB: common_vendor.o(($event) => $data.voteTitle = $event.detail.value),
-    aC: common_vendor.f($data.voteOptions, (opt, i, i0) => {
+    aB: $data.voteTitle,
+    aC: common_vendor.o(($event) => $data.voteTitle = $event.detail.value),
+    aD: common_vendor.f($data.voteOptions, (opt, i, i0) => {
       return common_vendor.e({
         a: "选项" + (i + 1),
         b: $data.voteOptions[i],
@@ -949,17 +958,17 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: i
       });
     }),
-    aD: $data.voteOptions.length > 2,
-    aE: $data.voteOptions.length < 5
+    aE: $data.voteOptions.length > 2,
+    aF: $data.voteOptions.length < 5
   }, $data.voteOptions.length < 5 ? {
-    aF: common_vendor.o((...args) => $options.addVoteOption && $options.addVoteOption(...args))
+    aG: common_vendor.o((...args) => $options.addVoteOption && $options.addVoteOption(...args))
   } : {}, {
-    aG: common_vendor.o((...args) => $options.createVoteAction && $options.createVoteAction(...args))
+    aH: common_vendor.o((...args) => $options.createVoteAction && $options.createVoteAction(...args))
   }) : {}, {
-    aH: $data.currentVote
+    aI: $data.currentVote
   }, $data.currentVote ? {
-    aI: common_vendor.t($data.currentVote.title),
-    aJ: common_vendor.f($data.currentVote.options, (opt, i, i0) => {
+    aJ: common_vendor.t($data.currentVote.title),
+    aK: common_vendor.f($data.currentVote.options, (opt, i, i0) => {
       return {
         a: common_vendor.t(opt.text),
         b: common_vendor.t(opt.count),
@@ -968,13 +977,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: common_vendor.o(($event) => $options.doVote(i), i)
       };
     }),
-    aK: common_vendor.t($data.currentVote.status === "active" ? "投票进行中" : "投票已结束")
+    aL: common_vendor.t($data.currentVote.status === "active" ? "投票进行中" : "投票已结束")
   } : {}, {
-    aL: $data.showVoteModal ? 1 : "",
-    aM: $data.showAchievementModal ? 1 : "",
-    aN: common_vendor.o(($event) => $data.showAchievementModal = false),
+    aM: $data.showVoteModal ? 1 : "",
+    aN: $data.showAchievementModal ? 1 : "",
     aO: common_vendor.o(($event) => $data.showAchievementModal = false),
-    aP: common_vendor.f($data.achievements, (a, i, i0) => {
+    aP: common_vendor.o(($event) => $data.showAchievementModal = false),
+    aQ: common_vendor.f($data.achievements, (a, i, i0) => {
       return {
         a: common_vendor.t(a.icon),
         b: common_vendor.t(a.name),
@@ -984,18 +993,18 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         f: a.unlocked ? 1 : ""
       };
     }),
-    aQ: common_vendor.t($data.streakDays),
-    aR: common_vendor.o(($event) => $data.showAchievementModal = false),
-    aS: $data.showAchievementModal ? 1 : "",
-    aT: $data.noCookMode && $data.pairId
+    aR: common_vendor.t($data.streakDays),
+    aS: common_vendor.o(($event) => $data.showAchievementModal = false),
+    aT: $data.showAchievementModal ? 1 : "",
+    aU: $data.noCookMode && $data.pairId
   }, $data.noCookMode && $data.pairId ? {
-    aU: common_vendor.o(($event) => $data.showVoteModal = true)
+    aV: common_vendor.o(($event) => $data.showVoteModal = true)
   } : {}, {
-    aV: $data.noCookMode
+    aW: $data.noCookMode
   }, $data.noCookMode ? {
-    aW: common_vendor.o(($event) => $data.showAchievementModal = true)
+    aX: common_vendor.o(($event) => $data.showAchievementModal = true)
   } : {}, {
-    aX: $data.pageEnter ? 1 : ""
+    aY: $data.pageEnter ? 1 : ""
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-83a5a03c"]]);

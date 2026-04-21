@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const utils_constants = require("../../utils/constants.js");
 const _sfc_main = {
   data() {
     return {
@@ -68,7 +67,6 @@ const _sfc_main = {
       const todayCheck = checks[dateStr];
       if (todayCheck) {
         const meals = [];
-        [...utils_constants.ALL_RECIPES.breakfast, ...utils_constants.ALL_RECIPES.lunch, ...utils_constants.ALL_RECIPES.dinner];
         if (todayCheck.breakfast)
           meals.push("早餐");
         if (todayCheck.lunch)

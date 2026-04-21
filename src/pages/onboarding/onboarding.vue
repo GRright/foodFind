@@ -192,12 +192,10 @@ export default {
         uni.setStorageSync('foodfind_user_count', userCountMap[userCountAns.value] || 2)
       }
 
-      uni.showLoading({ title: '保存中...' })
+      uni.showToast({ title: '设置完成，开始美食之旅！', icon: 'success', duration: 1500 })
       setTimeout(() => {
-        uni.hideLoading()
-        uni.showToast({ title: '设置完成，开始美食之旅！', icon: 'success', duration: 1800 })
-        setTimeout(() => { uni.switchTab({ url: '/pages/index/index' }) }, 1600)
-      }, 800)
+        uni.reLaunch({ url: '/pages/index/index' })
+      }, 1500)
     }
   }
 }

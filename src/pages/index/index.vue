@@ -539,11 +539,13 @@ export default {
   onLoad() {
     this.loadMode()
     this.loadPairId()
-    this.loadTodayCheckIn()
-    this.loadStreak()
-    this.loadAchievements()
-    this.checkGestureGuide()
     this.preloadMeals()
+    this.$nextTick(() => {
+      this.loadTodayCheckIn()
+      this.loadStreak()
+      this.loadAchievements()
+      this.checkGestureGuide()
+    })
   },
   onReady() {
     this.pageReady = true
@@ -689,7 +691,7 @@ export default {
     checkGestureGuide() {
       const done = uni.getStorageSync('foodfind_gesture_guide')
       if (done) return
-      uni.setStorageSync('foodfind_gesture_guide', true)
+      this.showGestureGuide = false
     },
     ggDemoCardTouchStart(e) {
       if (this.ggLocked) return
@@ -915,8 +917,8 @@ export default {
       }, 400)
     },
     regenerateAll() {
-      uni.showLoading({ title: '重新生成中...' })
-      setTimeout(() => { this.generateDailyMeals(); uni.hideLoading(); uni.showToast({ title: '已重新生成', icon: 'success' }) }, 600)
+      uni.showToast({ title: '已重新生成', icon: 'success' })
+      setTimeout(() => { this.generateDailyMeals() }, 300)
     },
     goToDetail(recipe) { uni.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` }) },
     goToShoppingList() { uni.navigateTo({ url: '/pages/shoppingList/shoppingList' }) },

@@ -181,11 +181,15 @@ export default {
   onLoad() {
     this.loadConfig()
     this.loadShoppingList()
-    this.autoGenerateIfEmpty()
   },
   onShow() {
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
+    if (this.items.length === 0) {
+      setTimeout(() => {
+        this.autoGenerateIfEmpty()
+      }, 500)
+    }
   },
   methods: {
     loadConfig() {
@@ -224,8 +228,8 @@ export default {
     getCacheKey() {
       const mode = this.config.mode
       const days = this.config.customDays
-      const weekdayMeals = this.mealConfig.weekday.sort().join(',')
-      const weekendMeals = this.mealConfig.weekend.sort().join(',')
+      const weekdayMeals = this.mealConfig.weekday.slice().sort().join(',')
+      const weekendMeals = this.mealConfig.weekend.slice().sort().join(',')
       return `${mode}-${days}-${weekdayMeals}-${weekendMeals}`
     },
     getTodayStr() {
@@ -254,19 +258,19 @@ export default {
       this.config.customDays = 3
       this.saveConfig()
       this.loadShoppingList()
-      this.autoGenerateIfEmpty()
+      setTimeout(() => { this.autoGenerateIfEmpty() }, 100)
     },
     setPreset(mode) {
       this.config.mode = mode
       this.saveConfig()
       this.loadShoppingList()
-      this.autoGenerateIfEmpty()
+      setTimeout(() => { this.autoGenerateIfEmpty() }, 100)
     },
     onCustomDaysChange(e) {
       this.config.customDays = parseInt(e.detail.value)
       this.saveConfig()
       this.loadShoppingList()
-      this.autoGenerateIfEmpty()
+      setTimeout(() => { this.autoGenerateIfEmpty() }, 100)
     },
     goToMealConfig() {
       uni.navigateTo({ url: '/pages/mealConfig/mealConfig' })

@@ -122,14 +122,10 @@ const _sfc_main = {
       if (userCountAns) {
         common_vendor.index.setStorageSync("foodfind_user_count", userCountMap[userCountAns.value] || 2);
       }
-      common_vendor.index.showLoading({ title: "保存中..." });
+      common_vendor.index.showToast({ title: "设置完成，开始美食之旅！", icon: "success", duration: 1500 });
       setTimeout(() => {
-        common_vendor.index.hideLoading();
-        common_vendor.index.showToast({ title: "设置完成，开始美食之旅！", icon: "success", duration: 1800 });
-        setTimeout(() => {
-          common_vendor.index.switchTab({ url: "/pages/index/index" });
-        }, 1600);
-      }, 800);
+        common_vendor.index.reLaunch({ url: "/pages/index/index" });
+      }, 1500);
     }
   }
 };

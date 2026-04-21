@@ -123,26 +123,25 @@ const _sfc_main = {
     this.initCalendar();
     this.loadWeeklyCache();
     this.loadUserPrefs();
-    this.loadSparkData();
-    this.loadPairStats();
   },
   onShow() {
     this.pageEnter = true;
     setTimeout(() => {
       this.pageEnter = false;
-    }, 400);
+    }, 300);
     if (this.currentMonday) {
       const cached = common_vendor.index.getStorageSync("foodfind_weekly");
       if (cached)
         this.weeklyData = cached;
-      this.loadSparkData();
-      this.loadPairStats();
     }
   },
   methods: {
     getTodayStr() {
       const d = /* @__PURE__ */ new Date();
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    },
+    goToShoppingList() {
+      common_vendor.index.navigateTo({ url: "/pages/shoppingList/shoppingList" });
     },
     loadUserPrefs() {
       const prefs = common_vendor.index.getStorageSync("foodfind_detailed_prefs");
@@ -314,10 +313,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
             b: common_vendor.t(food.name),
             c: common_vendor.t(food.nutrition.calories * $data.userCount),
             d: food.id,
-            e: common_vendor.o(($event) => $options.viewRecipe(food), food.id)
+            e: common_vendor.o(($event) => $options.viewRecipe(food), food.id),
+            f: 180 + mi * 60 + fi * 50 + "ms"
           };
         }),
-        e: mi
+        e: mi,
+        f: mi * 120 + "ms"
       };
     })
   } : {}, {
