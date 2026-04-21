@@ -98,6 +98,15 @@
             </view>
             <text class="menu-arrow">›</text>
           </view>
+
+          <view class="menu-item" @click="openSpecialDates">
+            <view class="menu-icon-wrap pink"><text class="menu-emoji">🎂</text></view>
+            <view class="mi-center">
+              <text class="menu-label">特别日子</text>
+              <text class="menu-desc">生日、纪念日，特别菜单推荐</text>
+            </view>
+            <text class="menu-arrow">›</text>
+          </view>
         </view>
       </view>
 
@@ -224,7 +233,7 @@
     </view>
 
     <view class="version-info">
-      <text class="version-text">吃点啥 v1.6 · 完整体验版</text>
+      <text class="version-text">吃点啥 v2.4 · 营养可视化+特别日子</text>
     </view>
 
     <view class="report-modal-mask" :class="{ show: showReportModal }" @click="closeReport"></view>
@@ -297,6 +306,48 @@
           <view class="rm-stat-card">
             <text class="rm-stat-value">{{ weeklyProtein }}</text>
             <text class="rm-stat-label">蛋白质(g)</text>
+          </view>
+        </view>
+
+        <view class="rm-section">
+          <view class="rm-section-header">
+            <text class="rms-title">🥗 营养摄入</text>
+            <text class="rms-desc">本周三大营养素占比</text>
+          </view>
+          <view class="rm-pie-card">
+            <view class="rm-pie-row">
+              <view class="rm-pie-chart">
+                <view class="rm-pie-outer" :style="pieChartStyle">
+                  <view class="rm-pie-inner">
+                    <text class="rm-pie-center-val">{{ nutritionTotal }}</text>
+                    <text class="rm-pie-center-label">总克数</text>
+                  </view>
+                </view>
+              </view>
+              <view class="rm-pie-legend">
+                <view class="rm-legend-item">
+                  <view class="rm-legend-dot" style="background:#07c160"></view>
+                  <view class="rm-legend-info">
+                    <text class="rm-legend-name">蛋白质</text>
+                    <text class="rm-legend-val">{{ weeklyProtein }}g · {{ proteinPercent }}%</text>
+                  </view>
+                </view>
+                <view class="rm-legend-item">
+                  <view class="rm-legend-dot" style="background:#ff9f43"></view>
+                  <view class="rm-legend-info">
+                    <text class="rm-legend-name">脂肪</text>
+                    <text class="rm-legend-val">{{ weeklyFat }}g · {{ fatPercent }}%</text>
+                  </view>
+                </view>
+                <view class="rm-legend-item">
+                  <view class="rm-legend-dot" style="background:#5b9bd5"></view>
+                  <view class="rm-legend-info">
+                    <text class="rm-legend-name">碳水</text>
+                    <text class="rm-legend-val">{{ weeklyCarbs }}g · {{ carbsPercent }}%</text>
+                  </view>
+                </view>
+              </view>
+            </view>
           </view>
         </view>
 
@@ -508,7 +559,7 @@ export default {
     },
     prefSummaryText() {
       const parts = []
-      const ut = this.userTypeOptions.find(o => o.value === this.prefs.userCount)
+      const ut = this.userTypeOptions.find(o => o.value === this.prefs.userType)
       if (ut) parts.push(ut.label)
       const tt = this.tasteOptions.find(o => o.value === this.prefs.taste)
       if (tt) parts.push(tt.label)
@@ -537,11 +588,55 @@ export default {
       }
       return this._weeklyNutritionCache.protein
     },
+    weeklyFat() {
+      if (!this._weeklyNutritionCache) {
+        this._weeklyNutritionCache = this.calcWeeklyNutrition()
+      }
+      return this._weeklyNutritionCache.fat
+    },
+    weeklyCarbs() {
+      if (!this._weeklyNutritionCache) {
+        this._weeklyNutritionCache = this.calcWeeklyNutrition()
+      }
+      return this._weeklyNutritionCache.carbs
+    },
+    nutritionTotal() {
+      return this.weeklyProtein + this.weeklyFat + this.weeklyCarbs
+    },
+    proteinPercent() {
+      const t = this.nutritionTotal
+      return t > 0 ? Math.round((this.weeklyProtein / t) * 100) : 33
+    },
+    fatPercent() {
+      const t = this.nutritionTotal
+      return t > 0 ? Math.round((this.weeklyFat / t) * 100) : 33
+    },
+    carbsPercent() {
+      const t = this.nutritionTotal
+      return t > 0 ? 100 - this.proteinPercent - this.fatPercent : 34
+    },
+    pieChartStyle() {
+      const p = this.proteinPercent
+      const f = this.fatPercent
+      const c = this.carbsPercent
+      return `background: conic-gradient(#07c160 0% ${p}%, #ff9f43 ${p}% ${p + f}%, #5b9bd5 ${p + f}% 100%)`
+    },
     myMealCount() {
       return this._myMealCount
     },
     partnerMealCount() {
-      return Math.max(0, this.myMealCount + Math.floor(Math.random() * 3))
+      const partnerChecks = uni.getStorageSync('foodfind_partner_checks')
+      if (partnerChecks) {
+        let count = 0
+        Object.keys(partnerChecks).forEach(date => {
+          const day = partnerChecks[date]
+          if (day.breakfast) count++
+          if (day.lunch) count++
+          if (day.dinner) count++
+        })
+        return count
+      }
+      return 0
     },
     myMealPercent() {
       const total = this.myMealCount + this.partnerMealCount
@@ -601,15 +696,15 @@ export default {
     loadMyWeeklyMeals() {
       const meals = []
       const allRecipes = [...ALL_RECIPES.breakfast, ...ALL_RECIPES.lunch, ...ALL_RECIPES.dinner]
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0]
-        const daily = uni.getStorageSync('foodfind_meals_date')
-        if (daily === d) {
-          const cached = uni.getStorageSync('foodfind_meals')
-          if (cached) {
+      const cachedDate = uni.getStorageSync('foodfind_meals_date')
+      const cachedMeals = uni.getStorageSync('foodfind_meals')
+      if (cachedDate && cachedMeals) {
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0]
+          if (cachedDate === d) {
             ;['breakfast', 'lunch', 'dinner'].forEach(mealType => {
-              if (cached[mealType]) {
-                cached[mealType].forEach(food => {
+              if (cachedMeals[mealType]) {
+                cachedMeals[mealType].forEach(food => {
                   const recipe = allRecipes.find(r => r.id === food.id)
                   if (recipe) meals.push({ ...recipe, mealType, date: d })
                 })
@@ -625,8 +720,10 @@ export default {
       return this.myWeeklyMeals.reduce((acc, m) => {
         acc.calories += m.nutrition?.calories || 0
         acc.protein += m.nutrition?.protein || 0
+        acc.fat += m.nutrition?.fat || 0
+        acc.carbs += m.nutrition?.carbs || 0
         return acc
-      }, { calories: 0, protein: 0 })
+      }, { calories: 0, protein: 0, fat: 0, carbs: 0 })
     },
     loadPairStats() {
       return
@@ -776,6 +873,10 @@ export default {
       uni.navigateTo({ url: '/pages/share/share?mode=view' })
     },
 
+    openSpecialDates() {
+      uni.navigateTo({ url: '/pages/index/index?openSpecial=1' })
+    },
+
     clearCache() {
       uni.showModal({
         title: '清除缓存', content: '将清除所有缓存数据，重新开始？', confirmColor: '#ff4757',
@@ -791,7 +892,7 @@ export default {
     },
     showAbout() {
       uni.showModal({
-        title: '关于吃点啥 v1.5', content: '为情侣/家人打造的共同决策吃什么的小工具\n\n✅ 智能一周菜单规划\n✅ 荤素营养均衡算法\n✅ 云端配对，跨设备同步\n✅ 分享菜单+双向确认\n✅ 互动打卡+火花系统\n✅ 本周饮食报告\n✅ 收藏喜欢的菜品\n\n每次交互约4次云函数调用', showCancel: false, confirmText: '知道了'
+        title: '关于吃点啥 v2.4', content: '为情侣/家人打造的共同决策吃什么的小工具\n\n✅ 智能一周菜单规划\n✅ 荤素营养均衡算法\n✅ 云端配对，跨设备同步\n✅ 分享菜单+双向确认\n✅ 互动打卡+火花系统\n✅ 本周饮食报告+营养饼图\n✅ 收藏喜欢的菜品\n✅ 生日/纪念日特别菜单', showCancel: false, confirmText: '知道了'
       })
     },
     loadFavorites() {
@@ -1129,6 +1230,30 @@ export default {
   background:#fff; border-radius:24rpx; padding:28rpx 24rpx 24rpx;
   box-shadow:0 2rpx 12rpx rgba(0,0,0,.06);
 }
+.rm-pie-card {
+  background:#fff; border-radius:24rpx; padding:28rpx 24rpx;
+  box-shadow:0 2rpx 12rpx rgba(0,0,0,.06);
+}
+.rm-pie-row { display:flex; align-items:center; gap:28rpx; }
+.rm-pie-chart { flex-shrink:0; }
+.rm-pie-outer {
+  width:180rpx; height:180rpx; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4rpx 20rpx rgba(0,0,0,.08);
+}
+.rm-pie-inner {
+  width:110rpx; height:110rpx; border-radius:50%;
+  background:#fff; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+}
+.rm-pie-center-val { font-size:28rpx; font-weight:800; color:#1a1a1a; }
+.rm-pie-center-label { font-size:18rpx; color:#999; }
+.rm-pie-legend { flex:1; display:flex; flex-direction:column; gap:16rpx; }
+.rm-legend-item { display:flex; align-items:center; gap:12rpx; }
+.rm-legend-dot { width:20rpx; height:20rpx; border-radius:6rpx; flex-shrink:0; }
+.rm-legend-info { display:flex; flex-direction:column; gap:2rpx; }
+.rm-legend-name { font-size:24rpx; font-weight:600; color:#1a1a1a; }
+.rm-legend-val { font-size:21rpx; color:#999; }
 .rm-chart-bars { display:flex; justify-content:space-between; align-items:flex-end; gap:10rpx; height:180rpx; }
 .rm-chart-bar {
   flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;

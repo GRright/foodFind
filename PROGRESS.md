@@ -1,7 +1,37 @@
 # 吃点啥 - 项目进度文档
 
 > 最后更新：2026-04-21
-> 版本：v2.4.0
+> 版本：v2.5.0
+
+---
+
+### v2.5.0 - 营养可视化 + 特别日子 + 性能优化 (2026-04-21)
+
+#### 🥗 本周营养数据可视化
+- **饼图展示**：在饮食报告中新增三大营养素（蛋白质/脂肪/碳水）占比饼图
+- **conic-gradient**：使用 CSS conic-gradient 实现环形饼图，无需第三方图表库
+- **图例说明**：右侧显示每种营养素的克数和百分比
+- **修复 calcWeeklyNutrition**：原来只计算 calories 和 protein，现在完整计算 fat 和 carbs
+
+#### 🎂 生日/纪念日特别菜单
+- **特别日子管理**：支持添加生日、纪念日等特别日期
+- **首页横幅**：当天是特别日子时，首页显示粉色渐变横幅提醒
+- **节日联动**：自动识别传统节日（元旦、情人节、中秋等）
+- **profile入口**：我的页面新增"特别日子"菜单项
+- **festival.js 扩展**：新增 `addSpecialDate`、`checkSpecialDateToday`、`getBirthdayMenuRecommendation` 等函数
+
+#### 🔧 关键 Bug 修复
+- **checkGestureGuide 逻辑反转**：新手引导永远不显示，已修复为正确显示
+- **prefSummaryText 字段错误**：用 `userCount` 去 `userTypeOptions` 查找，改为 `userType`
+- **partnerMealCount 使用 Math.random**：改为从 `foodfind_partner_checks` 读取真实数据
+- **share.vue 日期格式不一致**：`toDateString()` 改为 `toISOString().split('T')[0]`
+- **版本号不一致**：profile 页面底部和关于弹窗版本号统一为 v2.4
+
+#### ⚡ 性能优化
+- **loadMyWeeklyMeals**：从循环内 14 次 `getStorageSync` 优化为循环外 2 次
+- **menu.vue selectedDayMeals**：从 computed 内调用 `getStorageSync` 改为 onShow 中预加载
+- **menu.vue nutritionBalanced**：从循环内 7 次 `getStorageSync` 改为循环外 1 次传入
+- **清理未使用的导入**：index.vue 中移除未使用的 festival.js 导入
 
 ---
 

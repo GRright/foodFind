@@ -113,7 +113,8 @@ export default {
       weeklyData: {},
       sparkData: [],
       pairStats: null,
-      pageEnter: true
+      pageEnter: true,
+      todayHomeMeals: null
     }
   },
   computed: {
@@ -155,9 +156,8 @@ export default {
       if (!this.selectedDateStr) return null
       if (this.weeklyData[this.selectedDateStr]) return this.weeklyData[this.selectedDateStr]
       const todayStr = this.getTodayStr()
-      if (this.selectedDateStr === todayStr) {
-        const homeMeals = uni.getStorageSync('foodfind_meals')
-        if (homeMeals) return homeMeals
+      if (this.selectedDateStr === todayStr && this.todayHomeMeals) {
+        return this.todayHomeMeals
       }
       return null
     },
@@ -212,6 +212,7 @@ export default {
   onShow() {
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
+    this.todayHomeMeals = uni.getStorageSync('foodfind_meals') || null
     if (this.currentMonday) {
       const cached = uni.getStorageSync('foodfind_weekly')
       if (cached) this.weeklyData = cached
@@ -285,14 +286,14 @@ export default {
       const mc = Math.ceil(n * 0.55), vc = n - mc
       return [...this.shuffle(meat, mc), ...this.shuffle(veg, vc)].sort(() => Math.random() - 0.5)
     },
-    nutritionBalanced(dayIndex, allDaysMeals) {
+    nutritionBalanced(dayIndex, allDaysMeals, cachedPrefs) {
       const usedRecipes = new Set()
       allDaysMeals.forEach(dm => {
         ;['breakfast','lunch','dinner'].forEach(k => { (dm[k]||[]).forEach(r => usedRecipes.add(r.id)) })
       })
 
       const familyTags = getFamilyHealthTags()
-      const userPrefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      const userPrefs = cachedPrefs || {}
       const allHealthTags = [...new Set([...familyTags, ...(userPrefs.healthTags || [])])]
 
       let availableBreakfast = ALL_RECIPES.breakfast.filter(r => !usedRecipes.has(r.id))
@@ -318,13 +319,14 @@ export default {
       setTimeout(() => {
         const data = {}
         const allDaysMeals = []
+        const cachedPrefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
 
         for (let i = 0; i < 7; i++) {
           const d = new Date(this.currentMonday)
           d.setDate(d.getDate() + i)
           const ds = this.dateToStr(d)
 
-          const meals = this.nutritionBalanced(i, allDaysMeals)
+          const meals = this.nutritionBalanced(i, allDaysMeals, cachedPrefs)
           data[ds] = meals
           allDaysMeals.push(meals)
         }

@@ -9,7 +9,10 @@
     "pages/invite/invite",
     "pages/foodDiary/foodDiary",
     "pages/shoppingList/shoppingList",
-    "pages/mealConfig/mealConfig"
+    "pages/mealConfig/mealConfig",
+    "pages/family/family",
+    "pages/familyCheckIn/familyCheckIn",
+    "pages/familyReport/familyReport"
   ],
   "window": {
     "navigationBarTextStyle": "black",

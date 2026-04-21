@@ -38,6 +38,19 @@
         </view>
       </view>
 
+      <view class="special-banner" v-if="specialBanner" @click="onSpecialBannerClick">
+        <view class="sp-banner-left">
+          <text class="sp-banner-emoji">{{ specialBanner.emoji }}</text>
+          <view class="sp-banner-text">
+            <text class="sp-banner-title">{{ specialBanner.title }}</text>
+            <text class="sp-banner-sub">{{ specialBanner.subtitle }}</text>
+          </view>
+        </view>
+        <view class="sp-banner-action">
+          <text class="sp-banner-btn">查看推荐 →</text>
+        </view>
+      </view>
+
       <scroll-view scroll-y class="meal-scroll" :style="{ height: scrollHeight }" @scrolltolower="loadMore">
         <view
           class="meal-section"
@@ -378,12 +391,44 @@
       <text class="ae-icon">🏆</text>
       <text class="ae-text">成就</text>
     </view>
+
+    <!-- 特别日期设置弹窗 -->
+    <view class="modal-mask" :class="{ show: showSpecialModal }" @click="showSpecialModal = false"></view>
+    <view class="special-modal" :class="{ show: showSpecialModal }">
+      <view class="spm-header">
+        <text class="spm-title">🎂 添加特别日子</text>
+        <view class="spm-close" @click="showSpecialModal = false"><text>✕</text></view>
+      </view>
+      <view class="spm-body">
+        <view class="spm-row">
+          <text class="spm-label">名称</text>
+          <input class="spm-input" v-model="specialDateForm.name" placeholder="如：我的生日" maxlength="20" />
+        </view>
+        <view class="spm-row">
+          <text class="spm-label">类型</text>
+          <view class="spm-type-row">
+            <view class="spm-type-btn" :class="{ active: specialDateForm.type === 'birthday' }" @click="specialDateForm.type = 'birthday'">🎂 生日</view>
+            <view class="spm-type-btn" :class="{ active: specialDateForm.type === 'anniversary' }" @click="specialDateForm.type = 'anniversary'">💝 纪念日</view>
+          </view>
+        </view>
+        <view class="spm-row">
+          <text class="spm-label">日期</text>
+          <picker mode="date" :value="specialDateForm.month + '-' + specialDateForm.day" @change="onSpecialDatePick">
+            <view class="spm-date-display">{{ specialDateForm.month }}月{{ specialDateForm.day }}日</view>
+          </picker>
+        </view>
+        <view class="spm-save-btn" @click="saveSpecialDate">
+          <text class="spm-save-txt">保存</text>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
 import { filterRecipesByHealthTags, getFamilyHealthTags } from '@/utils/family.js'
+import { getBirthdayMenuRecommendation, addSpecialDate } from '@/utils/festival.js'
 
 export default {
   data() {
@@ -432,7 +477,10 @@ export default {
       achievements: [],
       pairId: '',
       pageReady: false,
-      _nutritionCache: null
+      _nutritionCache: null,
+      specialBanner: null,
+      showSpecialModal: false,
+      specialDateForm: { name: '', month: 1, day: 1, type: 'birthday' }
     }
   },
   computed: {
@@ -537,15 +585,19 @@ export default {
       return texts[this.ggStage] || '知道了'
     }
   },
-  onLoad() {
+  onLoad(options) {
     this.loadMode()
     this.loadPairId()
+    this.loadSpecialBanner()
     this.preloadMeals()
     this.$nextTick(() => {
       this.loadTodayCheckIn()
       this.loadStreak()
       this.loadAchievements()
       this.checkGestureGuide()
+      if (options && options.openSpecial === '1') {
+        setTimeout(() => { this.showSpecialModal = true }, 500)
+      }
     })
   },
   onReady() {
@@ -692,7 +744,7 @@ export default {
     checkGestureGuide() {
       const done = uni.getStorageSync('foodfind_gesture_guide')
       if (done) return
-      this.showGestureGuide = false
+      this.showGestureGuide = true
     },
     ggDemoCardTouchStart(e) {
       if (this.ggLocked) return
@@ -942,6 +994,36 @@ export default {
     },
     goToDetail(recipe) { uni.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` }) },
     goToShoppingList() { uni.navigateTo({ url: '/pages/shoppingList/shoppingList' }) },
+    loadSpecialBanner() {
+      this.specialBanner = getBirthdayMenuRecommendation()
+    },
+    onSpecialBannerClick() {
+      if (this.specialBanner) {
+        uni.showToast({ title: this.specialBanner.subtitle, icon: 'none', duration: 2000 })
+      }
+    },
+    onSpecialDatePick(e) {
+      const parts = e.detail.value.split('-')
+      if (parts.length >= 3) {
+        this.specialDateForm.month = parseInt(parts[1])
+        this.specialDateForm.day = parseInt(parts[2])
+      }
+    },
+    saveSpecialDate() {
+      if (!this.specialDateForm.name.trim()) {
+        uni.showToast({ title: '请输入名称', icon: 'none' })
+        return
+      }
+      addSpecialDate({
+        name: this.specialDateForm.name.trim(),
+        month: this.specialDateForm.month,
+        day: this.specialDateForm.day,
+        type: this.specialDateForm.type
+      })
+      uni.showToast({ title: '已保存', icon: 'success' })
+      this.showSpecialModal = false
+      this.loadSpecialBanner()
+    },
     onShareClick() {
       this.shareBtnClicked = true
       uni.showToast({ title: '请点击右上角分享', icon: 'none' })
@@ -1810,4 +1892,62 @@ export default {
 }
 .fab-icon { font-size:24rpx; }
 .fab-text { font-size:22rpx; color:#666; font-weight:500; }
+
+.special-banner {
+  display:flex; align-items:center; justify-content:space-between;
+  margin:0 28rpx 16rpx; padding:20rpx 24rpx;
+  background:linear-gradient(135deg,#fff5f5,#fff0f6);
+  border-radius:20rpx; border:2rpx solid #ffe0e8;
+  &:active { transform:scale(.98); }
+}
+.sp-banner-left { display:flex; align-items:center; gap:16rpx; flex:1; }
+.sp-banner-emoji { font-size:40rpx; }
+.sp-banner-text { display:flex; flex-direction:column; gap:4rpx; }
+.sp-banner-title { font-size:26rpx; font-weight:700; color:#e84393; }
+.sp-banner-sub { font-size:21rpx; color:#999; }
+.sp-banner-action { flex-shrink:0; }
+.sp-banner-btn {
+  font-size:22rpx; font-weight:600; color:#e84393;
+  padding:8rpx 16rpx; background:#fff; border-radius:20rpx;
+  border:1rpx solid #ffe0e8;
+}
+
+.special-modal {
+  position:fixed; left:0; right:0; bottom:0;
+  background:#fff; border-radius:32rpx 32rpx 0 0;
+  z-index:1000; transform:translateY(100%); transition:transform .35s cubic-bezier(.175,.885,.32,1.275);
+  &.show { transform:translateY(0); }
+}
+.spm-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:32rpx 28rpx 16rpx;
+}
+.spm-title { font-size:32rpx; font-weight:700; color:#1a1a1a; }
+.spm-close { padding:8rpx; }
+.spm-body { padding:0 28rpx 40rpx; }
+.spm-row {
+  display:flex; align-items:center; gap:16rpx;
+  padding:20rpx 0; border-bottom:1rpx solid #f0f0f0;
+}
+.spm-label { font-size:26rpx; font-weight:600; color:#333; width:100rpx; flex-shrink:0; }
+.spm-input {
+  flex:1; height:64rpx; font-size:26rpx; padding:0 16rpx;
+  background:#f5f6f8; border-radius:12rpx;
+}
+.spm-type-row { display:flex; gap:16rpx; }
+.spm-type-btn {
+  padding:12rpx 24rpx; border-radius:20rpx;
+  background:#f5f6f8; font-size:24rpx; font-weight:600; color:#666;
+  &.active { background:#e8f7ef; color:#07c160; }
+}
+.spm-date-display {
+  padding:12rpx 24rpx; background:#f5f6f8; border-radius:12rpx;
+  font-size:26rpx; color:#333;
+}
+.spm-save-btn {
+  margin-top:32rpx; padding:24rpx; background:#07c160;
+  border-radius:16rpx; text-align:center;
+  &:active { opacity:.85; }
+}
+.spm-save-txt { font-size:28rpx; font-weight:700; color:#fff; }
 </style>

@@ -191,7 +191,7 @@ export default {
       this.status = status
       if (meals) { this.dailyMeals = meals }
       uni.setStorageSync('foodfind_meals', this.dailyMeals)
-      uni.setStorageSync('foodfind_meals_date', new Date().toDateString())
+      uni.setStorageSync('foodfind_meals_date', new Date().toISOString().split('T')[0])
       const app = getApp()
       if (app?.globalData) app.globalData.dailyMeals = this.dailyMeals
       uni.showToast({ title: status === 'confirmed' ? '已确认 ✨' : '已调整', icon: 'success' })
@@ -199,7 +199,7 @@ export default {
 
     shareBack() {
       uni.setStorageSync('foodfind_meals', this.dailyMeals)
-      uni.setStorageSync('foodfind_meals_date', new Date().toDateString())
+      uni.setStorageSync('foodfind_meals_date', new Date().toISOString().split('T')[0])
       const app = getApp()
       if (app?.globalData) app.globalData.dailyMeals = this.dailyMeals
       uni.showToast({ title: '已设为今日菜单 ✨', icon: 'success', duration: 2000 })
