@@ -40,7 +40,8 @@
           class="meal-section"
           v-for="(section, si) in mealSections"
           :key="si"
-          style="animation: slideUp .45s ease forwards; animation-delay: calc(0.08s * si); opacity: 0;"
+          :style="{ animationDelay: (si * 80) + 'ms' }"
+          style="animation: slideUp .45s ease forwards; opacity: 0;"
         >
           <view class="meal-header">
             <view class="mh-left">
@@ -67,14 +68,14 @@
             <view
               class="food-card"
               :class="getCardClass(food.id)"
-              :style="getCardStyle(food.id)"
+              :style="getCardStyle(food.id) + ';animation-delay:' + (150 + si*60 + fi*50) + 'ms'"
               v-for="(food, fi) in section.recipes"
               :key="food.id"
               @click="goToDetail(food)"
               @touchstart="onSwipeStart(food, section.key, $event)"
               @touchmove.prevent="onSwipeMove($event)"
               @touchend="onSwipeEnd(food, section.key)"
-              style="animation: popIn .4s cubic-bezier(.175,.885,.32,1.275) forwards; animation-delay: calc(0.15s + si*0.06s + fi*0.05s); opacity: 0;"
+              style="animation: popIn .4s cubic-bezier(.175,.885,.32,1.275) forwards; opacity: 0;"
             >
               <view class="fc-inner" :class="{ 'flip-out': flippingCardId === food.id, 'flip-in': newCardId === food.id }">
                 <view class="fc-icon-wrap"><text class="fc-icon">{{ food.image || '🍽️' }}</text></view>
@@ -425,7 +426,9 @@ export default {
       showAchievementModal: false,
       streakDays: 0,
       achievements: [],
-      pairId: ''
+      pairId: '',
+      pageReady: false,
+      _nutritionCache: null
     }
   },
   computed: {
@@ -469,25 +472,31 @@ export default {
       ]
     },
     totalCalories() {
+      if (this._nutritionCache) return this._nutritionCache.calories
       if (!this.dailyMeals) return 0
-      let c = 0
-      ;['breakfast','lunch','dinner'].forEach(k => { (this.dailyMeals[k]||[]).forEach(r => c += r.nutrition?.calories||0) })
-      return Math.round(c * this.userCount)
+      let c = 0, p = 0, f = 0, cb = 0
+      ;['breakfast','lunch','dinner'].forEach(k => {
+        (this.dailyMeals[k]||[]).forEach(r => {
+          c += r.nutrition?.calories||0
+          p += r.nutrition?.protein||0
+          f += r.nutrition?.fat||0
+          cb += r.nutrition?.carbs||0
+        })
+      })
+      this._nutritionCache = { calories: Math.round(c * this.userCount), protein: Math.round(p), fat: Math.round(f), carbs: Math.round(cb) }
+      return this._nutritionCache.calories
     },
     totalProtein() {
-      if (!this.dailyMeals) return 0; let p = 0
-      ;['breakfast','lunch','dinner'].forEach(k => { (this.dailyMeals[k]||[]).forEach(r => p += r.nutrition?.protein||0) })
-      return Math.round(p)
+      if (this._nutritionCache) return this._nutritionCache.protein
+      return 0
     },
     totalFat() {
-      if (!this.dailyMeals) return 0; let f = 0
-      ;['breakfast','lunch','dinner'].forEach(k => { (this.dailyMeals[k]||[]).forEach(r => f += r.nutrition?.fat||0) })
-      return Math.round(f)
+      if (this._nutritionCache) return this._nutritionCache.fat
+      return 0
     },
     totalCarbs() {
-      if (!this.dailyMeals) return 0; let cb = 0
-      ;['breakfast','lunch','dinner'].forEach(k => { (this.dailyMeals[k]||[]).forEach(r => cb += r.nutrition?.carbs||0) })
-      return Math.round(cb)
+      if (this._nutritionCache) return this._nutritionCache.carbs
+      return 0
     },
     ggOverlayTitle() {
       const titles = [
@@ -531,6 +540,10 @@ export default {
     this.loadStreak()
     this.loadAchievements()
     this.checkGestureGuide()
+    this.preloadMeals()
+  },
+  onReady() {
+    this.pageReady = true
   },
   onShow() {
     this.shareBtnClicked = false
@@ -822,7 +835,7 @@ export default {
       uni.showToast({ title: `已更换「${food.name}」`, icon: 'none' })
     },
 
-    loadMeals() {
+    preloadMeals() {
       const cached = uni.getStorageSync('foodfind_meals')
       const cachedDate = uni.getStorageSync('foodfind_meals_date')
       if (cached && cachedDate && cachedDate === this.getTodayStr()) {
@@ -841,6 +854,12 @@ export default {
         return
       }
       this.generateDailyMeals()
+    },
+    loadMeals() {
+      this._nutritionCache = null
+      if (!this.dailyMeals) {
+        this.preloadMeals()
+      }
     },
     getTodayStr() {
       const d = new Date()

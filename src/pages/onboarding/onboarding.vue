@@ -264,11 +264,13 @@ export default {
 .btn-txt { font-size:27rpx; }
 .btn-primary {
   flex:1; text-align:center; padding:24rpx 0;
-  background: #07c160;
-  color: #fff; font-size:28rpx; font-weight:600; border-radius:50rpx;
+  background: #fff;
+  color: #1a1a1a; font-size:28rpx; font-weight:600; border-radius:50rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,.08);
+  border: 2rpx solid #e8e8e8;
   transition:all .25s;
   &.disabled { opacity:.45; pointer-events:none; }
-  &:active { opacity:.85; transform:scale(.98); }
+  &:active { background:#f5f5f5; transform:scale(.98); }
 }
 .btn-hint { flex:1; text-align:center; }
 .hint-txt { font-size:23rpx; color:#bbb; }

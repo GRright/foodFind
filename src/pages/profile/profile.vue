@@ -394,6 +394,7 @@ export default {
       favorites: [],
       _weeklyCheckInDays: 0,
       _myMealCount: 0,
+      _weeklyNutritionCache: null,
       prefs: {
         noCookMode: false,
         userType: 'adult',
@@ -493,10 +494,16 @@ export default {
       return this.myWeeklyMeals.filter(m => m.type === 'vegetarian').length
     },
     weeklyCalories() {
-      return this.myWeeklyMeals.reduce((sum, m) => sum + (m.nutrition?.calories || 0), 0)
+      if (!this._weeklyNutritionCache) {
+        this._weeklyNutritionCache = this.calcWeeklyNutrition()
+      }
+      return this._weeklyNutritionCache.calories
     },
     weeklyProtein() {
-      return Math.round(this.myWeeklyMeals.reduce((sum, m) => sum + (m.nutrition?.protein || 0), 0))
+      if (!this._weeklyNutritionCache) {
+        this._weeklyNutritionCache = this.calcWeeklyNutrition()
+      }
+      return this._weeklyNutritionCache.protein
     },
     myMealCount() {
       return this._myMealCount
@@ -529,13 +536,15 @@ export default {
       return `全家本周打卡${days}天，一起吃饭才是最温暖的时光~ 👨‍‍👧👦`
     }
   },
-  onShow() {
-    this.pageEnter = true
-    setTimeout(() => { this.pageEnter = false }, 300)
+  onLoad() {
     this.loadPairInfo()
     this.loadPrefs()
     this.loadCachedStats()
     this.loadFavorites()
+  },
+  onShow() {
+    this.pageEnter = true
+    setTimeout(() => { this.pageEnter = false }, 300)
   },
   methods: {
     loadCachedStats() {
@@ -577,6 +586,14 @@ export default {
         }
       }
       this.myWeeklyMeals = meals
+      this._weeklyNutritionCache = null
+    },
+    calcWeeklyNutrition() {
+      return this.myWeeklyMeals.reduce((acc, m) => {
+        acc.calories += m.nutrition?.calories || 0
+        acc.protein += m.nutrition?.protein || 0
+        return acc
+      }, { calories: 0, protein: 0 })
     },
     loadPairStats() {
       return

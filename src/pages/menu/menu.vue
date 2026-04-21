@@ -61,7 +61,8 @@
           class="meal-section"
           v-for="(meal, mi) in mealSections"
           :key="mi"
-          style="animation: slideUp .45s ease forwards; animation-delay: calc(0.12s * mi); opacity: 0;"
+          :style="{ animationDelay: (mi * 120) + 'ms' }"
+          style="animation: slideUp .45s ease forwards; opacity: 0;"
         >
           <view class="meal-header">
             <view class="mh-left">
@@ -76,7 +77,8 @@
               v-for="(food, fi) in meal.recipes"
               :key="food.id"
               @click="viewRecipe(food)"
-              style="animation: popIn .4s cubic-bezier(.175,.885,.32,1.275) forwards; animation-delay: calc(0.18s + mi*0.06s + fi*0.05s); opacity: 0;"
+              :style="{ animationDelay: (180 + mi*60 + fi*50) + 'ms' }"
+              style="animation: popIn .4s cubic-bezier(.175,.885,.32,1.275) forwards; opacity: 0;"
             >
               <view class="fc-icon-wrap"><text class="fc-icon">{{ food.image || '🍽️' }}</text></view>
               <text class="fc-name">{{ food.name }}</text>
