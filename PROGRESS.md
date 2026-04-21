@@ -1,7 +1,33 @@
 # 吃点啥 - 项目进度文档
 
 > 最后更新: 2026-04-20
-> 版本: v2.1.0
+> 版本: v2.2.0
+
+---
+
+### v2.2.0 - 性能优化 + 功能清理 (2026-04-20)
+
+#### 🚀 性能全面优化
+- **首页 (index.vue)**:
+  - 拆分 `onLoad` 和 `onShow`：一次性初始化移到 `onLoad`，`onShow` 只做数据刷新
+  - 减少页面进入动画时间（400ms → 300ms）
+  - 移除 `open-type="share"` 属性避免路由错误
+- **菜单页 (menu.vue)**:
+  - 移除无用的 `loadSparkData()` / `loadPairStats()` 调用
+  - 减少动画延迟（400ms → 300ms）
+- **个人中心 (profile.vue)**:
+  - 消除 computed 中的 `uni.getStorageSync` 调用，改用缓存变量
+  - 新增 `loadCachedStats()` 方法一次性计算统计数据
+  - 延迟加载 `loadMyWeeklyMeals()`（只在打开报告时执行）
+- **美食日记 (foodDiary.vue)**: 移除不必要的 `ALL_RECIPES` 导入
+- **全局配置**: 移除 `project.config.json` 中的 `cloudfunctionRoot`
+- **构建脚本**: 更新 `sync-cloudfunctions.js` 不再添加云函数配置
+
+#### 🗑️ 删除影视推荐功能
+- 删除 `cloudfunctions/getMovies/` 云函数目录
+- 从 `cloudbaserc.json` 移除 getMovies 配置
+- 从 `src/utils/icons.js` 移除 movies 图标引用
+- 云函数数量从 29 个减少到 28 个
 
 ---
 

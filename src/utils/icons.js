@@ -8,7 +8,6 @@ export const ICONS = {
     modify: '✎',
     back: '↩',
     menu: '☰',
-    movies: '',
     profile: '◉',
     settings: '⚙',
     trash: '✕',
