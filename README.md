@@ -2,7 +2,7 @@
 
 > **情侣/家人/朋友共同决策「今天吃什么」的微信小程序**
 >
-> **当前版本**: v1.5.2 · **完整体验版** · **最后更新**: 2026-04-19
+> **当前版本**: v2.5.1 · **家庭功能全体验版** · **最后更新**: 2026-04-21
 
 ---
 
@@ -10,6 +10,8 @@
 
 - 🎯 **智能推荐**：基于营养均衡算法的每日/每周菜单自动生成
 - 👥 **双人协作**：云端配对系统，跨设备实时同步菜单决策
+- 🏠 **家庭群组**：支持多人家庭/群组模式，共享购物清单和打卡监督
+- 🛒 **智能购物清单**：根据菜单自动生成采购清单，分类整理，支持家庭共享
 - 📷 **双模式切换**：做饭模式（菜谱推荐）+ 不做饭模式（美食拍照分享）
 - 🎨 **极致UI**：白色 + 绿色纯净色系，12种统一CSS动画
 - ☁️ **低成本架构**：菜谱本地缓存 + 云端仅用于配对/分享（每次交互约4次云函数调用）
@@ -48,17 +50,24 @@
 ```
 d:\project\foodFind/
 ├── src/                          # 源代码目录
-│   ├── pages/                    # 页面组件（7个）
+│   ├── pages/                    # 页面组件（12个）
 │   │   ├── index/index.vue       # ⭐ 首页（双模式核心）
 │   │   ├── menu/menu.vue         # 一周菜单规划页
 │   │   ├── profile/profile.vue   # 个人中心 + 偏好设置
 │   │   ├── share/share.vue       # 分享确认/查看页
 │   │   ├── invite/invite.vue     # 配对邀请接受页
 │   │   ├── onboarding/onboarding.vue  # 首次引导4题
-│   │   └── recipe-detail/recipe-detail.vue  # 菜品详情
+│   │   ├── recipe-detail/recipe-detail.vue  # 菜品详情
+│   │   ├── shoppingList/shoppingList.vue    # 🛒 智能购物清单
+│   │   ├── family/family.vue                # 🏠 家庭群组管理
+│   │   ├── familyCheckIn/familyCheckIn.vue  # 家庭打卡看板
+│   │   ├── familyReport/familyReport.vue    # 家庭饮食周报
+│   │   ├── foodDiary/foodDiary.vue          # 美食日记
+│   │   └── mealConfig/mealConfig.vue        # 用餐配置
 │   │
 │   ├── utils/                    # 工具模块
 │   │   ├── constants.js          # 20道完整菜谱数据
+│   │   ├── family.js             # 家庭群组相关工具函数
 │   │   └── icons.js              # 图标常量 + 色彩定义
 │   │
 │   ├── App.vue                   # 全局配置 + 动画系统
@@ -67,7 +76,7 @@ d:\project\foodFind/
 │   └── manifest.json             # 应用配置（含AppID）
 │
 ├── dist/build/mp-weixin/         # 编译输出目录
-│   └── cloudfunctions/           # 13个云函数（需手动恢复）
+│   └── cloudfunctions/           # 34个云函数
 │
 ├── generate-icons.js             # TabBar图标生成脚本
 ├── README.md                     # 本文档
@@ -239,7 +248,38 @@ d:\project\foodFind/
 
 ---
 
-## ☁️ 云函数架构（16个）
+### 7️⃣ 家庭/群组模式【v2.5新增】
+
+#### 创建与加入
+- **入口**：我的页面 → 家庭群组
+- **创建家庭**：输入家庭名称（2-20字），生成6位邀请码
+- **加入家庭**：输入邀请码，即可加入已有家庭
+- **群组类型**：支持"家庭"和"朋友群"两种模式
+
+#### 家庭功能
+- **共享购物清单**：家庭成员可共同编辑购物清单，实时同步
+- **打卡监督**：记录做饭、用餐、采购等打卡行为
+- **饮食周报**：统计家庭成员一周的饮食情况
+- **成员管理**：群主可管理成员，成员可随时退出
+
+---
+
+### 8️⃣ 智能购物清单【v2.5新增】
+
+#### 自动生成
+- **根据菜单生成**：读取当日或一周菜单，自动提取所需食材
+- **智能合并**：相同食材自动合并数量
+- **分类整理**：按蔬菜、肉蛋禽、主食、其他分类
+
+#### 交互优化
+- **准备天数**：支持1-14天自定义，数字输入框+加减按钮操作
+- **排除调料**：自动排除油盐酱醋等家庭常备调料
+- **勾选状态**：已购食材可勾选标记
+- **家庭共享**：家庭模式下清单实时同步给所有成员
+
+---
+
+## ☁️ 云函数架构（34个）
 
 ### 基础功能层（7个）
 
@@ -308,6 +348,39 @@ d:\project\foodFind/
 //     range='week': 返回近7天的 [{date, sparkLevel, allOpened, allShared}]
 //     无range: 返回指定日期的完整记录 + myCheckIn(当前用户)
 ```
+
+### 家庭/群组功能层（7个）【v2.5新增】
+
+```javascript
+// 17. createFamilyGroup - 创建家庭群组
+//     输入: { name, type, userName }
+//     输出: { code: 0, groupId, inviteCode }
+//
+// 18. joinFamilyGroup - 加入家庭群组
+//     输入: { inviteCode, userName }
+//     输出: { code: 0, groupId }
+//
+// 19. getFamilyCheckIns - 获取家庭打卡记录
+//     输入: { groupId, date? }
+//     输出: { checkIns: [{ userId, date, action, timestamp }] }
+//
+// 20. recordCheckIn - 记录家庭打卡
+//     输入: { groupId, userId, action, mealType? }
+//     action类型: 'cook' | 'eat' | 'buy'
+//
+// 21. sendFamilyNotification - 发送家庭通知
+//     输入: { groupId, userId, type, message }
+//     类型: 'check_in' | 'remind' | 'system'
+//
+// 22. syncFamilyShopping - 同步家庭购物清单
+//     输入: { groupId, items, operation }
+//     操作: 'add' | 'update' | 'delete' | 'sync'
+//
+// 23. updateFamilyMember - 更新家庭成员信息
+//     输入: { groupId, userId, name?, role?, isAdmin? }
+//
+// 24-34. 其他辅助云函数（投票、挑战、评论、日记等）
+```
 ```
 
 ---
@@ -324,6 +397,9 @@ d:\project\foodFind/
 | `pairs` | `{ pairId, inviterOpenid, accepterOpenid, relationType, status }` | 配对关系 | 1条/用户 |
 | `daily_checkins` | `{ pairId, date, members[], sparkLevel, allOpened, allShared }` | 每日打卡记录 | N条 |
 | `pair_stats` | `{ pairId, consecutiveShareDays, consecutiveOpenDays, ... }` | 配对统计 | 1条/配对 |
+| `family_groups` | `{ groupId, name, type, inviteCode, adminId, members[] }` | 家庭群组 | N条 |
+| `family_checkins` | `{ groupId, userId, date, action, timestamp }` | 家庭打卡记录 | N条 |
+| `shopping_lists` | `{ groupId?, userId?, items[], updatedAt }` | 购物清单 | 1条/用户或家庭 |
 
 ---
 
@@ -342,6 +418,10 @@ d:\project\foodFind/
 | `foodfind_preferences` | Array | 完成引导时 | - | 4题引导结果 |
 | `foodfind_feed` | Object | 分享美食时 | 按日期分组 | 自己的美食分享 |
 | `foodfind_partner_feed` | Object | 接收分享时 | 按日期分组 | 搭子的美食分享 |
+| `foodfind_family_group` | Object | 加入/创建家庭时 | 退出时删除 | 家庭群组信息 |
+| `foodfind_shopping_list` | Object | 更新购物清单时 | 手动清除 | 个人购物清单 |
+| `foodfind_family_shopping` | Object | 家庭清单更新时 | 退出家庭时删除 | 家庭共享购物清单 |
+| `foodfind_family_checkins` | Object | 打卡时 | 按日期失效 | 家庭打卡记录 |
 
 ### 数据流向图
 
