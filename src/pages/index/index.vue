@@ -383,6 +383,7 @@
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
+import { filterRecipesByHealthTags, getFamilyHealthTags } from '@/utils/family.js'
 
 export default {
   data() {
@@ -883,10 +884,29 @@ export default {
     },
     generateDailyMeals() {
       const n = this.getRecipeCount()
+      
+      const familyTags = getFamilyHealthTags()
+      const userPrefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      const allHealthTags = [...new Set([...familyTags, ...(userPrefs.healthTags || [])])]
+      
+      let breakfastPool = ALL_RECIPES.breakfast
+      let lunchPool = ALL_RECIPES.lunch
+      let dinnerPool = ALL_RECIPES.dinner
+      
+      if (allHealthTags.length > 0) {
+        breakfastPool = filterRecipesByHealthTags(breakfastPool, allHealthTags)
+        lunchPool = filterRecipesByHealthTags(lunchPool, allHealthTags)
+        dinnerPool = filterRecipesByHealthTags(dinnerPool, allHealthTags)
+      }
+      
+      if (breakfastPool.length === 0) breakfastPool = ALL_RECIPES.breakfast
+      if (lunchPool.length === 0) lunchPool = ALL_RECIPES.lunch
+      if (dinnerPool.length === 0) dinnerPool = ALL_RECIPES.dinner
+      
       const dailyMeals = {
-        breakfast: this.shuffle(ALL_RECIPES.breakfast, n),
-        lunch: this.balanced(ALL_RECIPES.lunch, n),
-        dinner: this.balanced(ALL_RECIPES.dinner, n)
+        breakfast: this.shuffle(breakfastPool, n),
+        lunch: this.balanced(lunchPool, n),
+        dinner: this.balanced(dinnerPool, n)
       }
       this.dailyMeals = dailyMeals
       const todayStr = this.getTodayStr()

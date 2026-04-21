@@ -104,6 +104,15 @@
       <view class="menu-group slide-up" style="animation-delay:0.1s;opacity:0">
         <text class="group-title">我的</text>
         <view class="menu-list">
+          <view class="menu-item" @click="goToFamily">
+            <view class="menu-icon-wrap green"><text class="menu-emoji">🏠</text></view>
+            <view class="mi-center">
+              <text class="menu-label">家庭群组</text>
+              <text class="menu-desc">{{ familySummary }}</text>
+            </view>
+            <text class="menu-arrow">›</text>
+          </view>
+
           <view class="menu-item" @click="openPrefModal">
             <view class="mi-center">
               <text class="menu-label">偏好设置</text>
@@ -194,6 +203,17 @@
           <text class="pm-stitle">菜系偏好（可多选）</text>
           <view class="pm-tags multi pm-wide">
             <view class="pm-tag" :class="{ active: prefs.cuisines.includes(opt.value) }" v-for="opt in cuisineOptions" :key="opt.value" @click="toggleMulti('cuisines', opt.value)">{{ opt.label }}</view>
+          </view>
+        </view>
+
+        <view class="pm-section" v-if="hasFamily">
+          <text class="pm-stitle">家庭健康标签</text>
+          <text class="pm-hint">设置后推荐菜品时会考虑家庭成员需求</text>
+          <view class="pm-row" v-for="category in healthTagCategories" :key="category">
+            <text class="pm-q">{{ category }}</text>
+            <view class="pm-tags multi">
+              <view class="pm-tag" :class="{ active: prefs.healthTags.includes(tag.id) }" v-for="tag in getTagsByCategory(category)" :key="tag.id" @click="toggleHealthTag(tag.id)">{{ tag.icon }} {{ tag.name }}</view>
+            </view>
           </view>
         </view>
       </scroll-view>
@@ -373,6 +393,7 @@
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
+import { HEALTH_TAGS, HEALTH_TAG_CATEGORIES, getFamilyGroup, getCurrentUserId } from '@/utils/family.js'
 
 export default {
   data() {
@@ -395,6 +416,7 @@ export default {
       _weeklyCheckInDays: 0,
       _myMealCount: 0,
       _weeklyNutritionCache: null,
+      _familyGroup: null,
       prefs: {
         noCookMode: false,
         userType: 'adult',
@@ -402,8 +424,11 @@ export default {
         taste: 'light',
         allergies: [],
         restrictions: [],
-        cuisines: []
+        cuisines: [],
+        healthTags: []
       },
+      healthTags: HEALTH_TAGS,
+      healthTagCategories: HEALTH_TAG_CATEGORIES,
       userTypeOptions: [
         { label: '🧑 成人', value: 'adult' },
         { label: '💪 健身', value: 'fitness' },
@@ -474,6 +499,13 @@ export default {
     weeklyCheckInDays() {
       return this._weeklyCheckInDays
     },
+    familySummary() {
+      if (!this._familyGroup) return '创建或加入家庭群组'
+      return this._familyGroup.name + ' · ' + this._familyGroup.members.length + '人'
+    },
+    hasFamily() {
+      return this._familyGroup !== null && this._familyGroup !== undefined
+    },
     prefSummaryText() {
       const parts = []
       const ut = this.userTypeOptions.find(o => o.value === this.prefs.userCount)
@@ -541,6 +573,7 @@ export default {
     this.loadPrefs()
     this.loadCachedStats()
     this.loadFavorites()
+    this.loadFamilyData()
   },
   onShow() {
     this.pageEnter = true
@@ -652,6 +685,10 @@ export default {
     savePrefs() {
       uni.setStorageSync('foodfind_detailed_prefs', this.prefs)
       uni.setStorageSync('foodfind_user_count', this.prefs.userCount)
+      if (this.hasFamily) {
+        const { updateMyHealthTags } = require('@/utils/family.js')
+        updateMyHealthTags(this.prefs.healthTags)
+      }
       uni.showToast({ title: '设置已保存', icon: 'success' })
       setTimeout(() => { this.showPrefModal = false }, 600)
     },
@@ -776,7 +813,24 @@ export default {
     goToFavoriteDetail(item) {
       this.closeFavorites()
       uni.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${item.id}` })
-    }
+    },
+    loadFamilyData() {
+      this._familyGroup = getFamilyGroup()
+    },
+    goToFamily() {
+      uni.navigateTo({ url: '/pages/family/family' })
+    },
+    getTagsByCategory(category) {
+      return HEALTH_TAGS.filter(t => t.category === category)
+    },
+    toggleHealthTag(tagId) {
+      const idx = this.prefs.healthTags.indexOf(tagId)
+      if (idx > -1) {
+        this.prefs.healthTags.splice(idx, 1)
+      } else {
+        this.prefs.healthTags.push(tagId)
+      }
+    },
   }
 }
 </script>
@@ -920,6 +974,7 @@ export default {
 .pm-body { flex:1; overflow:hidden; padding:0 28rpx 20rpx; }
 .pm-section { margin-bottom:28rpx; }
 .pm-stitle { display:block; font-size:26rpx; font-weight:600; color:#1a1a1a; margin-bottom:16rpx; padding-left:4rpx; }
+.pm-hint { display:block; font-size:22rpx; color:#999; margin-bottom:16rpx; padding-left:4rpx; }
 .mode-toggle-row {
   display:flex; justify-content:space-between; align-items:center;
   background:#f5f6f8; border-radius:18rpx; padding:22rpx 20rpx;

@@ -101,6 +101,7 @@
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
+import { filterRecipesByHealthTags, getFamilyHealthTags } from '@/utils/family.js'
 
 export default {
   data() {
@@ -290,9 +291,17 @@ export default {
         ;['breakfast','lunch','dinner'].forEach(k => { (dm[k]||[]).forEach(r => usedRecipes.add(r.id)) })
       })
 
-      const availableBreakfast = ALL_RECIPES.breakfast.filter(r => !usedRecipes.has(r.id))
-      const availableLunch = ALL_RECIPES.lunch.filter(r => !usedRecipes.has(r.id))
-      const availableDinner = ALL_RECIPES.dinner.filter(r => !usedRecipes.has(r.id))
+      const familyTags = getFamilyHealthTags()
+      const userPrefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      const allHealthTags = [...new Set([...familyTags, ...(userPrefs.healthTags || [])])]
+
+      let availableBreakfast = ALL_RECIPES.breakfast.filter(r => !usedRecipes.has(r.id))
+      let availableLunch = ALL_RECIPES.lunch.filter(r => !usedRecipes.has(r.id))
+      let availableDinner = ALL_RECIPES.dinner.filter(r => !usedRecipes.has(r.id))
+
+      availableBreakfast = filterRecipesByHealthTags(availableBreakfast, allHealthTags)
+      availableLunch = filterRecipesByHealthTags(availableLunch, allHealthTags)
+      availableDinner = filterRecipesByHealthTags(availableDinner, allHealthTags)
 
       const n = this.getRecipeCount()
 

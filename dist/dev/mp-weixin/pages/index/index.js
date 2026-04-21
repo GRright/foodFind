@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_constants = require("../../utils/constants.js");
+const utils_family = require("../../utils/family.js");
 const _sfc_main = {
   data() {
     return {
@@ -561,10 +562,27 @@ const _sfc_main = {
     },
     generateDailyMeals() {
       const n = this.getRecipeCount();
+      const familyTags = utils_family.getFamilyHealthTags();
+      const userPrefs = common_vendor.index.getStorageSync("foodfind_detailed_prefs") || {};
+      const allHealthTags = [.../* @__PURE__ */ new Set([...familyTags, ...userPrefs.healthTags || []])];
+      let breakfastPool = utils_constants.ALL_RECIPES.breakfast;
+      let lunchPool = utils_constants.ALL_RECIPES.lunch;
+      let dinnerPool = utils_constants.ALL_RECIPES.dinner;
+      if (allHealthTags.length > 0) {
+        breakfastPool = utils_family.filterRecipesByHealthTags(breakfastPool, allHealthTags);
+        lunchPool = utils_family.filterRecipesByHealthTags(lunchPool, allHealthTags);
+        dinnerPool = utils_family.filterRecipesByHealthTags(dinnerPool, allHealthTags);
+      }
+      if (breakfastPool.length === 0)
+        breakfastPool = utils_constants.ALL_RECIPES.breakfast;
+      if (lunchPool.length === 0)
+        lunchPool = utils_constants.ALL_RECIPES.lunch;
+      if (dinnerPool.length === 0)
+        dinnerPool = utils_constants.ALL_RECIPES.dinner;
       const dailyMeals = {
-        breakfast: this.shuffle(utils_constants.ALL_RECIPES.breakfast, n),
-        lunch: this.balanced(utils_constants.ALL_RECIPES.lunch, n),
-        dinner: this.balanced(utils_constants.ALL_RECIPES.dinner, n)
+        breakfast: this.shuffle(breakfastPool, n),
+        lunch: this.balanced(lunchPool, n),
+        dinner: this.balanced(dinnerPool, n)
       };
       this.dailyMeals = dailyMeals;
       const todayStr = this.getTodayStr();

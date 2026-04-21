@@ -38,6 +38,23 @@ to {
   color: #999;
   margin-bottom: 24rpx;
 }
+.mode-badge.data-v-b8f4481c {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  background: #e8f7ef;
+  padding: 12rpx 20rpx;
+  border-radius: 28rpx;
+  margin-bottom: 24rpx;
+}
+.mb-icon.data-v-b8f4481c {
+  font-size: 28rpx;
+}
+.mb-text.data-v-b8f4481c {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #07c160;
+}
 .day-config.data-v-b8f4481c {
   margin-bottom: 20rpx;
   padding-bottom: 20rpx;
@@ -332,6 +349,11 @@ to {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.item-added-by.data-v-b8f4481c {
+  font-size: 20rpx;
+  color: #07c160;
+  margin-top: 4rpx;
 }
 .item-delete.data-v-b8f4481c {
   width: 52rpx;

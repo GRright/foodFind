@@ -1,10 +1,15 @@
 <template>
   <view class="page" :class="{ 'page-enter': pageEnter }">
     <view class="header fade-in">
-      <text class="header-title">购物清单</text>
+      <text class="header-title">{{ isFamilyMode ? '家庭购物清单' : '购物清单' }}</text>
       <text class="header-sub">{{ todayStr }} · {{ totalItems }}项食材</text>
+      
+      <view class="mode-badge" v-if="isFamilyMode">
+        <text class="mb-icon">👨‍👩‍👧‍👦</text>
+        <text class="mb-text">{{ familyGroup?.name || '家庭' }}</text>
+      </view>
 
-      <view class="day-config">
+      <view class="day-config" v-if="!isFamilyMode">
         <view class="dc-row">
           <text class="dc-label">准备天数</text>
           <view class="dc-options">
@@ -45,14 +50,14 @@
         </view>
       </view>
 
-      <view class="meal-config-entry" @click="goToMealConfig">
+      <view class="meal-config-entry" @click="goToMealConfig" v-if="!isFamilyMode">
         <text class="mce-label">用餐配置</text>
         <text class="mce-summary">{{ mealConfigSummary }}</text>
         <text class="mce-arrow">›</text>
       </view>
 
       <view class="header-actions">
-        <view class="action-btn" @click="generateFromMenu">
+        <view class="action-btn" @click="generateFromMenu" v-if="!isFamilyMode">
           <text class="btn-icon">✦</text>
           <text class="btn-text">从菜单生成</text>
         </view>
@@ -81,6 +86,7 @@
               <view class="item-content">
                 <text class="item-name" :class="{ checked: item.checked }">{{ item.name }}</text>
                 <text class="item-amount" v-if="item.amount">{{ item.amount }}</text>
+                <text class="item-added-by" v-if="isFamilyMode && item.addedBy">由 {{ getMemberName(item.addedBy) }} 添加</text>
               </view>
               <view class="item-delete" @click.stop="deleteItem(item.id)">
                 <text class="delete-icon">✕</text>
@@ -111,6 +117,7 @@
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
+import { getFamilyGroup, getCurrentUserId, getFamilyShoppingList, saveFamilyShoppingList, recordFamilyCheckIn } from '@/utils/family.js'
 
 const CATEGORY_MAP = {
   vegetable: { name: '蔬菜', icon: '🥬' },
@@ -144,7 +151,10 @@ export default {
       },
       isPredefinedMode: true,
       _cachedIngredients: null,
-      _cacheKey: ''
+      _cacheKey: '',
+      isFamilyMode: false,
+      familyGroup: null,
+      currentUserId: ''
     }
   },
   computed: {
@@ -178,14 +188,23 @@ export default {
       return `工作日${weekdayText} · 周末${weekendText}`
     }
   },
-  onLoad() {
+  onLoad(options) {
+    this.currentUserId = getCurrentUserId()
     this.loadConfig()
-    this.loadShoppingList()
+    
+    if (options.mode === 'family') {
+      this.loadFamilyData()
+    } else {
+      this.loadShoppingList()
+    }
   },
   onShow() {
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
-    if (this.items.length === 0) {
+    
+    if (this.isFamilyMode) {
+      this.loadFamilyShoppingList()
+    } else if (this.items.length === 0) {
       setTimeout(() => {
         this.autoGenerateIfEmpty()
       }, 500)
@@ -434,15 +453,59 @@ export default {
       }
       return amount1 + ' + ' + amount2
     },
+    clearCompleted() {
+      uni.showModal({
+        title: '确认清空',
+        content: `确定删除已购买的${this.completedCount}项食材吗？`,
+        success: (res) => {
+          if (res.confirm) {
+            this.items = this.items.filter(i => !i.checked)
+            if (this.isFamilyMode) {
+              this.saveFamilyShoppingListData()
+            } else {
+              this.saveShoppingList()
+            }
+            uni.showToast({ title: '已清空', icon: 'success' })
+          }
+        }
+      })
+    },
+    loadFamilyData() {
+      this.familyGroup = getFamilyGroup()
+      if (this.familyGroup) {
+        this.isFamilyMode = true
+        this.loadFamilyShoppingList()
+      }
+    },
+    loadFamilyShoppingList() {
+      const familyData = getFamilyShoppingList()
+      this.items = familyData.items || []
+    },
+    saveFamilyShoppingListData() {
+      saveFamilyShoppingList({ items: this.items }, this.currentUserId)
+    },
+    getMemberName(userId) {
+      if (!this.familyGroup) return '未知'
+      const member = this.familyGroup.members.find(m => m.userId === userId)
+      return member ? member.name : '未知'
+    },
     toggleItem(item) {
       item.checked = !item.checked
-      this.saveShoppingList()
+      if (this.isFamilyMode) {
+        this.saveFamilyShoppingListData()
+      } else {
+        this.saveShoppingList()
+      }
     },
     deleteItem(id) {
       const idx = this.items.findIndex(i => i.id === id)
       if (idx > -1) {
         this.items.splice(idx, 1)
-        this.saveShoppingList()
+        if (this.isFamilyMode) {
+          this.saveFamilyShoppingListData()
+        } else {
+          this.saveShoppingList()
+        }
       }
     },
     addItem() {
@@ -454,27 +517,22 @@ export default {
         name: name,
         amount: this.newItemAmount.trim(),
         category: this.classifyIngredient(name),
-        checked: false
+        checked: false,
+        addedBy: this.currentUserId,
+        addedAt: new Date().toISOString()
       }
 
       this.items.push(item)
       this.newItemName = ''
       this.newItemAmount = ''
-      this.saveShoppingList()
+      
+      if (this.isFamilyMode) {
+        this.saveFamilyShoppingListData()
+      } else {
+        this.saveShoppingList()
+      }
+      
       uni.showToast({ title: '已添加', icon: 'success' })
-    },
-    clearCompleted() {
-      uni.showModal({
-        title: '确认清空',
-        content: `确定删除已购买的${this.completedCount}项食材吗？`,
-        success: (res) => {
-          if (res.confirm) {
-            this.items = this.items.filter(i => !i.checked)
-            this.saveShoppingList()
-            uni.showToast({ title: '已清空', icon: 'success' })
-          }
-        }
-      })
     }
   }
 }
@@ -492,6 +550,14 @@ export default {
 .header { padding: 56rpx 28rpx 24rpx; background: #fff; width: 100%; box-sizing: border-box; }
 .header-title { display: block; font-size: 44rpx; font-weight: 800; color: #1a1a1a; margin-bottom: 8rpx; }
 .header-sub { display: block; font-size: 24rpx; color: #999; margin-bottom: 24rpx; }
+
+.mode-badge {
+  display: inline-flex; align-items: center; gap: 8rpx;
+  background: #e8f7ef; padding: 12rpx 20rpx; border-radius: 28rpx;
+  margin-bottom: 24rpx;
+}
+.mb-icon { font-size: 28rpx; }
+.mb-text { font-size: 24rpx; font-weight: 600; color: #07c160; }
 
 .day-config {
   margin-bottom: 20rpx;
@@ -589,6 +655,7 @@ export default {
 .item-name { font-size: 28rpx; color: #1a1a1a; font-weight: 500; transition: all .2s ease; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .item-name.checked { text-decoration: line-through; color: #bbb; }
 .item-amount { font-size: 22rpx; color: #999; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-added-by { font-size: 20rpx; color: #07c160; margin-top: 4rpx; }
 .item-delete {
   width: 52rpx; height: 52rpx; display: flex; align-items: center; justify-content: center; border-radius: 50%;
   transition: all .2s ease; flex-shrink: 0; &:active { background: #f5f5f5; }

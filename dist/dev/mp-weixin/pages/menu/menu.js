@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_constants = require("../../utils/constants.js");
+const utils_family = require("../../utils/family.js");
 const _sfc_main = {
   data() {
     return {
@@ -218,9 +219,15 @@ const _sfc_main = {
           (dm[k] || []).forEach((r) => usedRecipes.add(r.id));
         });
       });
-      const availableBreakfast = utils_constants.ALL_RECIPES.breakfast.filter((r) => !usedRecipes.has(r.id));
-      const availableLunch = utils_constants.ALL_RECIPES.lunch.filter((r) => !usedRecipes.has(r.id));
-      const availableDinner = utils_constants.ALL_RECIPES.dinner.filter((r) => !usedRecipes.has(r.id));
+      const familyTags = utils_family.getFamilyHealthTags();
+      const userPrefs = common_vendor.index.getStorageSync("foodfind_detailed_prefs") || {};
+      const allHealthTags = [.../* @__PURE__ */ new Set([...familyTags, ...userPrefs.healthTags || []])];
+      let availableBreakfast = utils_constants.ALL_RECIPES.breakfast.filter((r) => !usedRecipes.has(r.id));
+      let availableLunch = utils_constants.ALL_RECIPES.lunch.filter((r) => !usedRecipes.has(r.id));
+      let availableDinner = utils_constants.ALL_RECIPES.dinner.filter((r) => !usedRecipes.has(r.id));
+      availableBreakfast = utils_family.filterRecipesByHealthTags(availableBreakfast, allHealthTags);
+      availableLunch = utils_family.filterRecipesByHealthTags(availableLunch, allHealthTags);
+      availableDinner = utils_family.filterRecipesByHealthTags(availableDinner, allHealthTags);
       const n = this.getRecipeCount();
       let breakfast = availableBreakfast.length >= n ? this.shuffle(availableBreakfast, n) : this.shuffle(utils_constants.ALL_RECIPES.breakfast, n);
       let lunch = availableLunch.length >= n ? this.balanced(availableLunch, n) : this.balanced(utils_constants.ALL_RECIPES.lunch, n);

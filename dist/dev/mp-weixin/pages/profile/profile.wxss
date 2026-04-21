@@ -352,6 +352,13 @@
   margin-bottom: 16rpx;
   padding-left: 4rpx;
 }
+.pm-hint.data-v-04d37cba {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+  padding-left: 4rpx;
+}
 .mode-toggle-row.data-v-04d37cba {
   display: flex;
   justify-content: space-between;

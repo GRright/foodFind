@@ -12,6 +12,9 @@ if (!Math) {
   "./pages/foodDiary/foodDiary.js";
   "./pages/shoppingList/shoppingList.js";
   "./pages/mealConfig/mealConfig.js";
+  "./pages/family/family.js";
+  "./pages/familyCheckIn/familyCheckIn.js";
+  "./pages/familyReport/familyReport.js";
 }
 const _sfc_main = {
   onLaunch() {
