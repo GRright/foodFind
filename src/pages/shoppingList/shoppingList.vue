@@ -3,6 +3,54 @@
     <view class="header fade-in">
       <text class="header-title">购物清单</text>
       <text class="header-sub">{{ todayStr }} · {{ totalItems }}项食材</text>
+
+      <view class="day-config">
+        <view class="dc-row">
+          <text class="dc-label">准备天数</text>
+          <view class="dc-options">
+            <view class="dc-option" :class="{ active: isPredefinedMode }" @click="togglePredefinedMode">
+              <text class="dc-text">预设</text>
+            </view>
+            <view class="dc-option" :class="{ active: !isPredefinedMode }" @click="togglePredefinedMode">
+              <text class="dc-text">自定义</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="dc-preset" v-if="isPredefinedMode">
+          <view class="dc-preset-item" :class="{ active: config.mode === 'today' }" @click="setPreset('today')">
+            <text class="dpi-emoji">📅</text>
+            <text class="dpi-label">今天</text>
+          </view>
+          <view class="dc-preset-item" :class="{ active: config.mode === 'weekend' }" @click="setPreset('weekend')">
+            <text class="dpi-emoji">🎯</text>
+            <text class="dpi-label">周末</text>
+          </view>
+          <view class="dc-preset-item" :class="{ active: config.mode === 'week' }" @click="setPreset('week')">
+            <text class="dpi-emoji">🌱</text>
+            <text class="dpi-label">本周</text>
+          </view>
+        </view>
+
+        <view class="dc-custom" v-else>
+          <view class="dcc-slider">
+            <text class="dcc-min">1天</text>
+            <view class="dcc-track">
+              <view class="dcc-progress" :style="{ width: ((config.customDays - 1) / 13) * 100 + '%' }"></view>
+              <input type="range" :min="1" :max="14" :value="config.customDays" @input="onCustomDaysChange" class="dcc-input"/>
+            </view>
+            <text class="dcc-max">14天</text>
+          </view>
+          <text class="dcc-value">{{ config.customDays }}天</text>
+        </view>
+      </view>
+
+      <view class="meal-config-entry" @click="goToMealConfig">
+        <text class="mce-label">用餐配置</text>
+        <text class="mce-summary">{{ mealConfigSummary }}</text>
+        <text class="mce-arrow">›</text>
+      </view>
+
       <view class="header-actions">
         <view class="action-btn" @click="generateFromMenu">
           <text class="btn-icon">✦</text>
@@ -17,28 +65,14 @@
 
     <scroll-view scroll-y class="list-scroll">
       <view class="category-list" v-if="categorizedItems.length > 0">
-        <view
-          class="category-section"
-          v-for="(cat, ci) in categorizedItems"
-          :key="cat.category"
-          :style="{ animationDelay: (ci * 80) + 'ms' }"
-          style="animation: slideUp .4s ease forwards; opacity: 0;"
-        >
+        <view class="category-section" v-for="(cat, ci) in categorizedItems" :key="cat.category" :style="{ animationDelay: (ci * 80) + 'ms' }" style="animation: slideUp .4s ease forwards; opacity: 0;">
           <view class="cat-header">
             <text class="cat-icon">{{ cat.icon }}</text>
             <text class="cat-name">{{ cat.name }}</text>
             <text class="cat-count">{{ cat.items.filter(i => !i.checked).length }}/{{ cat.items.length }}</text>
           </view>
           <view class="item-list">
-            <view
-              class="item-row"
-              :class="{ checked: item.checked }"
-              v-for="(item, ii) in cat.items"
-              :key="item.id"
-              @click="toggleItem(item)"
-              :style="{ animationDelay: (ci * 80 + ii * 40) + 'ms' }"
-              style="animation: popIn .35s ease forwards; opacity: 0;"
-            >
+            <view class="item-row" :class="{ checked: item.checked }" v-for="(item, ii) in cat.items" :key="item.id" @click="toggleItem(item)" :style="{ animationDelay: (ci * 80 + ii * 40) + 'ms' }" style="animation: popIn .35s ease forwards; opacity: 0;">
               <view class="item-check">
                 <view class="check-circle" :class="{ checked: item.checked }">
                   <text class="check-mark" v-if="item.checked">✓</text>
@@ -59,27 +93,15 @@
       <view class="empty-state" v-else>
         <text class="empty-icon">🛒</text>
         <text class="empty-title">购物清单为空</text>
-        <text class="empty-hint">点击「从菜单生成」自动添加今日所需食材</text>
+        <text class="empty-hint">点击「从菜单生成」自动添加食材</text>
       </view>
 
       <view class="bottom-spacer"></view>
     </scroll-view>
 
     <view class="add-bar">
-      <input
-        class="add-input"
-        v-model="newItemName"
-        placeholder="添加新物品..."
-        maxlength="30"
-        @confirm="addItem"
-      />
-      <input
-        class="add-amount"
-        v-model="newItemAmount"
-        placeholder="数量"
-        maxlength="20"
-        @confirm="addItem"
-      />
+      <input class="add-input" v-model="newItemName" placeholder="添加新物品..." maxlength="30" @confirm="addItem"/>
+      <input class="add-amount" v-model="newItemAmount" placeholder="数量" maxlength="20" @confirm="addItem"/>
       <view class="add-btn" :class="{ disabled: !newItemName.trim() }" @click="addItem">
         <text class="add-icon">+</text>
       </view>
@@ -111,7 +133,18 @@ export default {
       items: [],
       pageEnter: true,
       newItemName: '',
-      newItemAmount: ''
+      newItemAmount: '',
+      config: {
+        mode: 'today',
+        customDays: 3
+      },
+      mealConfig: {
+        weekday: ['dinner'],
+        weekend: ['breakfast', 'lunch', 'dinner']
+      },
+      isPredefinedMode: true,
+      _cachedIngredients: null,
+      _cacheKey: ''
     }
   },
   computed: {
@@ -136,33 +169,76 @@ export default {
       })
       const order = ['vegetable', 'meat', 'staple', 'seasoning', 'other']
       return order.filter(k => cats[k]).map(k => cats[k])
+    },
+    mealConfigSummary() {
+      const weekdayText = this.mealConfig.weekday.length === 3 ? '三餐' :
+        this.mealConfig.weekday.length === 2 ? '两餐' : '一餐'
+      const weekendText = this.mealConfig.weekend.length === 3 ? '三餐' :
+        this.mealConfig.weekend.length === 2 ? '两餐' : '一餐'
+      return `工作日${weekdayText} · 周末${weekendText}`
     }
   },
   onLoad() {
+    this.loadConfig()
     this.loadShoppingList()
+    this.autoGenerateIfEmpty()
   },
   onShow() {
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
   },
   methods: {
+    loadConfig() {
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs')
+      if (prefs) {
+        if (prefs.shoppingConfig) {
+          this.config = { ...this.config, ...prefs.shoppingConfig }
+        }
+        if (prefs.mealConfig) {
+          this.mealConfig = { ...this.mealConfig, ...prefs.mealConfig }
+        }
+      }
+      this.isPredefinedMode = ['today', 'weekend', 'week'].includes(this.config.mode)
+    },
+    saveConfig() {
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      prefs.shoppingConfig = this.config
+      prefs.mealConfig = this.mealConfig
+      uni.setStorageSync('foodfind_detailed_prefs', prefs)
+    },
     loadShoppingList() {
       const saved = uni.getStorageSync('foodfind_shopping_list')
-      if (saved && saved.date === this.getTodayStr()) {
+      const cacheKey = this.getCacheKey()
+      if (saved && saved.cacheKey === cacheKey) {
         this.items = saved.items || []
-      } else {
-        this.items = []
+        return
       }
+      this.items = []
     },
     saveShoppingList() {
       uni.setStorageSync('foodfind_shopping_list', {
-        date: this.getTodayStr(),
+        cacheKey: this.getCacheKey(),
         items: this.items
       })
+    },
+    getCacheKey() {
+      const mode = this.config.mode
+      const days = this.config.customDays
+      const weekdayMeals = this.mealConfig.weekday.sort().join(',')
+      const weekendMeals = this.mealConfig.weekend.sort().join(',')
+      return `${mode}-${days}-${weekdayMeals}-${weekendMeals}`
     },
     getTodayStr() {
       const d = new Date()
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    },
+    getDateStr(offset) {
+      const d = new Date(Date.now() + offset * 86400000)
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    },
+    getDayOfWeek(offset) {
+      const d = new Date(Date.now() + offset * 86400000)
+      return d.getDay()
     },
     classifyIngredient(name) {
       for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
@@ -172,37 +248,88 @@ export default {
       }
       return 'other'
     },
+    togglePredefinedMode() {
+      this.isPredefinedMode = !this.isPredefinedMode
+      this.config.mode = this.isPredefinedMode ? 'today' : 'custom'
+      this.config.customDays = 3
+      this.saveConfig()
+      this.loadShoppingList()
+      this.autoGenerateIfEmpty()
+    },
+    setPreset(mode) {
+      this.config.mode = mode
+      this.saveConfig()
+      this.loadShoppingList()
+      this.autoGenerateIfEmpty()
+    },
+    onCustomDaysChange(e) {
+      this.config.customDays = parseInt(e.detail.value)
+      this.saveConfig()
+      this.loadShoppingList()
+      this.autoGenerateIfEmpty()
+    },
+    goToMealConfig() {
+      uni.navigateTo({ url: '/pages/mealConfig/mealConfig' })
+    },
+    autoGenerateIfEmpty() {
+      if (this.items.length === 0) {
+        this.generateFromMenu()
+      }
+    },
     generateFromMenu() {
+      const cacheKey = this.getCacheKey()
+      if (this._cacheKey === cacheKey && this._cachedIngredients) {
+        this.applyCachedIngredients()
+        return
+      }
+
+      const weeklyData = uni.getStorageSync('foodfind_weekly')
       const dailyMeals = uni.getStorageSync('foodfind_meals')
-      if (!dailyMeals) {
-        uni.showToast({ title: '请先生成今日菜单', icon: 'none' })
+
+      if (!weeklyData && !dailyMeals) {
+        uni.showToast({ title: '请先生成菜单', icon: 'none' })
         return
       }
 
       const allRecipes = [...ALL_RECIPES.breakfast, ...ALL_RECIPES.lunch, ...ALL_RECIPES.dinner]
       const ingredientMap = new Map()
+      const daysToProcess = this.getDaysToProcess()
 
-      ;['breakfast', 'lunch', 'dinner'].forEach(mealType => {
-        const recipes = dailyMeals[mealType] || []
-        recipes.forEach(recipe => {
-          const fullRecipe = allRecipes.find(r => r.id === recipe.id)
-          if (fullRecipe && fullRecipe.ingredients) {
-            fullRecipe.ingredients.forEach(ing => {
-              const key = ing.name
-              if (ingredientMap.has(key)) {
-                const existing = ingredientMap.get(key)
-                existing.amount = this.mergeAmount(existing.amount, ing.amount)
-              } else {
-                ingredientMap.set(key, {
-                  name: ing.name,
-                  amount: ing.amount,
-                  category: this.classifyIngredient(ing.name)
+      for (let i = 0; i < daysToProcess.length; i++) {
+        const { dateStr, isWeekend, offset } = daysToProcess[i]
+        let dayMeals = null
+
+        if (weeklyData && weeklyData[dateStr]) {
+          dayMeals = weeklyData[dateStr]
+        } else if (offset === 0 && dailyMeals) {
+          dayMeals = dailyMeals
+        }
+
+        if (dayMeals) {
+          const mealTypes = isWeekend ? this.mealConfig.weekend : this.mealConfig.weekday
+          mealTypes.forEach(mealType => {
+            const recipes = dayMeals[mealType] || []
+            recipes.forEach(recipe => {
+              const fullRecipe = allRecipes.find(r => r.id === recipe.id)
+              if (fullRecipe && fullRecipe.ingredients) {
+                fullRecipe.ingredients.forEach(ing => {
+                  const key = ing.name
+                  if (ingredientMap.has(key)) {
+                    const existing = ingredientMap.get(key)
+                    existing.amount = this.mergeAmount(existing.amount, ing.amount)
+                  } else {
+                    ingredientMap.set(key, {
+                      name: ing.name,
+                      amount: ing.amount,
+                      category: this.classifyIngredient(ing.name)
+                    })
+                  }
                 })
               }
             })
-          }
-        })
-      })
+          })
+        }
+      }
 
       const newItems = Array.from(ingredientMap.values()).map(ing => ({
         id: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
@@ -217,6 +344,75 @@ export default {
         return
       }
 
+      this._cachedIngredients = newItems
+      this._cacheKey = cacheKey
+      this.items = newItems
+      this.saveShoppingList()
+      uni.showToast({ title: `已添加${newItems.length}项食材`, icon: 'success' })
+    },
+    getDaysToProcess() {
+      const days = []
+
+      if (this.config.mode === 'today') {
+        const dateStr = this.getDateStr(0)
+        const dayOfWeek = this.getDayOfWeek(0)
+        days.push({
+          dateStr,
+          isWeekend: dayOfWeek === 0 || dayOfWeek === 6,
+          offset: 0
+        })
+      } else if (this.config.mode === 'weekend') {
+        const today = new Date()
+        const dayOfWeek = today.getDay()
+
+        const daysUntilSaturday = (6 - dayOfWeek + 7) % 7
+        const daysUntilSunday = (0 - dayOfWeek + 7) % 7
+
+        const saturdayOffset = daysUntilSaturday === 0 ? 7 : daysUntilSaturday
+        const sundayOffset = daysUntilSunday === 0 ? 7 : daysUntilSunday
+
+        days.push({
+          dateStr: this.getDateStr(saturdayOffset),
+          isWeekend: true,
+          offset: saturdayOffset
+        })
+        days.push({
+          dateStr: this.getDateStr(sundayOffset),
+          isWeekend: true,
+          offset: sundayOffset
+        })
+      } else if (this.config.mode === 'week') {
+        for (let offset = 0; offset < 7; offset++) {
+          const dateStr = this.getDateStr(offset)
+          const dayOfWeek = this.getDayOfWeek(offset)
+          days.push({
+            dateStr,
+            isWeekend: dayOfWeek === 0 || dayOfWeek === 6,
+            offset
+          })
+        }
+      } else if (this.config.mode === 'custom') {
+        for (let offset = 0; offset < this.config.customDays; offset++) {
+          const dateStr = this.getDateStr(offset)
+          const dayOfWeek = this.getDayOfWeek(offset)
+          days.push({
+            dateStr,
+            isWeekend: dayOfWeek === 0 || dayOfWeek === 6,
+            offset
+          })
+        }
+      }
+
+      return days
+    },
+    applyCachedIngredients() {
+      const newItems = this._cachedIngredients.map(ing => ({
+        id: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        name: ing.name,
+        amount: ing.amount,
+        category: ing.category,
+        checked: false
+      }))
       this.items = newItems
       this.saveShoppingList()
       uni.showToast({ title: `已添加${newItems.length}项食材`, icon: 'success' })
@@ -281,7 +477,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.page { min-height: 100vh; background: #F5F6FA; display: flex; flex-direction: column; }
+.page { min-height: 100vh; background: #F5F6FA; display: flex; flex-direction: column; width: 100%; overflow-x: hidden; }
 .page-enter { animation: pageEnter .3s ease forwards; }
 
 @keyframes pageEnter {
@@ -289,15 +485,69 @@ export default {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Header */
-.header { padding: 56rpx 28rpx 24rpx; background: #fff; }
+.header { padding: 56rpx 28rpx 24rpx; background: #fff; width: 100%; box-sizing: border-box; }
 .header-title { display: block; font-size: 44rpx; font-weight: 800; color: #1a1a1a; margin-bottom: 8rpx; }
 .header-sub { display: block; font-size: 24rpx; color: #999; margin-bottom: 24rpx; }
-.header-actions { display: flex; gap: 16rpx; }
+
+.day-config {
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+  width: 100%;
+}
+.dc-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16rpx;
+  width: 100%;
+}
+.dc-label { font-size: 26rpx; color: #666; font-weight: 600; }
+.dc-options { display: flex; gap: 8rpx; flex-shrink: 0; }
+.dc-option {
+  padding: 10rpx 24rpx;
+  background: #f5f6f8;
+  border-radius: 28rpx;
+  border: 2rpx solid transparent;
+  transition: all .2s ease;
+  &:active { opacity: .8; }
+  &.active { background: #07c160; border-color: #07c160; }
+}
+.dc-text { font-size: 24rpx; color: #666; font-weight: 500; }
+.dc-option.active .dc-text { color: #fff; }
+
+.dc-preset { display: flex; gap: 12rpx; width: 100%; }
+.dc-preset-item {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 16rpx; background: #f5f6f8; border-radius: 16rpx; border: 2rpx solid transparent;
+  transition: all .2s ease;
+  &:active { opacity: .8; }
+  &.active { background: #fff; border-color: #07c160; box-shadow: 0 2rpx 12rpx rgba(7, 193, 96, .15); }
+}
+.dpi-emoji { font-size: 32rpx; margin-bottom: 6rpx; }
+.dpi-label { font-size: 22rpx; color: #666; }
+
+.dc-custom { display: flex; flex-direction: column; gap: 12rpx; width: 100%; }
+.dcc-slider { display: flex; align-items: center; gap: 16rpx; width: 100%; }
+.dcc-min, .dcc-max { font-size: 20rpx; color: #999; width: 60rpx; text-align: center; flex-shrink: 0; }
+.dcc-track {
+  flex: 1; height: 4rpx; background: #f5f6f8; border-radius: 2rpx; position: relative; min-width: 0;
+}
+.dcc-progress { position: absolute; left: 0; top: 0; height: 100%; background: linear-gradient(90deg, #07c160 0%, #09e370 100%); border-radius: 2rpx; }
+.dcc-input { position: absolute; left: -40rpx; right: -40rpx; top: -20rpx; bottom: -20rpx; opacity: 0; }
+.dcc-value { text-align: center; font-size: 32rpx; font-weight: 700; color: #07c160; }
+
+.meal-config-entry {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16rpx 0; width: 100%;
+}
+.mce-label { font-size: 24rpx; color: #666; }
+.mce-summary { font-size: 22rpx; color: #999; flex: 1; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mce-arrow { font-size: 28rpx; color: #ccc; flex-shrink: 0; }
+
+.header-actions { display: flex; gap: 16rpx; width: 100%; }
 .action-btn {
-  flex: 1; display: flex; align-items: center; justify-content: center; gap: 8rpx;
-  padding: 20rpx 0; background: #07c160; border-radius: 48rpx;
-  transition: all .25s ease;
+  flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 8rpx;
+  padding: 20rpx 0; background: #07c160; border-radius: 48rpx; transition: all .25s ease;
   &:active { opacity: .85; transform: scale(.97); }
   &.secondary { background: #f5f6f8; }
 }
@@ -306,94 +556,72 @@ export default {
 .btn-text { font-size: 26rpx; color: #fff; font-weight: 600; }
 .action-btn.secondary .btn-text { color: #666; }
 
-/* List Scroll */
-.list-scroll { flex: 1; padding: 20rpx 28rpx; }
+.list-scroll { flex: 1; padding: 20rpx 28rpx; width: 100%; box-sizing: border-box; }
 
-/* Category Section */
 .category-section {
-  background: #fff; border-radius: 24rpx;
-  margin-bottom: 20rpx; overflow: hidden;
-  box-shadow: 0 1rpx 12rpx rgba(0,0,0,.04);
+  background: #fff; border-radius: 24rpx; margin-bottom: 20rpx; overflow: hidden;
+  box-shadow: 0 1rpx 12rpx rgba(0,0,0,.04); width: 100%;
 }
-.cat-header {
-  display: flex; align-items: center; gap: 12rpx;
-  padding: 24rpx 28rpx; border-bottom: 1rpx solid #f5f5f5;
-}
-.cat-icon { font-size: 32rpx; }
-.cat-name { flex: 1; font-size: 28rpx; font-weight: 700; color: #1a1a1a; }
-.cat-count { font-size: 22rpx; color: #999; }
+.cat-header { display: flex; align-items: center; gap: 12rpx; padding: 24rpx 28rpx; border-bottom: 1rpx solid #f5f5f5; }
+.cat-icon { font-size: 32rpx; flex-shrink: 0; }
+.cat-name { flex: 1; font-size: 28rpx; font-weight: 700; color: #1a1a1a; min-width: 0; }
+.cat-count { font-size: 22rpx; color: #999; flex-shrink: 0; }
 
-/* Item List */
-.item-list { padding: 8rpx 0; }
+.item-list { padding: 8rpx 0; width: 100%; }
 .item-row {
   display: flex; align-items: center; gap: 16rpx;
-  padding: 20rpx 28rpx; transition: all .2s ease;
+  padding: 20rpx 28rpx; transition: all .2s ease; width: 100%; box-sizing: border-box;
   &:active { background: #f9f9f9; }
   &.checked { opacity: .6; }
 }
 .item-check { flex-shrink: 0; }
 .check-circle {
   width: 44rpx; height: 44rpx; border: 3rpx solid #d0d0d0; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .25s ease;
+  display: flex; align-items: center; justify-content: center; transition: all .25s ease;
   &.checked { background: #07c160; border-color: #07c160; }
 }
 .check-mark { font-size: 24rpx; color: #fff; font-weight: 700; }
-.item-content { flex: 1; display: flex; flex-direction: column; gap: 4rpx; }
-.item-name { font-size: 28rpx; color: #1a1a1a; font-weight: 500; transition: all .2s ease; }
+.item-content { flex: 1; display: flex; flex-direction: column; gap: 4rpx; min-width: 0; }
+.item-name { font-size: 28rpx; color: #1a1a1a; font-weight: 500; transition: all .2s ease; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .item-name.checked { text-decoration: line-through; color: #bbb; }
-.item-amount { font-size: 22rpx; color: #999; }
+.item-amount { font-size: 22rpx; color: #999; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .item-delete {
-  width: 52rpx; height: 52rpx; display: flex; align-items: center; justify-content: center;
-  border-radius: 50%; transition: all .2s ease;
-  &:active { background: #f5f5f5; }
+  width: 52rpx; height: 52rpx; display: flex; align-items: center; justify-content: center; border-radius: 50%;
+  transition: all .2s ease; flex-shrink: 0; &:active { background: #f5f5f5; }
 }
 .delete-icon { font-size: 24rpx; color: #ff6b6b; }
 
-/* Empty State */
-.empty-state {
-  display: flex; flex-direction: column; align-items: center;
-  padding: 160rpx 40rpx;
-}
+.empty-state { display: flex; flex-direction: column; align-items: center; padding: 160rpx 40rpx; width: 100%; }
 .empty-icon { font-size: 100rpx; margin-bottom: 24rpx; }
 .empty-title { font-size: 32rpx; font-weight: 600; color: #333; margin-bottom: 12rpx; }
 .empty-hint { font-size: 24rpx; color: #bbb; text-align: center; }
 .bottom-spacer { height: 160rpx; }
 
-/* Add Bar */
 .add-bar {
   position: fixed; left: 0; right: 0; bottom: 0;
   display: flex; align-items: center; gap: 12rpx;
-  padding: 20rpx 28rpx 40rpx; background: #fff;
-  box-shadow: 0 -2rpx 16rpx rgba(0,0,0,.06);
+  padding: 20rpx 28rpx 40rpx; background: #fff; box-shadow: 0 -2rpx 16rpx rgba(0,0,0,.06);
+  width: 100%; box-sizing: border-box;
 }
 .add-input {
   flex: 1; height: 72rpx; padding: 0 24rpx;
   background: #f5f6f8; border-radius: 36rpx;
-  font-size: 28rpx; color: #333;
+  font-size: 28rpx; color: #333; min-width: 0;
 }
 .add-amount {
   width: 120rpx; height: 72rpx; padding: 0 20rpx;
   background: #f5f6f8; border-radius: 36rpx;
-  font-size: 26rpx; color: #666; text-align: center;
+  font-size: 26rpx; color: #666; text-align: center; flex-shrink: 0;
 }
 .add-btn {
-  width: 72rpx; height: 72rpx;
-  background: #07c160; border-radius: 50%;
+  width: 72rpx; height: 72rpx; background: #07c160; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  transition: all .25s ease;
+  transition: all .25s ease; flex-shrink: 0;
   &:active { opacity: .85; transform: scale(.95); }
   &.disabled { opacity: .4; pointer-events: none; }
 }
 .add-icon { font-size: 36rpx; color: #fff; font-weight: 300; }
 
-/* Animations */
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20rpx); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes popIn {
-  from { opacity: 0; transform: scale(.9); }
-  to { opacity: 1; transform: scale(1); }
-}
+@keyframes slideUp { from { opacity: 0; transform: translateY(20rpx); } to { opacity: 1; transform: translateY(0); } }
+@keyframes popIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
 </style>
