@@ -1,6 +1,30 @@
 <template>
   <view class="page" :class="{ 'page-enter': pageEnter }">
-    <view class="profile-header fade-in">
+    <!-- 骨架屏 -->
+    <view class="skeleton-container" v-if="isLoading">
+      <view class="skeleton-header">
+        <view class="skeleton-avatar"></view>
+        <view class="skeleton-line skeleton-line-short"></view>
+        <view class="skeleton-line skeleton-line-shorter"></view>
+      </view>
+      <view class="skeleton-menu-group" v-for="i in 4" :key="i">
+        <view class="skeleton-group-title">
+          <view class="skeleton-line skeleton-line-group"></view>
+        </view>
+        <view class="skeleton-menu-list">
+          <view class="skeleton-menu-item" v-for="j in 3" :key="j">
+            <view class="skeleton-icon"></view>
+            <view class="skeleton-text">
+              <view class="skeleton-line skeleton-line-label"></view>
+              <view class="skeleton-line skeleton-line-desc"></view>
+            </view>
+            <view class="skeleton-arrow"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="profile-header fade-in" v-if="!isLoading">
       <view class="avatar-large">
         <text class="avatar-char">{{ userInfo.nickname ? userInfo.nickname.charAt(0) : '美' }}</text>
       </view>
@@ -8,7 +32,7 @@
       <text class="user-desc">享受每一餐的美好时光</text>
     </view>
 
-    <view class="menu-section">
+    <view class="menu-section" v-if="!isLoading">
       <view class="menu-group slide-up" style="animation-delay:0.05s;opacity:0">
         <text class="group-title">搭子</text>
         <view class="menu-list">
@@ -444,12 +468,44 @@
         </view>
       </scroll-view>
     </view>
+
+    <!-- 特别日期设置弹窗 -->
+    <view class="special-modal-mask" :class="{ show: showSpecialModal }" @click="showSpecialModal = false"></view>
+    <view class="special-modal" :class="{ show: showSpecialModal }">
+      <view class="spm-header">
+        <text class="spm-title">🎂 添加特别日子</text>
+        <view class="spm-close" @click="showSpecialModal = false"><text>✕</text></view>
+      </view>
+      <view class="spm-body">
+        <view class="spm-row">
+          <text class="spm-label">名称</text>
+          <input class="spm-input" v-model="specialDateForm.name" placeholder="如：我的生日" maxlength="20" />
+        </view>
+        <view class="spm-row">
+          <text class="spm-label">类型</text>
+          <view class="spm-type-row">
+            <view class="spm-type-btn" :class="{ active: specialDateForm.type === 'birthday' }" @click="specialDateForm.type = 'birthday'">🎂 生日</view>
+            <view class="spm-type-btn" :class="{ active: specialDateForm.type === 'anniversary' }" @click="specialDateForm.type = 'anniversary'">💝 纪念日</view>
+          </view>
+        </view>
+        <view class="spm-row">
+          <text class="spm-label">日期</text>
+          <picker mode="date" :value="specialDateForm.month + '-' + specialDateForm.day" @change="onSpecialDatePick">
+            <view class="spm-date-display">{{ specialDateForm.month }}月{{ specialDateForm.day }}日</view>
+          </picker>
+        </view>
+        <view class="spm-save-btn" @click="saveSpecialDate">
+          <text class="spm-save-txt">保存</text>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
 import { HEALTH_TAGS, HEALTH_TAG_CATEGORIES, getFamilyGroup, getCurrentUserId } from '@/utils/family.js'
+import { addSpecialDate } from '@/utils/festival.js'
 
 export default {
   data() {
@@ -467,12 +523,15 @@ export default {
       myWeeklyMeals: [],
       partnerWeeklyMeals: [],
       pageEnter: true,
+      isLoading: true,
       showFavoritesModal: false,
       favorites: [],
       _weeklyCheckInDays: 0,
       _myMealCount: 0,
       _weeklyNutritionCache: null,
       _familyGroup: null,
+      showSpecialModal: false,
+      specialDateForm: { name: '', month: 1, day: 1, type: 'birthday' },
       prefs: {
         noCookMode: false,
         userType: 'adult',
@@ -674,6 +733,7 @@ export default {
     this.loadCachedStats()
     this.loadFavorites()
     this.loadFamilyData()
+    setTimeout(() => { this.isLoading = false }, 500)
   },
   onShow() {
     this.pageEnter = true
@@ -879,7 +939,29 @@ export default {
     },
 
     openSpecialDates() {
-      uni.navigateTo({ url: '/pages/index/index?openSpecial=1' })
+      this.showSpecialModal = true
+    },
+    onSpecialDatePick(e) {
+      const parts = e.detail.value.split('-')
+      if (parts.length >= 3) {
+        this.specialDateForm.month = parseInt(parts[1])
+        this.specialDateForm.day = parseInt(parts[2])
+      }
+    },
+    saveSpecialDate() {
+      if (!this.specialDateForm.name.trim()) {
+        uni.showToast({ title: '请输入名称', icon: 'none' })
+        return
+      }
+      addSpecialDate({
+        name: this.specialDateForm.name.trim(),
+        month: this.specialDateForm.month,
+        day: this.specialDateForm.day,
+        type: this.specialDateForm.type
+      })
+      uni.showToast({ title: '已保存', icon: 'success' })
+      this.showSpecialModal = false
+      this.specialDateForm = { name: '', month: 1, day: 1, type: 'birthday' }
     },
 
     clearCache() {
@@ -943,6 +1025,35 @@ export default {
 
 <style lang="scss" scoped>
 .page { min-height:100vh; background:#F5F6FA; padding:0 28rpx; }
+
+/* ===== Skeleton Screen ===== */
+.skeleton-container { padding:56rpx 0 24rpx; }
+.skeleton-header {
+  display:flex; flex-direction:column; align-items:center;
+  padding-bottom:48rpx;
+}
+.skeleton-avatar { width:128rpx; height:128rpx; border-radius:50%; background:#e0e0e0; margin-bottom:24rpx; }
+.skeleton-menu-group { margin-bottom:32rpx; }
+.skeleton-group-title { margin-bottom:16rpx; padding:0 8rpx; }
+.skeleton-menu-list { background:#fff; border-radius:20rpx; padding:0 20rpx; }
+.skeleton-menu-item {
+  display:flex; align-items:center; gap:20rpx;
+  padding:24rpx 0; border-bottom:1rpx solid #f0f0f0;
+}
+.skeleton-menu-item:last-child { border-bottom:none; }
+.skeleton-icon { width:56rpx; height:56rpx; background:#e0e0e0; border-radius:50%; flex-shrink:0; }
+.skeleton-text { flex:1; }
+.skeleton-arrow { width:32rpx; height:32rpx; background:#e0e0e0; border-radius:50%; flex-shrink:0; }
+.skeleton-line { background:#e0e0e0; border-radius:8rpx; height:24rpx; animation: skeletonPulse 1.5s ease-in-out infinite; }
+.skeleton-line-short { width:140rpx; margin-bottom:12rpx; }
+.skeleton-line-shorter { width:100rpx; }
+.skeleton-line-group { width:80rpx; height:28rpx; }
+.skeleton-line-label { width:120rpx; margin-bottom:8rpx; }
+.skeleton-line-desc { width:180rpx; height:18rpx; }
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
 
 /* ===== Profile Header ===== */
 .profile-header {
@@ -1399,4 +1510,58 @@ export default {
   &:active { background:#e8e8e8; transform:scale(.9); }
 }
 .fdb-icon { font-size:24rpx; color:#999; }
+
+/* ===== Special Date Modal ===== */
+.special-modal-mask {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0); z-index:999; transition:background .3s ease;
+  pointer-events:none;
+  &.show { background:rgba(0,0,0,.45); pointer-events:auto; }
+}
+.special-modal {
+  position:fixed; left:0; right:0; bottom:0;
+  background:#fff; border-radius:32rpx 32rpx 0 0;
+  z-index:1000; transform:translateY(100%); transition:transform .35s cubic-bezier(.175,.885,.32,1.275);
+  max-height:80vh; display:flex; flex-direction:column;
+  &.show { transform:translateY(0); }
+}
+.spm-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:32rpx 28rpx 20rpx; flex-shrink:0;
+}
+.spm-title { font-size:34rpx; font-weight:700; color:#1a1a1a; }
+.spm-close {
+  width:56rpx; height:56rpx; border-radius:50%;
+  background:#f5f5f5; display:flex; align-items:center; justify-content:center;
+  &:active { background:#eee; }
+}
+.spm-body { flex:1; overflow:hidden; padding:0 28rpx 40rpx; }
+.spm-row { margin-bottom:28rpx; }
+.spm-label { display:block; font-size:26rpx; font-weight:600; color:#1a1a1a; margin-bottom:14rpx; }
+.spm-input {
+  width:100%; height:76rpx; padding:0 20rpx;
+  background:#f5f6f8; border-radius:14rpx;
+  font-size:28rpx; color:#333;
+}
+.spm-type-row { display:flex; gap:16rpx; }
+.spm-type-btn {
+  flex:1; height:76rpx; display:flex; align-items:center; justify-content:center;
+  background:#f5f6f8; border-radius:14rpx;
+  font-size:27rpx; color:#666;
+  transition:all .2s ease;
+  &.active { background:#e8f7ef; color:#07c160; font-weight:600; border:2rpx solid #07c160; }
+}
+.spm-date-display {
+  height:76rpx; display:flex; align-items:center;
+  padding:0 20rpx; background:#f5f6f8; border-radius:14rpx;
+  font-size:28rpx; color:#07c160; font-weight:600;
+}
+.spm-save-btn {
+  margin-top:12rpx; height:86rpx;
+  display:flex; align-items:center; justify-content:center;
+  background:#07c160; border-radius:48rpx;
+  transition:all .25s ease;
+  &:active { opacity:.85; transform:scale(.97); }
+}
+.spm-save-txt { font-size:30rpx; font-weight:600; color:#fff; }
 </style>
