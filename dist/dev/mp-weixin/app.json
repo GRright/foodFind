@@ -2,10 +2,12 @@
   "pages": [
     "pages/index/index",
     "pages/menu/menu",
-    "pages/movies/movies",
     "pages/profile/profile",
     "pages/onboarding/onboarding",
-    "pages/recipe-detail/recipe-detail"
+    "pages/recipe-detail/recipe-detail",
+    "pages/share/share",
+    "pages/invite/invite",
+    "pages/foodDiary/foodDiary"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -30,12 +32,6 @@
         "text": "菜单",
         "iconPath": "static/tabbar/menu.png",
         "selectedIconPath": "static/tabbar/menu-active.png"
-      },
-      {
-        "pagePath": "pages/movies/movies",
-        "text": "影视",
-        "iconPath": "static/tabbar/movies.png",
-        "selectedIconPath": "static/tabbar/movies-active.png"
       },
       {
         "pagePath": "pages/profile/profile",

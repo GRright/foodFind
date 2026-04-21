@@ -1,51 +1,539 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_constants = require("../../utils/constants.js");
 const _sfc_main = {
   data() {
-    return { userCount: 2, scrollHeight: "calc(100vh - 420rpx)", dailyMeals: { breakfast: [], lunch: [], dinner: [] } };
+    return {
+      dailyMeals: null,
+      userCount: 2,
+      scrollHeight: "calc(100vh - 260rpx)",
+      isRefreshing: "",
+      noCookMode: false,
+      feedList: [],
+      feedScrollHeight: "calc(100vh - 380rpx)",
+      pageEnter: true,
+      mealCheckIn: { breakfast: false, lunch: false, dinner: false },
+      swipeCardId: null,
+      swipeStartY: 0,
+      swipeOffset: 0,
+      swipeMealKey: "",
+      flippingCardId: null,
+      newCardId: null,
+      showSparkle: false,
+      sparkleCardId: null,
+      showDeleteModal: false,
+      deleteTargetFood: null,
+      deleteTargetMealKey: "",
+      showGestureGuide: false,
+      shareBtnClicked: false,
+      ggStage: 0,
+      ggDemoFood: null,
+      ggSwipeOffset: 0,
+      ggDemoCardAnim: "",
+      ggShowSparkle: false,
+      ggLocked: false,
+      showNotifPanel: false,
+      notifList: [],
+      unreadCount: 0,
+      showCommentModal: false,
+      commentList: [],
+      commentInput: "",
+      currentFeedItem: null,
+      showVoteModal: false,
+      voteTitle: "今天吃什么？",
+      voteOptions: ["火锅", "烧烤", "日料"],
+      currentVote: null,
+      showAchievementModal: false,
+      streakDays: 0,
+      achievements: [],
+      pairId: ""
+    };
   },
   computed: {
-    currentDate() {
+    greetingText() {
+      const h = (/* @__PURE__ */ new Date()).getHours();
+      if (h < 6)
+        return "夜深了，早点休息";
+      if (h < 9)
+        return "早上好";
+      if (h < 12)
+        return "中午好";
+      if (h < 14)
+        return "午休时间";
+      if (h < 18)
+        return "下午好";
+      return "晚上好";
+    },
+    greetingTextNoCook() {
+      const h = (/* @__PURE__ */ new Date()).getHours();
+      if (h < 6)
+        return "夜深了";
+      if (h < 9)
+        return "早安";
+      if (h < 12)
+        return "中午了";
+      if (h < 14)
+        return "下午茶时间";
+      if (h < 18)
+        return "晚餐时间";
+      return "晚上好";
+    },
+    greetingSubText() {
+      const h = (/* @__PURE__ */ new Date()).getHours();
+      if (h < 9)
+        return "今天吃点好的~";
+      if (h < 12)
+        return "午餐想好吃什么了吗";
+      if (h < 14)
+        return "吃饱了才有力气";
+      if (h < 18)
+        return "晚餐安排起来";
+      return "明天也要好好吃饭";
+    },
+    todayLabel() {
       const d = /* @__PURE__ */ new Date();
-      return `${d.getMonth() + 1}月${d.getDate()}日 ${["周日", "周一", "周二", "周三", "周四", "周五", "周六"][d.getDay()]}`;
+      const w = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"][d.getDay()];
+      return `${d.getMonth() + 1}月${d.getDate()}日 ${w}`;
     },
-    gridRows() {
+    mealSections() {
+      if (!this.dailyMeals)
+        return [];
       return [
-        { title: "早餐", icon: "🌅", recipes: this.dailyMeals.breakfast },
-        { title: "午餐", icon: "☀️", recipes: this.dailyMeals.lunch },
-        { title: "晚餐", icon: "🌙", recipes: this.dailyMeals.dinner }
-      ].map((m) => ({
-        ...m,
-        cal: m.recipes.reduce((s, r) => s + r.nutrition.calories * this.userCount, 0)
-      }));
-    },
-    allCells() {
-      let cells = [];
-      this.gridRows.forEach((row) => {
-        cells = [...cells, ...row.recipes];
-      });
-      return cells;
+        { key: "breakfast", title: "早餐", icon: "☀", recipes: this.dailyMeals.breakfast || [] },
+        { key: "lunch", title: "午餐", icon: "🌞", recipes: this.dailyMeals.lunch || [] },
+        { key: "dinner", title: "晚餐", icon: "🌙", recipes: this.dailyMeals.dinner || [] }
+      ];
     },
     totalCalories() {
-      return Math.round(this.allCells.reduce((s, r) => s + r.nutrition.calories * this.userCount, 0));
+      if (!this.dailyMeals)
+        return 0;
+      let c = 0;
+      ["breakfast", "lunch", "dinner"].forEach((k) => {
+        (this.dailyMeals[k] || []).forEach((r) => {
+          var _a;
+          return c += ((_a = r.nutrition) == null ? void 0 : _a.calories) || 0;
+        });
+      });
+      return Math.round(c * this.userCount);
     },
     totalProtein() {
-      return Math.round(this.allCells.reduce((s, r) => s + (r.nutrition.protein || 0) * this.userCount, 0));
+      if (!this.dailyMeals)
+        return 0;
+      let p = 0;
+      ["breakfast", "lunch", "dinner"].forEach((k) => {
+        (this.dailyMeals[k] || []).forEach((r) => {
+          var _a;
+          return p += ((_a = r.nutrition) == null ? void 0 : _a.protein) || 0;
+        });
+      });
+      return Math.round(p);
     },
     totalFat() {
-      return Math.round(this.allCells.reduce((s, r) => s + (r.nutrition.fat || 0) * this.userCount, 0));
+      if (!this.dailyMeals)
+        return 0;
+      let f = 0;
+      ["breakfast", "lunch", "dinner"].forEach((k) => {
+        (this.dailyMeals[k] || []).forEach((r) => {
+          var _a;
+          return f += ((_a = r.nutrition) == null ? void 0 : _a.fat) || 0;
+        });
+      });
+      return Math.round(f);
     },
     totalCarbs() {
-      return Math.round(this.allCells.reduce((s, r) => s + (r.nutrition.carbs || 0) * this.userCount, 0));
+      if (!this.dailyMeals)
+        return 0;
+      let cb = 0;
+      ["breakfast", "lunch", "dinner"].forEach((k) => {
+        (this.dailyMeals[k] || []).forEach((r) => {
+          var _a;
+          return cb += ((_a = r.nutrition) == null ? void 0 : _a.carbs) || 0;
+        });
+      });
+      return Math.round(cb);
     },
-    calPercent() {
-      return Math.min(100, Math.round(this.totalCalories / 2e3 * 100));
+    ggOverlayTitle() {
+      const titles = [
+        "上滑试试换菜？",
+        "下滑试试删除？"
+      ];
+      return titles[this.ggStage] || "引导完成！";
+    },
+    ggOverlaySub() {
+      const subs = [
+        "按住下方菜品，往上滑动试试",
+        "按住下方菜品，往下滑动试试"
+      ];
+      return subs[this.ggStage] || "";
+    },
+    ggHintClass() {
+      const off = this.ggSwipeOffset;
+      if (this.ggStage === 0 && off > 30)
+        return "show-up";
+      if (this.ggStage === 1 && off < -30)
+        return "show-down";
+      return "";
+    },
+    ggHintIcon() {
+      return this.ggStage === 0 ? "✨" : this.ggStage === 1 ? "✕" : "";
+    },
+    ggHintText() {
+      return this.ggStage === 0 ? "换一道" : this.ggStage === 1 ? "删除" : "";
+    },
+    ggActIcon() {
+      const icons = ["↻", "✕"];
+      return icons[this.ggStage] || "✓";
+    },
+    ggActText() {
+      const texts = ["上滑换菜 ↑", "下滑删除 ↓"];
+      return texts[this.ggStage] || "知道了";
     }
   },
-  onLoad() {
-    this.generateDailyRecipes();
+  onShow() {
+    this.shareBtnClicked = false;
+    this.pageEnter = true;
+    setTimeout(() => {
+      this.pageEnter = false;
+    }, 400);
+    this.loadMode();
+    this.loadPairId();
+    if (this.noCookMode) {
+      this.loadFeed();
+    } else {
+      this.loadMeals();
+    }
   },
   methods: {
+    getSwipeOpacity() {
+      if (!this.swipeCardId)
+        return 1;
+      const absOffset = Math.abs(this.swipeOffset);
+      if (absOffset < 40)
+        return 1;
+      if (absOffset > 120)
+        return 0.3;
+      return 1 - (absOffset - 40) / 80 * 0.7;
+    },
+    getCardClass(id) {
+      const classes = [];
+      if (this.swipeCardId === id)
+        classes.push("swiping");
+      if (this.flippingCardId === id)
+        classes.push("flipping");
+      if (this.newCardId === id)
+        classes.push("new-card");
+      return classes.join(" ");
+    },
+    getCardStyle(id) {
+      if (this.swipeCardId !== id && this.flippingCardId !== id)
+        return "";
+      if (this.flippingCardId === id)
+        return "animation: none;";
+      let rotateX = 0;
+      if (this.swipeOffset > 30) {
+        rotateX = Math.min((this.swipeOffset - 30) / 2, 45);
+      } else if (this.swipeOffset < -30) {
+        rotateX = Math.max((this.swipeOffset + 30) / 2, -25);
+      }
+      return `transform: translateY(${Math.round(this.swipeOffset * 0.5)}rpx) rotateX(${rotateX}deg); opacity:${this.getSwipeOpacity()};`;
+    },
+    loadMode() {
+      const prefs = common_vendor.index.getStorageSync("foodfind_detailed_prefs") || {};
+      this.noCookMode = !!prefs.noCookMode;
+    },
+    recordAppOpen() {
+      return;
+    },
+    loadTodayCheckIn() {
+      const todayStr = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+      const personalChecks = common_vendor.index.getStorageSync("foodfind_personal_checks") || {};
+      if (personalChecks[todayStr]) {
+        this.mealCheckIn = { ...personalChecks[todayStr] };
+      }
+    },
+    markMealEaten(mealKey) {
+      const newState = !this.mealCheckIn[mealKey];
+      this.mealCheckIn[mealKey] = newState;
+      const personalChecks = common_vendor.index.getStorageSync("foodfind_personal_checks") || {};
+      const todayStr = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+      if (!personalChecks[todayStr])
+        personalChecks[todayStr] = { breakfast: false, lunch: false, dinner: false };
+      personalChecks[todayStr][mealKey] = newState;
+      common_vendor.index.setStorageSync("foodfind_personal_checks", personalChecks);
+      if (newState) {
+        common_vendor.index.showToast({ title: `${mealKey === "breakfast" ? "早餐" : mealKey === "lunch" ? "午餐" : "晚餐"}已打卡 ✓`, icon: "success" });
+      }
+    },
+    takePhoto() {
+      common_vendor.index.chooseImage({
+        count: 1,
+        sizeType: ["compressed"],
+        sourceType: ["camera"],
+        success: (res) => {
+          if (res.tempFilePaths && res.tempFilePaths.length > 0) {
+            this.addFeedItem(res.tempFilePaths[0]);
+          }
+        }
+      });
+    },
+    choosePhoto() {
+      common_vendor.index.chooseImage({
+        count: 1,
+        sizeType: ["compressed"],
+        sourceType: ["album"],
+        success: (res) => {
+          if (res.tempFilePaths && res.tempFilePaths.length > 0) {
+            this.addFeedItem(res.tempFilePaths[0]);
+          }
+        }
+      });
+    },
+    addFeedItem(imagePath) {
+      var _a, _b, _c;
+      const app = getApp();
+      const item = {
+        id: "feed_" + Date.now(),
+        image: imagePath,
+        fromName: ((_b = (_a = app == null ? void 0 : app.globalData) == null ? void 0 : _a.userInfo) == null ? void 0 : _b.nickname) || "我",
+        fromOpenid: "",
+        caption: "",
+        createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+        isSelf: true
+      };
+      const feed = [item, ...this.feedList];
+      this.feedList = feed;
+      const saved = common_vendor.index.getStorageSync("foodfind_feed") || {};
+      const todayStr = this.getTodayStr();
+      if (!saved[todayStr])
+        saved[todayStr] = [];
+      saved[todayStr].unshift(item);
+      common_vendor.index.setStorageSync("foodfind_feed", saved);
+      common_vendor.index.showToast({ title: "已分享", icon: "success" });
+      if (((_c = app == null ? void 0 : app.globalData) == null ? void 0 : _c.partnerInfo) && app.globalData.pairStatus === "paired")
+        ;
+    },
+    loadFeed() {
+      const saved = common_vendor.index.getStorageSync("foodfind_feed") || {};
+      const todayStr = this.getTodayStr();
+      this.feedList = saved[todayStr] || [];
+      const partnerFeed = common_vendor.index.getStorageSync("foodfind_partner_feed") || {};
+      if (partnerFeed[todayStr]) {
+        const combined = [...this.feedList, ...partnerFeed[todayStr]];
+        combined.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        this.feedList = combined;
+      }
+    },
+    loadMoreFeed() {
+    },
+    previewImage(url) {
+      const urls = this.feedList.filter((f) => f.image).map((f) => f.image);
+      common_vendor.index.previewImage({ current: url, urls });
+    },
+    formatTime(isoStr) {
+      try {
+        const d = new Date(isoStr);
+        const h = String(d.getHours()).padStart(2, "0");
+        const m = String(d.getMinutes()).padStart(2, "0");
+        return `${h}:${m}`;
+      } catch (e) {
+        return "";
+      }
+    },
+    checkGestureGuide() {
+      const done = common_vendor.index.getStorageSync("foodfind_gesture_guide");
+      if (done)
+        return;
+      common_vendor.index.setStorageSync("foodfind_gesture_guide", true);
+    },
+    ggDemoCardTouchStart(e) {
+      if (this.ggLocked)
+        return;
+      this._ggTouchStartY = e.touches[0].clientY;
+      this._ggTouchStartX = e.touches[0].clientX;
+      this.ggSwipeOffset = 0;
+      this.ggDemoCardAnim = "active";
+    },
+    ggDemoCardTouchMove(e) {
+      if (this.ggLocked)
+        return;
+      const currentY = e.touches[0].clientY;
+      this.ggSwipeOffset = this._ggTouchStartY - currentY;
+    },
+    ggDemoCardTouchEnd() {
+      if (this.ggLocked)
+        return;
+      this.ggDemoCardAnim = "";
+      if (this.ggStage === 0 && this.ggSwipeOffset > 50) {
+        this.ggCompleteStage0();
+      } else if (this.ggStage === 1 && this.ggSwipeOffset < -50) {
+        this.ggCompleteStage1();
+      } else {
+        this.ggSwipeOffset = 0;
+      }
+    },
+    ggCompleteStage0() {
+      this.ggLocked = true;
+      this.ggShowSparkle = true;
+      this.ggDemoCardAnim = "flip-out";
+      setTimeout(() => {
+        const pool = utils_constants.ALL_RECIPES.breakfast || [];
+        this.ggDemoFood = pool[Math.floor(Math.random() * pool.length)];
+        this.ggDemoCardAnim = "flip-in";
+        this.ggSwipeOffset = 0;
+        setTimeout(() => {
+          this.ggShowSparkle = false;
+          this.ggDemoCardAnim = "";
+          this.ggStage = 1;
+          this.ggLocked = false;
+        }, 400);
+      }, 350);
+    },
+    ggCompleteStage1() {
+      this.ggLocked = true;
+      this.ggDemoCardAnim = "swipe-away";
+      setTimeout(() => {
+        const pool = utils_constants.ALL_RECIPES.lunch || [];
+        this.ggDemoFood = pool[Math.floor(Math.random() * pool.length)];
+        this.ggSwipeOffset = 0;
+        this.ggDemoCardAnim = "slide-in";
+        setTimeout(() => {
+          this.ggDemoCardAnim = "";
+          this.closeGestureGuide();
+        }, 400);
+      }, 400);
+    },
+    ggAct() {
+      if (this.ggLocked)
+        return;
+      if (this.ggStage === 0) {
+        this.ggSwipeOffset = 100;
+        this.ggCompleteStage0();
+      } else if (this.ggStage === 1) {
+        this.ggSwipeOffset = -100;
+        this.ggCompleteStage1();
+      }
+    },
+    closeGestureGuide() {
+      this.showGestureGuide = false;
+      this.ggStage = 0;
+      this.ggLocked = false;
+      this.ggSwipeOffset = 0;
+      this.ggShowSparkle = false;
+      this.ggDemoCardAnim = "";
+      common_vendor.index.setStorageSync("foodfind_gesture_guide", true);
+    },
+    onSwipeStart(food, mealKey, e) {
+      this.swipeCardId = food.id;
+      this.swipeMealKey = mealKey;
+      this.swipeOffset = 0;
+      this.swipeStartY = e.touches[0].clientY;
+    },
+    onSwipeMove(e) {
+      if (!this.swipeCardId)
+        return;
+      const currentY = e.touches[0].clientY;
+      let delta = this.swipeStartY - currentY;
+      if (delta > 160)
+        delta = 160;
+      if (delta < -100)
+        delta = -100;
+      this.swipeOffset = Math.round(delta);
+    },
+    onSwipeEnd(food, mealKey) {
+      if (!this.swipeCardId)
+        return;
+      const offset = this.swipeOffset;
+      if (offset >= 60) {
+        this.triggerSwapAnimation(food, mealKey);
+      } else if (offset <= -50) {
+        this.deleteTargetFood = food;
+        this.deleteTargetMealKey = mealKey;
+        this.showDeleteModal = true;
+        this.resetSwipe();
+      } else {
+        this.resetSwipe();
+      }
+    },
+    resetSwipe() {
+      this.swipeCardId = null;
+      this.swipeOffset = 0;
+      this.swipeMealKey = "";
+    },
+    triggerSwapAnimation(food, mealKey) {
+      this.flippingCardId = food.id;
+      this.sparkleCardId = food.id;
+      this.showSparkle = true;
+      setTimeout(() => {
+        this.showSparkle = false;
+      }, 600);
+      setTimeout(() => {
+        this.swapOneFood(food, mealKey);
+        this.newCardId = food.id;
+        this.flippingCardId = null;
+        setTimeout(() => {
+          this.newCardId = null;
+          this.resetSwipe();
+        }, 450);
+      }, 350);
+    },
+    confirmDelete() {
+      if (!this.deleteTargetFood || !this.deleteTargetMealKey)
+        return;
+      const meals = this.dailyMeals[this.deleteTargetMealKey] || [];
+      const idx = meals.findIndex((r) => r.id === this.deleteTargetFood.id);
+      if (idx > -1) {
+        meals.splice(idx, 1);
+        common_vendor.index.setStorageSync("foodfind_meals", this.dailyMeals);
+        const wc = common_vendor.index.getStorageSync("foodfind_weekly") || {};
+        wc[this.getTodayStr()] = this.dailyMeals;
+        common_vendor.index.setStorageSync("foodfind_weekly", wc);
+      }
+      common_vendor.index.showToast({ title: `已删除「${this.deleteTargetFood.name}」`, icon: "none" });
+      this.showDeleteModal = false;
+      this.deleteTargetFood = null;
+      this.deleteTargetMealKey = "";
+    },
+    swapOneFood(food, mealKey) {
+      const meals = this.dailyMeals[mealKey] || [];
+      const idx = meals.findIndex((r) => r.id === food.id);
+      if (idx > -1) {
+        const pool = utils_constants.ALL_RECIPES[mealKey] || [];
+        const otherIds = new Set(meals.filter((r) => r.id !== food.id).map((r) => r.id));
+        const available = pool.filter((r) => !otherIds.has(r.id));
+        meals[idx] = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : pool[Math.floor(Math.random() * pool.length)];
+        common_vendor.index.setStorageSync("foodfind_meals", this.dailyMeals);
+        const wc = common_vendor.index.getStorageSync("foodfind_weekly") || {};
+        wc[this.getTodayStr()] = this.dailyMeals;
+        common_vendor.index.setStorageSync("foodfind_weekly", wc);
+      }
+      common_vendor.index.showToast({ title: `已更换「${food.name}」`, icon: "none" });
+    },
+    loadMeals() {
+      const cached = common_vendor.index.getStorageSync("foodfind_meals");
+      const cachedDate = common_vendor.index.getStorageSync("foodfind_meals_date");
+      if (cached && cachedDate && cachedDate === this.getTodayStr()) {
+        this.dailyMeals = cached;
+        const app = getApp();
+        if (app == null ? void 0 : app.globalData)
+          app.globalData.dailyMeals = cached;
+        return;
+      }
+      const weeklyCache = common_vendor.index.getStorageSync("foodfind_weekly");
+      if (weeklyCache && weeklyCache[this.getTodayStr()]) {
+        this.dailyMeals = weeklyCache[this.getTodayStr()];
+        common_vendor.index.setStorageSync("foodfind_meals", this.dailyMeals);
+        common_vendor.index.setStorageSync("foodfind_meals_date", this.getTodayStr());
+        const app = getApp();
+        if (app == null ? void 0 : app.globalData)
+          app.globalData.dailyMeals = this.dailyMeals;
+        return;
+      }
+      this.generateDailyMeals();
+    },
+    getTodayStr() {
+      const d = /* @__PURE__ */ new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    },
     getRecipeCount() {
       const c = this.userCount;
       if (c === 1)
@@ -60,72 +548,456 @@ const _sfc_main = {
       return [...arr].sort(() => Math.random() - 0.5).slice(0, n);
     },
     balanced(recipes, n) {
-      const m = recipes.filter((r) => r.type === "meat" || r.type === "mixed");
-      const v = recipes.filter((r) => r.type === "vegetarian");
-      const mc = Math.ceil(n / 2), vc = n - mc;
-      return [...this.shuffle(m, mc), ...this.shuffle(v, vc)].sort(() => Math.random() - 0.5);
+      const meat = recipes.filter((r) => r.type === "meat" || r.type === "mixed");
+      const veg = recipes.filter((r) => r.type === "vegetarian");
+      const mc = Math.ceil(n * 0.55), vc = n - mc;
+      return [...this.shuffle(meat, mc), ...this.shuffle(veg, vc)].sort(() => Math.random() - 0.5);
     },
-    generateDailyRecipes() {
+    generateDailyMeals() {
       const n = this.getRecipeCount();
-      this.dailyMeals = {
-        breakfast: this.shuffle(common_vendor.ALL_RECIPES.breakfast, n),
-        lunch: this.balanced(common_vendor.ALL_RECIPES.lunch, n),
-        dinner: this.balanced(common_vendor.ALL_RECIPES.dinner, n)
+      const dailyMeals = {
+        breakfast: this.shuffle(utils_constants.ALL_RECIPES.breakfast, n),
+        lunch: this.balanced(utils_constants.ALL_RECIPES.lunch, n),
+        dinner: this.balanced(utils_constants.ALL_RECIPES.dinner, n)
       };
+      this.dailyMeals = dailyMeals;
+      const todayStr = this.getTodayStr();
+      common_vendor.index.setStorageSync("foodfind_meals", dailyMeals);
+      common_vendor.index.setStorageSync("foodfind_meals_date", todayStr);
       const app = getApp();
       if (app == null ? void 0 : app.globalData)
-        app.globalData.dailyMeals = this.dailyMeals;
+        app.globalData.dailyMeals = dailyMeals;
+      const weeklyCache = common_vendor.index.getStorageSync("foodfind_weekly") || {};
+      weeklyCache[todayStr] = dailyMeals;
+      common_vendor.index.setStorageSync("foodfind_weekly", weeklyCache);
+      if (app == null ? void 0 : app.globalData)
+        app.globalData.weeklyMeals = weeklyCache;
     },
-    viewRecipe(r) {
-      common_vendor.index.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${r.id}` });
-    },
-    goToMenu() {
-      common_vendor.index.switchTab({ url: "/pages/menu/menu" });
-    },
-    goToMovies() {
-      common_vendor.index.switchTab({ url: "/pages/movies/movies" });
-    },
-    refreshMeals() {
-      common_vendor.index.showLoading({ title: "生成中..." });
+    refreshMeal(mealKey) {
+      if (this.isRefreshing)
+        return;
+      this.isRefreshing = mealKey;
       setTimeout(() => {
-        this.generateDailyRecipes();
+        const n = this.getRecipeCount();
+        const pool = utils_constants.ALL_RECIPES[mealKey] || [];
+        const currentIds = new Set((this.dailyMeals[mealKey] || []).map((r) => r.id));
+        const available = pool.filter((r) => !currentIds.has(r.id));
+        this.dailyMeals[mealKey] = available.length >= n ? mealKey === "breakfast" ? this.shuffle(available, n) : this.balanced(available, n) : mealKey === "breakfast" ? this.shuffle(pool, n) : this.balanced(pool, n);
+        common_vendor.index.setStorageSync("foodfind_meals", this.dailyMeals);
+        const wc = common_vendor.index.getStorageSync("foodfind_weekly") || {};
+        wc[this.getTodayStr()] = this.dailyMeals;
+        common_vendor.index.setStorageSync("foodfind_weekly", wc);
+        this.isRefreshing = "";
+        common_vendor.index.showToast({ title: `已更换${mealKey === "breakfast" ? "早餐" : mealKey === "lunch" ? "午餐" : "晚餐"}`, icon: "none" });
+      }, 400);
+    },
+    regenerateAll() {
+      common_vendor.index.showLoading({ title: "重新生成中..." });
+      setTimeout(() => {
+        this.generateDailyMeals();
         common_vendor.index.hideLoading();
-        common_vendor.index.showToast({ title: "已更新", icon: "success" });
-      }, 500);
+        common_vendor.index.showToast({ title: "已重新生成", icon: "success" });
+      }, 600);
+    },
+    goToDetail(recipe) {
+      common_vendor.index.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` });
+    },
+    onShareClick() {
+      this.shareBtnClicked = true;
+      common_vendor.index.showToast({ title: "请点击右上角分享", icon: "none" });
+    },
+    onShareAppMessage() {
+      var _a, _b;
+      const app = getApp();
+      const partnerName = ((_b = (_a = app == null ? void 0 : app.globalData) == null ? void 0 : _a.partnerInfo) == null ? void 0 : _b.nickname) || "TA";
+      if (this.noCookMode) {
+        return { title: `来看看我今天吃了什么~`, path: "/pages/index/index", imageUrl: "" };
+      }
+      const cal = this.totalCalories;
+      return { title: `${partnerName}，今天吃这些？(${cal}kcal)`, path: "/pages/index/index", imageUrl: "" };
+    },
+    loadMore() {
+    },
+    loadPairId() {
+      const partner = common_vendor.index.getStorageSync("foodfind_partner");
+      if (partner && partner.pairId) {
+        this.pairId = partner.pairId;
+      }
+    },
+    loadNotifications() {
+      return;
+    },
+    showNotifications() {
+      this.showNotifPanel = true;
+    },
+    openComment(item) {
+      this.currentFeedItem = item;
+      this.showCommentModal = true;
+      this.commentInput = "";
+      this.commentList = [];
+    },
+    submitComment() {
+      if (!this.commentInput.trim() || !this.currentFeedItem)
+        return;
+      this.commentInput = "";
+      this.showCommentModal = false;
+      if (this.currentFeedItem) {
+        this.currentFeedItem.commentCount = (this.currentFeedItem.commentCount || 0) + 1;
+      }
+      common_vendor.index.showToast({ title: "评论成功", icon: "success" });
+    },
+    toggleLike(item) {
+      item.liked = !item.liked;
+      if (item.liked) {
+        item.likeCount = (item.likeCount || 0) + 1;
+      } else {
+        item.likeCount = Math.max(0, (item.likeCount || 0) - 1);
+      }
+      const saved = common_vendor.index.getStorageSync("foodfind_feed") || {};
+      const todayStr = this.getTodayStr();
+      if (saved[todayStr]) {
+        const idx = saved[todayStr].findIndex((f) => f.id === item.id);
+        if (idx > -1) {
+          saved[todayStr][idx].liked = item.liked;
+          saved[todayStr][idx].likeCount = item.likeCount;
+          common_vendor.index.setStorageSync("foodfind_feed", saved);
+        }
+      }
+    },
+    addVoteOption() {
+      if (this.voteOptions.length < 5) {
+        this.voteOptions.push("");
+      }
+    },
+    removeVoteOption(i) {
+      if (this.voteOptions.length > 2) {
+        this.voteOptions.splice(i, 1);
+      }
+    },
+    createVoteAction() {
+      if (!this.voteTitle.trim()) {
+        common_vendor.index.showToast({ title: "请输入投票标题", icon: "none" });
+        return;
+      }
+      const opts = this.voteOptions.filter((o) => o.trim());
+      if (opts.length < 2) {
+        common_vendor.index.showToast({ title: "至少需要2个选项", icon: "none" });
+        return;
+      }
+      common_vendor.index.showToast({ title: "投票已创建", icon: "success" });
+      this.showVoteModal = false;
+    },
+    loadActiveVote() {
+      return;
+    },
+    doVote(optionIndex) {
+      common_vendor.index.showToast({ title: "投票成功", icon: "success" });
+      this.showVoteModal = false;
+    },
+    getVotePercent(opt, vote) {
+      const total = vote.options.reduce((sum, o) => sum + o.count, 0);
+      if (total === 0)
+        return 0;
+      return Math.round(opt.count / total * 100);
+    },
+    loadStreak() {
+      const streak = common_vendor.index.getStorageSync("foodfind_streak") || { days: 0, lastDate: "" };
+      const today = this.getTodayStr();
+      if (streak.lastDate === today) {
+        this.streakDays = streak.days;
+      } else {
+        const yesterday = /* @__PURE__ */ new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, "0")}-${String(yesterday.getDate()).padStart(2, "0")}`;
+        if (streak.lastDate === yStr) {
+          this.streakDays = streak.days;
+        } else if (streak.lastDate !== today) {
+          this.streakDays = 0;
+        }
+      }
+    },
+    updateStreak() {
+      const today = this.getTodayStr();
+      const streak = common_vendor.index.getStorageSync("foodfind_streak") || { days: 0, lastDate: "" };
+      if (streak.lastDate === today)
+        return;
+      const yesterday = /* @__PURE__ */ new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, "0")}-${String(yesterday.getDate()).padStart(2, "0")}`;
+      if (streak.lastDate === yStr) {
+        streak.days += 1;
+      } else {
+        streak.days = 1;
+      }
+      streak.lastDate = today;
+      common_vendor.index.setStorageSync("foodfind_streak", streak);
+      this.streakDays = streak.days;
+      this.checkAchievements();
+    },
+    loadAchievements() {
+      const defaultAchievements = [
+        { id: "streak_3", name: "初出茅庐", desc: "连续打卡3天", icon: "🌱", condition: () => this.streakDays >= 3 },
+        { id: "streak_7", name: "坚持不懈", desc: "连续打卡7天", icon: "🔥", condition: () => this.streakDays >= 7 },
+        { id: "streak_14", name: "美食达人", desc: "连续打卡14天", icon: "⭐", condition: () => this.streakDays >= 14 },
+        { id: "streak_30", name: "食神", desc: "连续打卡30天", icon: "👑", condition: () => this.streakDays >= 30 },
+        { id: "share_5", name: "分享使者", desc: "分享5次美食", icon: "📤", condition: () => (common_vendor.index.getStorageSync("foodfind_share_count") || 0) >= 5 },
+        { id: "comment_10", name: "评论达人", desc: "评论10次", icon: "💬", condition: () => (common_vendor.index.getStorageSync("foodfind_comment_count") || 0) >= 10 },
+        { id: "vote_3", name: "选择困难", desc: "发起3次投票", icon: "🗳️", condition: () => (common_vendor.index.getStorageSync("foodfind_vote_count") || 0) >= 3 }
+      ];
+      const unlocked = common_vendor.index.getStorageSync("foodfind_achievements") || [];
+      this.achievements = defaultAchievements.map((a) => ({
+        ...a,
+        unlocked: unlocked.includes(a.id) || a.condition()
+      }));
+      this.achievements.forEach((a) => {
+        if (a.unlocked && !unlocked.includes(a.id)) {
+          unlocked.push(a.id);
+          common_vendor.index.setStorageSync("foodfind_achievements", unlocked);
+        }
+      });
+    },
+    checkAchievements() {
+      const unlocked = common_vendor.index.getStorageSync("foodfind_achievements") || [];
+      let newUnlock = false;
+      this.achievements.forEach((a) => {
+        if (!unlocked.includes(a.id) && a.condition()) {
+          unlocked.push(a.id);
+          newUnlock = true;
+        }
+      });
+      if (newUnlock) {
+        common_vendor.index.setStorageSync("foodfind_achievements", unlocked);
+        common_vendor.index.showToast({ title: "🏆 解锁新成就！", icon: "none", duration: 2e3 });
+      }
     }
   }
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return {
-    a: common_vendor.t($options.currentDate),
-    b: common_vendor.t($options.totalCalories),
-    c: common_vendor.t($options.totalCalories),
-    d: $options.calPercent + "%",
-    e: common_vendor.t($options.totalProtein),
-    f: common_vendor.t($options.totalFat),
-    g: common_vendor.t($options.totalCarbs),
-    h: common_vendor.f($options.gridRows, (meal, mi, i0) => {
+  var _a, _b, _c;
+  return common_vendor.e({
+    a: !$data.noCookMode
+  }, !$data.noCookMode ? common_vendor.e({
+    b: common_vendor.t($options.greetingText),
+    c: common_vendor.t($options.greetingSubText),
+    d: $data.unreadCount > 0
+  }, $data.unreadCount > 0 ? {
+    e: common_vendor.t($data.unreadCount > 9 ? "9+" : $data.unreadCount)
+  } : {}, {
+    f: $data.unreadCount > 0 ? 1 : "",
+    g: common_vendor.o((...args) => $options.showNotifications && $options.showNotifications(...args)),
+    h: common_vendor.t($data.shareBtnClicked ? "已分享" : "分享"),
+    i: $data.shareBtnClicked ? 1 : "",
+    j: common_vendor.o((...args) => $options.onShareClick && $options.onShareClick(...args)),
+    k: $options.totalCalories > 0
+  }, $options.totalCalories > 0 ? {
+    l: common_vendor.t($options.totalCalories),
+    m: common_vendor.t($options.totalProtein),
+    n: common_vendor.t($options.totalFat),
+    o: common_vendor.t($options.totalCarbs)
+  } : {}, {
+    p: common_vendor.f($options.mealSections, (section, si, i0) => {
       return {
-        a: common_vendor.t(meal.icon),
-        b: common_vendor.t(meal.title),
-        c: common_vendor.t(meal.cal),
-        d: common_vendor.f(meal.recipes, (food, fi, i1) => {
-          return {
+        a: common_vendor.t(section.icon),
+        b: common_vendor.t(section.title),
+        c: common_vendor.t($data.mealCheckIn[section.key] ? "✓" : "○"),
+        d: common_vendor.t($data.mealCheckIn[section.key] ? "已打卡" : "打卡"),
+        e: $data.mealCheckIn[section.key] ? 1 : "",
+        f: common_vendor.o(($event) => $options.markMealEaten(section.key), si),
+        g: $data.isRefreshing === section.key ? 1 : "",
+        h: common_vendor.o(($event) => $options.refreshMeal(section.key), si),
+        i: common_vendor.f(section.recipes, (food, fi, i1) => {
+          return common_vendor.e({
             a: common_vendor.t(food.image || "🍽️"),
             b: common_vendor.t(food.name),
-            c: common_vendor.t(food.nutrition.calories * $data.userCount),
-            d: food.id,
-            e: common_vendor.o(($event) => $options.viewRecipe(food), food.id)
-          };
+            c: $data.flippingCardId === food.id ? 1 : "",
+            d: $data.newCardId === food.id ? 1 : "",
+            e: $data.swipeCardId === food.id && $data.swipeOffset > 50
+          }, $data.swipeCardId === food.id && $data.swipeOffset > 50 ? {} : {}, {
+            f: $data.swipeCardId === food.id && $data.swipeOffset < -50
+          }, $data.swipeCardId === food.id && $data.swipeOffset < -50 ? {} : {}, {
+            g: $data.showSparkle && $data.sparkleCardId === food.id
+          }, $data.showSparkle && $data.sparkleCardId === food.id ? {} : {}, {
+            h: common_vendor.n($options.getCardClass(food.id)),
+            i: common_vendor.s($options.getCardStyle(food.id)),
+            j: food.id,
+            k: common_vendor.o(($event) => $options.goToDetail(food), food.id),
+            l: common_vendor.o(($event) => $options.onSwipeStart(food, section.key, $event), food.id),
+            m: common_vendor.o(($event) => $options.onSwipeMove($event), food.id),
+            n: common_vendor.o(($event) => $options.onSwipeEnd(food, section.key), food.id)
+          });
         }),
-        e: mi
+        j: si
       };
     }),
-    i: $data.scrollHeight,
-    j: common_vendor.o((...args) => $options.goToMenu && $options.goToMenu(...args)),
-    k: common_vendor.o((...args) => $options.goToMovies && $options.goToMovies(...args)),
-    l: common_vendor.o((...args) => $options.refreshMeals && $options.refreshMeals(...args))
-  };
+    q: common_vendor.o((...args) => $options.regenerateAll && $options.regenerateAll(...args)),
+    r: $data.scrollHeight,
+    s: common_vendor.o((...args) => $options.loadMore && $options.loadMore(...args)),
+    t: $data.showDeleteModal ? 1 : "",
+    v: common_vendor.o(($event) => $data.showDeleteModal = false),
+    w: common_vendor.t((_a = $data.deleteTargetFood) == null ? void 0 : _a.name),
+    x: common_vendor.o(($event) => $data.showDeleteModal = false),
+    y: common_vendor.o((...args) => $options.confirmDelete && $options.confirmDelete(...args)),
+    z: $data.showDeleteModal ? 1 : "",
+    A: common_vendor.o((...args) => $options.closeGestureGuide && $options.closeGestureGuide(...args)),
+    B: ($data.ggStage + 1) / 2 * 100 + "%",
+    C: common_vendor.t($data.ggStage + 1),
+    D: common_vendor.t($options.ggOverlayTitle),
+    E: common_vendor.t($options.ggOverlaySub),
+    F: common_vendor.t($options.ggHintIcon),
+    G: common_vendor.t($options.ggHintText),
+    H: common_vendor.n($options.ggHintClass),
+    I: common_vendor.t(((_b = $data.ggDemoFood) == null ? void 0 : _b.image) || "🍽️"),
+    J: common_vendor.t(((_c = $data.ggDemoFood) == null ? void 0 : _c.name) || "示例菜品"),
+    K: $data.ggShowSparkle
+  }, $data.ggShowSparkle ? {} : {}, {
+    L: common_vendor.n($data.ggDemoCardAnim),
+    M: common_vendor.o((...args) => $options.ggDemoCardTouchStart && $options.ggDemoCardTouchStart(...args)),
+    N: common_vendor.o((...args) => $options.ggDemoCardTouchMove && $options.ggDemoCardTouchMove(...args)),
+    O: common_vendor.o((...args) => $options.ggDemoCardTouchEnd && $options.ggDemoCardTouchEnd(...args)),
+    P: common_vendor.t($options.ggActIcon),
+    Q: common_vendor.t($options.ggActText),
+    R: common_vendor.o((...args) => $options.ggAct && $options.ggAct(...args)),
+    S: $data.ggLocked ? 1 : "",
+    T: common_vendor.o((...args) => $options.closeGestureGuide && $options.closeGestureGuide(...args)),
+    U: $data.showGestureGuide ? 1 : ""
+  }) : common_vendor.e({
+    V: common_vendor.t($options.greetingTextNoCook),
+    W: common_vendor.o((...args) => $options.takePhoto && $options.takePhoto(...args)),
+    X: common_vendor.o((...args) => $options.choosePhoto && $options.choosePhoto(...args)),
+    Y: $data.feedList.length > 0
+  }, $data.feedList.length > 0 ? {
+    Z: common_vendor.t($options.todayLabel)
+  } : {}, {
+    aa: common_vendor.f($data.feedList, (item, idx, i0) => {
+      return common_vendor.e({
+        a: item.image,
+        b: common_vendor.o(($event) => $options.previewImage(item.image), item.id),
+        c: common_vendor.t((item.fromName || "我").charAt(0)),
+        d: common_vendor.t(item.fromName || "我"),
+        e: common_vendor.t($options.formatTime(item.createdAt)),
+        f: item.isSelf
+      }, item.isSelf ? {} : {}, {
+        g: item.caption
+      }, item.caption ? {
+        h: common_vendor.t(item.caption)
+      } : {}, $data.noCookMode ? {
+        i: common_vendor.t(item.commentCount || 0),
+        j: common_vendor.o(($event) => $options.openComment(item), item.id),
+        k: common_vendor.t(item.liked ? "❤️" : "🤍"),
+        l: common_vendor.t(item.likeCount || 0),
+        m: common_vendor.o(($event) => $options.toggleLike(item), item.id)
+      } : {}, {
+        n: item.id
+      });
+    }),
+    ab: $data.noCookMode,
+    ac: $data.feedList.length === 0
+  }, $data.feedList.length === 0 ? {} : {}, {
+    ad: $data.feedScrollHeight,
+    ae: common_vendor.o((...args) => $options.loadMoreFeed && $options.loadMoreFeed(...args))
+  }), {
+    af: $data.showNotifPanel ? 1 : "",
+    ag: common_vendor.o(($event) => $data.showNotifPanel = false),
+    ah: common_vendor.o(($event) => $data.showNotifPanel = false),
+    ai: common_vendor.f($data.notifList, (n, i, i0) => {
+      return {
+        a: common_vendor.t(n.type === "checkin" ? "🍽️" : n.type === "comment" ? "💬" : n.type === "vote" ? "🗳️" : "🔔"),
+        b: common_vendor.t(n.fromName),
+        c: common_vendor.t(n.content),
+        d: common_vendor.t($options.formatTime(n.createdAt)),
+        e: i,
+        f: !n.read ? 1 : ""
+      };
+    }),
+    aj: $data.notifList.length === 0
+  }, $data.notifList.length === 0 ? {} : {}, {
+    ak: $data.showNotifPanel ? 1 : "",
+    al: $data.showCommentModal ? 1 : "",
+    am: common_vendor.o(($event) => $data.showCommentModal = false),
+    an: common_vendor.o(($event) => $data.showCommentModal = false),
+    ao: common_vendor.f($data.commentList, (c, i, i0) => {
+      return {
+        a: common_vendor.t(c.fromName.charAt(0)),
+        b: common_vendor.t(c.fromName),
+        c: common_vendor.t(c.content),
+        d: common_vendor.t($options.formatTime(c.createdAt)),
+        e: i
+      };
+    }),
+    ap: $data.commentList.length === 0
+  }, $data.commentList.length === 0 ? {} : {}, {
+    aq: common_vendor.o((...args) => $options.submitComment && $options.submitComment(...args)),
+    ar: $data.commentInput,
+    as: common_vendor.o(($event) => $data.commentInput = $event.detail.value),
+    at: common_vendor.o((...args) => $options.submitComment && $options.submitComment(...args)),
+    av: $data.showCommentModal ? 1 : "",
+    aw: $data.showVoteModal ? 1 : "",
+    ax: common_vendor.o(($event) => $data.showVoteModal = false),
+    ay: common_vendor.o(($event) => $data.showVoteModal = false),
+    az: !$data.currentVote
+  }, !$data.currentVote ? common_vendor.e({
+    aA: $data.voteTitle,
+    aB: common_vendor.o(($event) => $data.voteTitle = $event.detail.value),
+    aC: common_vendor.f($data.voteOptions, (opt, i, i0) => {
+      return common_vendor.e({
+        a: "选项" + (i + 1),
+        b: $data.voteOptions[i],
+        c: common_vendor.o(($event) => $data.voteOptions[i] = $event.detail.value, i)
+      }, $data.voteOptions.length > 2 ? {
+        d: common_vendor.o(($event) => $options.removeVoteOption(i), i)
+      } : {}, {
+        e: i
+      });
+    }),
+    aD: $data.voteOptions.length > 2,
+    aE: $data.voteOptions.length < 5
+  }, $data.voteOptions.length < 5 ? {
+    aF: common_vendor.o((...args) => $options.addVoteOption && $options.addVoteOption(...args))
+  } : {}, {
+    aG: common_vendor.o((...args) => $options.createVoteAction && $options.createVoteAction(...args))
+  }) : {}, {
+    aH: $data.currentVote
+  }, $data.currentVote ? {
+    aI: common_vendor.t($data.currentVote.title),
+    aJ: common_vendor.f($data.currentVote.options, (opt, i, i0) => {
+      return {
+        a: common_vendor.t(opt.text),
+        b: common_vendor.t(opt.count),
+        c: $options.getVotePercent(opt, $data.currentVote) + "%",
+        d: i,
+        e: common_vendor.o(($event) => $options.doVote(i), i)
+      };
+    }),
+    aK: common_vendor.t($data.currentVote.status === "active" ? "投票进行中" : "投票已结束")
+  } : {}, {
+    aL: $data.showVoteModal ? 1 : "",
+    aM: $data.showAchievementModal ? 1 : "",
+    aN: common_vendor.o(($event) => $data.showAchievementModal = false),
+    aO: common_vendor.o(($event) => $data.showAchievementModal = false),
+    aP: common_vendor.f($data.achievements, (a, i, i0) => {
+      return {
+        a: common_vendor.t(a.icon),
+        b: common_vendor.t(a.name),
+        c: common_vendor.t(a.desc),
+        d: common_vendor.t(a.unlocked ? "✓ 已解锁" : "🔒 未解锁"),
+        e: i,
+        f: a.unlocked ? 1 : ""
+      };
+    }),
+    aQ: common_vendor.t($data.streakDays),
+    aR: common_vendor.o(($event) => $data.showAchievementModal = false),
+    aS: $data.showAchievementModal ? 1 : "",
+    aT: $data.noCookMode && $data.pairId
+  }, $data.noCookMode && $data.pairId ? {
+    aU: common_vendor.o(($event) => $data.showVoteModal = true)
+  } : {}, {
+    aV: $data.noCookMode
+  }, $data.noCookMode ? {
+    aW: common_vendor.o(($event) => $data.showAchievementModal = true)
+  } : {}, {
+    aX: $data.pageEnter ? 1 : ""
+  });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-83a5a03c"]]);
+_sfc_main.__runtimeHooks = 2;
 wx.createPage(MiniProgramPage);

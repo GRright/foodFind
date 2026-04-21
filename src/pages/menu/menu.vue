@@ -205,17 +205,13 @@ export default {
     this.initCalendar()
     this.loadWeeklyCache()
     this.loadUserPrefs()
-    this.loadSparkData()
-    this.loadPairStats()
   },
   onShow() {
     this.pageEnter = true
-    setTimeout(() => { this.pageEnter = false }, 400)
+    setTimeout(() => { this.pageEnter = false }, 300)
     if (this.currentMonday) {
       const cached = uni.getStorageSync('foodfind_weekly')
       if (cached) this.weeklyData = cached
-      this.loadSparkData()
-      this.loadPairStats()
     }
   },
   methods: {

@@ -524,17 +524,23 @@ export default {
       return texts[this.ggStage] || '知道了'
     }
   },
+  onLoad() {
+    this.loadMode()
+    this.loadPairId()
+    this.loadTodayCheckIn()
+    this.loadStreak()
+    this.loadAchievements()
+    this.checkGestureGuide()
+  },
   onShow() {
     this.shareBtnClicked = false
     this.pageEnter = true
-    setTimeout(() => { this.pageEnter = false }, 400)
-    this.loadMode()
-    this.loadPairId()
+    setTimeout(() => { this.pageEnter = false }, 300)
     if (this.noCookMode) {
       this.loadFeed()
-    }
-    else {
+    } else {
       this.loadMeals()
+      this.loadTodayCheckIn()
     }
   },
   methods: {

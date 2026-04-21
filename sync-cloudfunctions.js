@@ -23,10 +23,10 @@ function fixProjectConfig() {
       const raw = fs.readFileSync(configPath, 'utf-8')
       const cfg = JSON.parse(raw)
       let changed = false
-      if (!cfg.cloudfunctionRoot) { cfg.cloudfunctionRoot = './cloudfunctions/'; changed = true }
+      if (cfg.cloudfunctionRoot) { delete cfg.cloudfunctionRoot; changed = true }
       if (!cfg.setting) { cfg.setting = {} }
       if (cfg.setting.bigPackageSizeSupport !== true) { cfg.setting.bigPackageSizeSupport = true; changed = true }
-      if (changed) { fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2), 'utf-8'); console.log('  ✅ project.config.json 已更新 (cloudfunctionRoot + bigPackageSizeSupport)') }
+      if (changed) { fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2), 'utf-8'); console.log('  ✅ project.config.json 已更新') }
     } catch(e) { console.log('  ⚠️  project.config.json 修复失败:', e.message) }
   }
 

@@ -90,8 +90,6 @@
 </template>
 
 <script>
-import { ALL_RECIPES } from '@/utils/constants.js'
-
 export default {
   data() {
     return {
@@ -162,8 +160,6 @@ export default {
       const todayCheck = checks[dateStr]
       if (todayCheck) {
         const meals = []
-        const allRecipes = [...ALL_RECIPES.breakfast, ...ALL_RECIPES.lunch, ...ALL_RECIPES.dinner]
-        
         if (todayCheck.breakfast) meals.push('早餐')
         if (todayCheck.lunch) meals.push('午餐')
         if (todayCheck.dinner) meals.push('晚餐')

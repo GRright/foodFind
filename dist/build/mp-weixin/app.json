@@ -6,7 +6,8 @@
     "pages/onboarding/onboarding",
     "pages/recipe-detail/recipe-detail",
     "pages/share/share",
-    "pages/invite/invite"
+    "pages/invite/invite",
+    "pages/foodDiary/foodDiary"
   ],
   "window": {
     "navigationBarTextStyle": "black",

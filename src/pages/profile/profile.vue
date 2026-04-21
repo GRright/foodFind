@@ -56,7 +56,7 @@
                 <text class="menu-label">等待对方接受邀请...</text>
                 <text class="menu-desc">已发送邀请，请分享给TA</text>
               </view>
-              <button class="resend-btn" open-type="share" @click="onResendInvite">
+              <button class="resend-btn" @click="onResendInvite">
                 <text class="resend-text">再次发送</text>
               </button>
             </view>
@@ -392,6 +392,8 @@ export default {
       pageEnter: true,
       showFavoritesModal: false,
       favorites: [],
+      _weeklyCheckInDays: 0,
+      _myMealCount: 0,
       prefs: {
         noCookMode: false,
         userType: 'adult',
@@ -469,13 +471,7 @@ export default {
       return `连续${days}天好好吃饭，太棒了！继续加油！`
     },
     weeklyCheckInDays() {
-      const checks = uni.getStorageSync('foodfind_personal_checks') || {}
-      let days = 0
-      Object.keys(checks).forEach(date => {
-        const day = checks[date]
-        if (day.breakfast || day.lunch || day.dinner) days++
-      })
-      return days
+      return this._weeklyCheckInDays
     },
     prefSummaryText() {
       const parts = []
@@ -503,15 +499,7 @@ export default {
       return Math.round(this.myWeeklyMeals.reduce((sum, m) => sum + (m.nutrition?.protein || 0), 0))
     },
     myMealCount() {
-      const checks = uni.getStorageSync('foodfind_personal_checks') || {}
-      let count = 0
-      Object.keys(checks).forEach(date => {
-        const day = checks[date]
-        if (day.breakfast) count++
-        if (day.lunch) count++
-        if (day.dinner) count++
-      })
-      return count
+      return this._myMealCount
     },
     partnerMealCount() {
       return Math.max(0, this.myMealCount + Math.floor(Math.random() * 3))
@@ -543,16 +531,27 @@ export default {
   },
   onShow() {
     this.pageEnter = true
-    setTimeout(() => { this.pageEnter = false }, 400)
+    setTimeout(() => { this.pageEnter = false }, 300)
     this.loadPairInfo()
     this.loadPrefs()
-    this.loadMyWeeklyMeals()
+    this.loadCachedStats()
     this.loadFavorites()
-    if (this.hasPartner && this.pairStatus === 'paired') {
-      this.loadPairStats()
-    }
   },
   methods: {
+    loadCachedStats() {
+      const checks = uni.getStorageSync('foodfind_personal_checks') || {}
+      let days = 0
+      let count = 0
+      Object.keys(checks).forEach(date => {
+        const day = checks[date]
+        if (day.breakfast || day.lunch || day.dinner) days++
+        if (day.breakfast) count++
+        if (day.lunch) count++
+        if (day.dinner) count++
+      })
+      this._weeklyCheckInDays = days
+      this._myMealCount = count
+    },
     loadPrefs() {
       const cached = uni.getStorageSync('foodfind_detailed_prefs')
       if (cached) { this.prefs = { ...this.prefs, ...cached } }
@@ -586,6 +585,7 @@ export default {
       this.showReportModal = true
       this.loadWeeklyReport()
       this.loadMyWeeklyMeals()
+      this.loadCachedStats()
     },
     closeReport() { this.showReportModal = false },
     loadWeeklyReport() {
