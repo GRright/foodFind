@@ -1,6 +1,0 @@
-{
-  "name": "sendFamilyNotification",
-  "version": "1.0.0",
-  "description": "发送家庭通知",
-  "main": "index.js"
-}

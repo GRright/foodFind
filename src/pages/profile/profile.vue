@@ -246,7 +246,7 @@
         <view class="rm-close" @click="closeReport"><text class="pm-close-txt">✕</text></view>
       </view>
 
-      <scroll-view scroll-y class="rm-body">
+      <scroll-view scroll-y class="rm-body" :style="{ height: 'calc(88vh - 200rpx)' }">
         <view class="rm-hero">
           <view class="rmh-content">
             <view v-if="reportMode === 'solo'" class="rmh-solo">
@@ -442,12 +442,12 @@
 
     <!-- 我的信息弹窗 -->
     <view class="special-modal-mask" :class="{ show: showMyInfoModal }" @click="showMyInfoModal = false"></view>
-    <view class="special-modal" :class="{ show: showMyInfoModal }">
+    <view class="special-modal" :class="{ show: showMyInfoModal }" style="height:75vh;">
       <view class="spm-header">
         <text class="spm-title">👤 我的信息</text>
         <view class="spm-close" @click="showMyInfoModal = false"><text>✕</text></view>
       </view>
-      <scroll-view scroll-y class="spm-body">
+      <scroll-view scroll-y class="spm-body" :style="{ height: 'calc(75vh - 180rpx)' }">
         <!-- 生日和纪念日 -->
         <view class="spm-section-title">🎂 生日与纪念日</view>
         <view class="spm-special-list" v-for="(d, i) in specialDates" :key="i">
@@ -777,25 +777,32 @@ export default {
     loadMyWeeklyMeals() {
       const meals = []
       const allRecipes = [...ALL_RECIPES.breakfast, ...ALL_RECIPES.lunch, ...ALL_RECIPES.dinner]
-      const cachedDate = uni.getStorageSync('foodfind_meals_date')
-      const cachedMeals = uni.getStorageSync('foodfind_meals')
-      if (cachedDate && cachedMeals) {
-        for (let i = 6; i >= 0; i--) {
-          const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0]
-          if (cachedDate === d) {
-            ;['breakfast', 'lunch', 'dinner'].forEach(mealType => {
-              if (cachedMeals[mealType]) {
-                cachedMeals[mealType].forEach(food => {
-                  const recipe = allRecipes.find(r => r.id === food.id)
-                  if (recipe) meals.push({ ...recipe, mealType, date: d })
-                })
-              }
+      const checks = uni.getStorageSync('foodfind_personal_checks') || {}
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0]
+        const dayChecks = checks[d] || {}
+        const dayMeals = uni.getStorageSync('foodfind_meals_date') === d
+          ? uni.getStorageSync('foodfind_meals') || {}
+          : this._getWeeklyMealsForDate(d)
+        ;['breakfast', 'lunch', 'dinner'].forEach(mealType => {
+          if (dayChecks[mealType] && dayMeals[mealType]) {
+            dayMeals[mealType].forEach(food => {
+              const recipe = allRecipes.find(r => r.id === food.id)
+              if (recipe) meals.push({ ...recipe, mealType, date: d })
             })
           }
-        }
+        })
       }
       this.myWeeklyMeals = meals
       this._weeklyNutritionCache = null
+    },
+    _getWeeklyMealsForDate(dateStr) {
+      const weeklyKey = 'foodfind_weekly_' + dateStr
+      const weeklyMeals = uni.getStorageSync('foodfind_weekly')
+      if (weeklyMeals && weeklyMeals[dateStr]) {
+        return weeklyMeals[dateStr]
+      }
+      return { breakfast: [], lunch: [], dinner: [] }
     },
     calcWeeklyNutrition() {
       return this.myWeeklyMeals.reduce((acc, m) => {
@@ -1360,7 +1367,7 @@ export default {
   position:fixed; left:0; right:0; bottom:0;
   background:#fafafa; border-radius:40rpx 40rpx 0 0;
   z-index:1000; transform:translateY(100%); transition:transform .4s cubic-bezier(.175,.885,.32,1.275);
-  max-height:88vh; display:flex; flex-direction:column;
+  height:88vh; display:flex; flex-direction:column;
   box-shadow:0 -10rpx 60rpx rgba(0,0,0,.15);
   &.show { transform:translateY(0); }
 }
@@ -1373,7 +1380,7 @@ export default {
 .rm-title { font-size:36rpx; font-weight:800; color:#1a1a1a; letter-spacing:-1rpx; }
 .rm-subtitle { font-size:23rpx; color:#999; }
 
-.rm-body { flex:1; overflow:hidden; padding:0 32rpx 24rpx; box-sizing:border-box; }
+.rm-body { flex:1; padding:0 32rpx 24rpx; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 
 .rm-hero {
   position:relative; border-radius:28rpx; overflow:hidden;
@@ -1630,7 +1637,7 @@ export default {
   background:#f5f5f5; display:flex; align-items:center; justify-content:center;
   &:active { background:#eee; }
 }
-.spm-body { flex:1; overflow:hidden; padding:0 28rpx 40rpx; }
+.spm-body { flex:1; padding:0 28rpx 40rpx; overflow-y:auto; -webkit-overflow-scrolling:touch; box-sizing:border-box; }
 .spm-section-title {
   display:block; font-size:28rpx; font-weight:700; color:#1a1a1a;
   margin-bottom:16rpx; padding-bottom:8rpx;
@@ -1662,6 +1669,7 @@ export default {
   width:100%; height:76rpx; padding:0 20rpx;
   background:#f5f6f8; border-radius:14rpx;
   font-size:28rpx; color:#333;
+  box-sizing:border-box;
 }
 .spm-type-row { display:flex; gap:16rpx; }
 .spm-type-btn {
@@ -1675,6 +1683,7 @@ export default {
   height:76rpx; display:flex; align-items:center;
   padding:0 20rpx; background:#f5f6f8; border-radius:14rpx;
   font-size:28rpx; color:#07c160; font-weight:600;
+  box-sizing:border-box;
 }
 .spm-save-btn {
   margin-top:12rpx; height:86rpx;
