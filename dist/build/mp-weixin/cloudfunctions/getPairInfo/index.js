@@ -2,11 +2,13 @@ const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
+
 exports.main = async (event) => {
   try {
     const openid = cloud.getWXContext().OPENID
     const pairId = event ? event.pairId : null
     let pair
+
     if (pairId) {
       const r = await db.collection('pairs').where({ pairId }).get()
       if (r.data.length === 0) {
@@ -26,15 +28,16 @@ exports.main = async (event) => {
       }
       pair = r.data[0]
     }
+
     const isInviter = pair.inviterOpenid === openid
     return {
       code: 0,
       hasPair: true,
       data: {
         pairId: pair.pairId,
-        partnerName: isInviter ? (pair.accepterName || 'TA') : (pair.inviterName || 'æˆ?),
+        partnerName: isInviter ? (pair.accepterName || 'TA') : (pair.inviterName || 'TA'),
         partnerOpenid: isInviter ? pair.accepterOpenid : pair.inviterOpenid,
-        inviterName: pair.inviterName || 'æˆ?,
+        inviterName: pair.inviterName || 'TA',
         accepterName: pair.accepterName || 'TA',
         relationType: pair.relationType || 'friend',
         status: pair.status,
