@@ -572,17 +572,28 @@ export default {
     },
     mealSections() {
       if (!this.dailyMeals) return []
-      return [
+      const today = new Date()
+      const isWeekend = today.getDay() === 0 || today.getDay() === 6
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      const mealConfig = prefs.mealConfig || { weekday: ['dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
+      const activeMeals = isWeekend ? mealConfig.weekend : mealConfig.weekday
+      const sections = [
         { key: 'breakfast', title: '早餐', icon: '☀', recipes: this.dailyMeals.breakfast || [] },
         { key: 'lunch', title: '午餐', icon: '🌞', recipes: this.dailyMeals.lunch || [] },
         { key: 'dinner', title: '晚餐', icon: '🌙', recipes: this.dailyMeals.dinner || [] }
       ]
+      return sections.filter(s => activeMeals.includes(s.key))
     },
     totalCalories() {
       if (this._nutritionCache) return this._nutritionCache.calories
       if (!this.dailyMeals) return 0
+      const today = new Date()
+      const isWeekend = today.getDay() === 0 || today.getDay() === 6
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      const mealConfig = prefs.mealConfig || { weekday: ['dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
+      const activeMeals = isWeekend ? mealConfig.weekend : mealConfig.weekday
       let c = 0, p = 0, f = 0, cb = 0
-      ;['breakfast','lunch','dinner'].forEach(k => {
+      activeMeals.forEach(k => {
         (this.dailyMeals[k]||[]).forEach(r => {
           c += r.nutrition?.calories||0
           p += r.nutrition?.protein||0

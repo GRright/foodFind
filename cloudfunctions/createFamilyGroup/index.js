@@ -19,10 +19,22 @@ exports.main = async (event) => {
       return { success: false, error: '名称格式不正确' }
     }
 
+    // 确保集合存在（自动创建）
+    try {
+      await db.createCollection('families')
+    } catch (e) {
+      // 集合已存在或其他错误，忽略
+    }
+
     // 检查用户是否已经属于某个家庭
-    const existingFamily = await db.collection('families').where({
-      members: _.elemMatch({ userId: OPENID })
-    }).get()
+    let existingFamily
+    try {
+      existingFamily = await db.collection('families').where({
+        members: _.elemMatch({ userId: OPENID })
+      }).get()
+    } catch (e) {
+      existingFamily = { data: [] }
+    }
 
     if (existingFamily.data.length > 0) {
       return { success: false, error: '您已经属于一个家庭群组' }

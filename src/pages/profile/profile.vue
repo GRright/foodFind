@@ -233,7 +233,7 @@
     </view>
 
     <view class="version-info">
-      <text class="version-text">吃点啥 v2.5.3 · 交互体验优化版</text>
+      <text class="version-text">吃点啥 v2.6.3 · 系统安全加固版</text>
     </view>
 
     <view class="report-modal-mask" :class="{ show: showReportModal }" @click="closeReport"></view>
@@ -492,17 +492,6 @@
         <view class="spm-row">
           <text class="spm-label">体重 (kg)</text>
           <input class="spm-input" type="number" v-model.number="myInfo.weight" placeholder="如：65" />
-        </view>
-
-        <!-- 饮食偏好 -->
-        <view class="spm-section-title" style="margin-top:24rpx;">🥗 饮食偏好</view>
-        <view class="spm-row">
-          <text class="spm-label">过敏食物</text>
-          <input class="spm-input" v-model="myInfo.allergies" placeholder="如：花生、海鲜" maxlength="50" />
-        </view>
-        <view class="spm-row">
-          <text class="spm-label">忌口</text>
-          <input class="spm-input" v-model="myInfo.dietary" placeholder="如：不吃辣、少油" maxlength="50" />
         </view>
 
         <view class="spm-save-btn" style="margin-top:24rpx;" @click="saveMyInfo">
@@ -826,6 +815,7 @@ export default {
     },
     openReport() {
       this.showReportModal = true
+      this._weeklyNutritionCache = null
       this.loadWeeklyReport()
       this.loadMyWeeklyMeals()
       this.loadCachedStats()
@@ -1080,7 +1070,7 @@ export default {
 
     showAbout() {
       uni.showModal({
-        title: '关于吃点啥 v2.5.3', content: '为情侣/家人打造的共同决策吃什么的小工具\n\n✅ 智能一周菜单规划\n✅ 荤素营养均衡算法\n✅ 云端配对，跨设备同步\n✅ 分享菜单+双向确认\n✅ 互动打卡+火花系统\n✅ 本周饮食报告+营养饼图\n✅ 喜欢/不喜欢标记菜品\n✅ 生日/纪念日特别菜单\n✅ 家庭群组功能\n✅ 智能购物清单', showCancel: false, confirmText: '知道了'
+        title: '关于吃点啥 v2.6.3', content: '为情侣/家人打造的共同决策「今天吃什么」的微信小程序\n\n智能推荐 · 营养均衡 · 云端同步 · 家庭共享', showCancel: false, confirmText: '知道了'
       })
     },
     loadFavorites() {
@@ -1302,6 +1292,12 @@ export default {
   background:#f5f5f5; display:flex; align-items:center; justify-content:center;
   &:active { background:#eee; }
 }
+.rm-close {
+  width:72rpx; height:72rpx; border-radius:50%;
+  background:#f5f5f5; display:flex; align-items:center; justify-content:center;
+  margin:-8rpx -8rpx 0 0;
+  &:active { background:#eee; }
+}
 .pm-close-txt { font-size:28rpx; color:#999; }
 
 .pm-body { flex:1; overflow:hidden; padding:0 28rpx 20rpx; box-sizing:border-box; }
@@ -1380,7 +1376,7 @@ export default {
 .rm-title { font-size:36rpx; font-weight:800; color:#1a1a1a; letter-spacing:-1rpx; }
 .rm-subtitle { font-size:23rpx; color:#999; }
 
-.rm-body { flex:1; padding:0 32rpx 24rpx; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.rm-body { flex:1; padding:0 32rpx 24rpx; overflow-y:auto; -webkit-overflow-scrolling:touch; box-sizing:border-box; }
 
 .rm-hero {
   position:relative; border-radius:28rpx; overflow:hidden;

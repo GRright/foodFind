@@ -67,9 +67,9 @@
           <view class="spark-icon" v-if="d.sparkLevel === 1"><text class="si-txt">🔥</text></view>
           <view class="spark-icon double" v-else-if="d.sparkLevel >= 2"><text class="si-txt">🔥🔥</text></view>
           <view class="dot-row" v-if="d.hasData && d.sparkLevel === 0">
-            <view class="nutri-dot b-dot"></view>
-            <view class="nutri-dot l-dot"></view>
-            <view class="nutri-dot d-dot"></view>
+            <view class="nutri-dot" :class="{ 'checked': d.checkInStatus.breakfast, 'unchecked': !d.checkInStatus.breakfast }"></view>
+            <view class="nutri-dot" :class="{ 'checked': d.checkInStatus.lunch, 'unchecked': !d.checkInStatus.lunch }"></view>
+            <view class="nutri-dot" :class="{ 'checked': d.checkInStatus.dinner, 'unchecked': !d.checkInStatus.dinner }"></view>
           </view>
         </view>
       </view>
@@ -164,6 +164,7 @@ export default {
       const today = new Date()
       today.setHours(0,0,0,0)
       const weekNames = ['一','二','三','四','五','六','日']
+      const checks = uni.getStorageSync('foodfind_personal_checks') || {}
       for (let i = 0; i < 7; i++) {
         const d = new Date(this.currentMonday)
         d.setDate(d.getDate() + i)
@@ -171,6 +172,7 @@ export default {
 
         const sparkRecord = this.sparkData.find(s => s.date === ds)
         const sparkLevel = sparkRecord ? sparkRecord.sparkLevel : 0
+        const dayChecks = checks[ds] || {}
 
         days.push({
           date: d,
@@ -180,7 +182,12 @@ export default {
           isActive: this.selectedDate ? ds === this.dateToStr(this.selectedDate) : false,
           hasData: !!this.weeklyData[ds],
           dateStr: ds,
-          sparkLevel
+          sparkLevel,
+          checkInStatus: {
+            breakfast: !!dayChecks.breakfast,
+            lunch: !!dayChecks.lunch,
+            dinner: !!dayChecks.dinner
+          }
         })
       }
       return days
@@ -506,10 +513,9 @@ export default {
 }
 
 .dot-row { display:flex; gap:6rpx; margin-top:8rpx; }
-.nutri-dot { width:10rpx; height:10rpx; border-radius:50%; }
-.b-dot { background:#ccc; }
-.l-dot { background:#ccc; }
-.d-dot { background:#ccc; }
+.nutri-dot { width:10rpx; height:10rpx; border-radius:50%; transition:all .3s ease; }
+.nutri-dot.checked { background:#07c160; }
+.nutri-dot.unchecked { background:#ddd; }
 
 .spark-icon {
   position:absolute; bottom:4rpx;

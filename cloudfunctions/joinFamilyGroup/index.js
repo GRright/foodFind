@@ -18,6 +18,11 @@ exports.main = async (event) => {
       return { success: false, error: '邀请码格式不正确' }
     }
 
+    // 确保集合存在
+    try {
+      await db.createCollection('families')
+    } catch (e) {}
+
     const familyResult = await db.collection('families').where({
       inviteCode: inviteCode
     }).get()
