@@ -38,22 +38,24 @@
         </view>
 
         <view class="dc-custom" v-else>
-          <view class="dc-custom-input-row">
-            <text class="dc-custom-label">准备</text>
-            <view class="dc-custom-number-box">
-              <view class="dc-custom-minus" @click="adjustDays(-1)">−</view>
-              <input 
-                class="dc-custom-input" 
-                type="number" 
-                v-model="config.customDays" 
-                @blur="onDaysInputBlur"
-                @confirm="onDaysInputConfirm"
-              />
-              <view class="dc-custom-plus" @click="adjustDays(1)">+</view>
+          <scroll-view scroll-x class="dc-days-scroll" :show-scrollbar="false">
+            <view class="dc-days-list">
+              <view 
+                class="dc-day-item" 
+                :class="{ active: config.customDays === day }" 
+                v-for="day in 14" 
+                :key="day"
+                @click="selectDay(day)"
+              >
+                <text class="dc-day-num">{{ day }}</text>
+                <text class="dc-day-text">天</text>
+              </view>
             </view>
-            <text class="dc-custom-unit">天</text>
+          </scroll-view>
+          <view class="dc-selected-info">
+            <text class="dc-selected-label">已选</text>
+            <text class="dc-selected-value">{{ config.customDays }} 天</text>
           </view>
-          <text class="dc-custom-hint">可输入 1-14 天</text>
         </view>
       </view>
 
@@ -286,6 +288,12 @@ export default {
     },
     setPreset(mode) {
       this.config.mode = mode
+      this.saveConfig()
+      this.loadShoppingList()
+      setTimeout(() => { this.autoGenerateIfEmpty() }, 100)
+    },
+    selectDay(day) {
+      this.config.customDays = day
       this.saveConfig()
       this.loadShoppingList()
       setTimeout(() => { this.autoGenerateIfEmpty() }, 100)
@@ -627,33 +635,41 @@ export default {
 .dpi-emoji { font-size: 32rpx; margin-bottom: 6rpx; }
 .dpi-label { font-size: 22rpx; color: #666; }
 
-.dc-custom { display: flex; flex-direction: column; gap: 12rpx; width: 100%; }
-.dc-custom-input-row {
-  display: flex; align-items: center; justify-content: center;
-  gap: 16rpx; padding: 20rpx 0;
+.dc-custom { display: flex; flex-direction: column; gap: 16rpx; width: 100%; }
+.dc-days-scroll {
+  width: 100%; white-space: nowrap;
 }
-.dc-custom-label { font-size: 28rpx; color: #333; }
-.dc-custom-unit { font-size: 28rpx; color: #333; }
-.dc-custom-number-box {
-  display: flex; align-items: center;
-  background: #f5f6f8; border-radius: 16rpx;
-  overflow: hidden;
+.dc-days-list {
+  display: inline-flex; gap: 12rpx; padding: 8rpx 0;
 }
-.dc-custom-minus, .dc-custom-plus {
-  width: 80rpx; height: 80rpx;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32rpx; color: #07c160; font-weight: 600;
-  &:active { background: #e8f7ef; }
+.dc-day-item {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  min-width: 80rpx; height: 88rpx; padding: 0 16rpx;
+  background: #f5f6f8; border-radius: 20rpx;
+  border: 2rpx solid transparent;
+  transition: all .2s ease; flex-shrink: 0;
+  &:active { transform: scale(.95); }
+  &.active {
+    background: linear-gradient(135deg, #07c160, #06ae56);
+    border-color: #07c160;
+    box-shadow: 0 4rpx 16rpx rgba(7, 193, 96, .3);
+  }
 }
-.dc-custom-input {
-  width: 100rpx; height: 80rpx;
-  text-align: center; font-size: 36rpx; font-weight: 700; color: #07c160;
-  background: #fff; border-radius: 12rpx;
-  margin: 0 8rpx;
+.dc-day-num {
+  font-size: 32rpx; font-weight: 700; color: #333;
+  line-height: 1.2;
 }
-.dc-custom-hint {
-  text-align: center; font-size: 22rpx; color: #999;
+.dc-day-item.active .dc-day-num { color: #fff; }
+.dc-day-text {
+  font-size: 18rpx; color: #999;
+  line-height: 1.2;
 }
+.dc-day-item.active .dc-day-text { color: rgba(255,255,255,.85); }
+.dc-selected-info {
+  display: flex; align-items: center; justify-content: center; gap: 8rpx;
+}
+.dc-selected-label { font-size: 24rpx; color: #999; }
+.dc-selected-value { font-size: 26rpx; font-weight: 600; color: #07c160; }
 
 .meal-config-entry {
   display: flex; align-items: center; justify-content: space-between;

@@ -1,7 +1,37 @@
 <template>
   <view class="page" :class="{ 'page-enter': pageEnter }">
+    <!-- 骨架屏 -->
+    <view class="skeleton-container" v-if="!pageReady">
+      <view class="skeleton-header">
+        <view class="skeleton-greeting">
+          <view class="skeleton-line skeleton-line-short"></view>
+          <view class="skeleton-line skeleton-line-shorter"></view>
+        </view>
+        <view class="skeleton-actions">
+          <view class="skeleton-btn"></view>
+          <view class="skeleton-btn"></view>
+        </view>
+      </view>
+      <view class="skeleton-calorie">
+        <view class="skeleton-line skeleton-line-long"></view>
+      </view>
+      <view class="skeleton-meals">
+        <view class="skeleton-meal-section" v-for="i in 3" :key="i">
+          <view class="skeleton-meal-header">
+            <view class="skeleton-line skeleton-line-short"></view>
+          </view>
+          <view class="skeleton-food-row">
+            <view class="skeleton-food-card" v-for="j in 3" :key="j">
+              <view class="skeleton-food-icon"></view>
+              <view class="skeleton-line skeleton-line-card"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <!-- ===== 做饭模式（默认）===== -->
-    <template v-if="!noCookMode">
+    <template v-if="!noCookMode && pageReady">
       <view class="header fade-in">
         <view class="header-top">
           <view class="header-left">
@@ -609,6 +639,11 @@ export default {
     setTimeout(() => { this.pageEnter = false }, 300)
     this.loadMeals()
     this.loadTodayCheckIn()
+    const openSpecial = uni.getStorageSync('foodfind_open_special')
+    if (openSpecial === '1') {
+      uni.removeStorageSync('foodfind_open_special')
+      setTimeout(() => { this.showSpecialModal = true }, 500)
+    }
   },
   methods: {
     getSwipeOpacity() {
@@ -1196,6 +1231,34 @@ export default {
 @keyframes pageEnter {
   from { opacity: 0; transform: translateY(20rpx); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Skeleton Screen ===== */
+.skeleton-container { padding:56rpx 0 24rpx; }
+.skeleton-header {
+  display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32rpx;
+}
+.skeleton-greeting { flex:1; }
+.skeleton-actions { display:flex; gap:16rpx; }
+.skeleton-btn { width:80rpx; height:56rpx; background:#e0e0e0; border-radius:28rpx; }
+.skeleton-calorie { margin-bottom:24rpx; }
+.skeleton-meal-section { margin-bottom:32rpx; }
+.skeleton-meal-header { margin-bottom:16rpx; }
+.skeleton-food-row { display:flex; gap:16rpx; }
+.skeleton-food-card {
+  flex:1; height:220rpx; background:#e8e8e8; border-radius:20rpx;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16rpx;
+  padding:20rpx;
+}
+.skeleton-food-icon { width:80rpx; height:80rpx; background:#d0d0d0; border-radius:50%; }
+.skeleton-line { background:#e0e0e0; border-radius:8rpx; height:24rpx; animation: skeletonPulse 1.5s ease-in-out infinite; }
+.skeleton-line-short { width:140rpx; margin-bottom:12rpx; }
+.skeleton-line-shorter { width:100rpx; }
+.skeleton-line-long { width:280rpx; height:32rpx; }
+.skeleton-line-card { width:80%; height:20rpx; }
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 /* ===== Header ===== */

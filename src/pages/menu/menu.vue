@@ -1,11 +1,44 @@
 <template>
   <view class="page" :class="{ 'page-enter': pageEnter }">
-    <view class="header fade-in">
+    <!-- 骨架屏 -->
+    <view class="skeleton-container" v-if="isLoading">
+      <view class="skeleton-header">
+        <view class="skeleton-line skeleton-line-short"></view>
+        <view class="skeleton-line skeleton-line-shorter"></view>
+      </view>
+      <view class="skeleton-calendar">
+        <view class="skeleton-cal-nav">
+          <view class="skeleton-line skeleton-line-nav"></view>
+        </view>
+        <view class="skeleton-week">
+          <view class="skeleton-day-cell" v-for="i in 7" :key="i">
+            <view class="skeleton-dot"></view>
+            <view class="skeleton-line skeleton-line-day"></view>
+          </view>
+        </view>
+      </view>
+      <view class="skeleton-action">
+        <view class="skeleton-btn"></view>
+      </view>
+      <view class="skeleton-meals" v-for="i in 3" :key="i">
+        <view class="skeleton-meal-header">
+          <view class="skeleton-line skeleton-line-short"></view>
+        </view>
+        <view class="skeleton-food-row">
+          <view class="skeleton-food-card" v-for="j in 3" :key="j">
+            <view class="skeleton-food-icon"></view>
+            <view class="skeleton-line skeleton-line-card"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="header fade-in" v-if="!isLoading">
       <text class="header-title">一周菜单</text>
       <text class="header-sub">点击日期查看 · 智能荤素搭配</text>
     </view>
 
-    <view class="spark-banner pop-in" v-if="pairStats && pairStats.consecutiveShareDays > 0" style="animation-delay:0.1s;opacity:0">
+    <view class="spark-banner pop-in" v-if="!isLoading && pairStats && pairStats.consecutiveShareDays > 0" style="animation-delay:0.1s;opacity:0">
       <view class="spark-icon-wrap"><text class="spark-emoji">🔥</text></view>
       <view class="spark-info">
         <text class="spark-main">{{ pairStats.consecutiveShareDays }}天连续互动</text>
@@ -14,7 +47,7 @@
       <view class="spark-badge" v-if="pairStats.consecutiveShareDays >= 7"><text class="badge-txt">💎</text></view>
     </view>
 
-    <view class="calendar-wrap slide-up" style="animation-delay:0.08s">
+    <view class="calendar-wrap slide-up" style="animation-delay:0.08s" v-if="!isLoading">
       <view class="cal-nav">
         <view class="nav-btn" @click="prevWeek"><text class="nav-arrow">◀</text><text class="nav-txt">上一周</text></view>
         <text class="cal-month">{{ calMonth }}</text>
@@ -42,7 +75,7 @@
       </view>
     </view>
 
-    <view class="action-bar pop-in" style="animation-delay:0.15s">
+    <view class="action-bar pop-in" style="animation-delay:0.15s" v-if="!isLoading">
       <view class="gen-btn" @click="generateWeekPlan">
         <text class="gen-icon">✦</text>
         <text class="gen-text">生成本周菜单</text>
@@ -50,7 +83,7 @@
       <text class="gen-hint" v-if="weeklyData && weeklyData[selectedDateStr]">已生成 · {{ weekNutriSummary }}</text>
     </view>
 
-    <scroll-view scroll-y class="meal-scroll" :style="{ height: scrollHeight }">
+    <scroll-view scroll-y class="meal-scroll" :style="{ height: scrollHeight }" v-if="!isLoading">
       <view v-if="selectedDayMeals" class="day-meals">
         <view class="day-label bounce-in">
           <text class="dl-date">{{ selectedDayLabel }}</text>
@@ -114,7 +147,8 @@ export default {
       sparkData: [],
       pairStats: null,
       pageEnter: true,
-      todayHomeMeals: null
+      todayHomeMeals: null,
+      isLoading: true
     }
   },
   computed: {
@@ -208,6 +242,7 @@ export default {
     this.initCalendar()
     this.loadWeeklyCache()
     this.loadUserPrefs()
+    setTimeout(() => { this.isLoading = false }, 500)
   },
   onShow() {
     this.pageEnter = true
@@ -357,6 +392,36 @@ export default {
 
 <style lang="scss" scoped>
 .page { min-height:100vh; background:#F5F6FA; padding:0 28rpx; }
+
+/* ===== Skeleton Screen ===== */
+.skeleton-container { padding:56rpx 0 24rpx; }
+.skeleton-header { margin-bottom:32rpx; }
+.skeleton-calendar { background:#e8e8e8; border-radius:20rpx; padding:24rpx; margin-bottom:24rpx; }
+.skeleton-cal-nav { display:flex; justify-content:center; margin-bottom:24rpx; }
+.skeleton-week { display:flex; justify-content:space-between; }
+.skeleton-day-cell { display:flex; flex-direction:column; align-items:center; gap:12rpx; }
+.skeleton-dot { width:48rpx; height:48rpx; background:#d0d0d0; border-radius:50%; }
+.skeleton-action { display:flex; justify-content:center; margin-bottom:32rpx; }
+.skeleton-btn { width:280rpx; height:76rpx; background:#e0e0e0; border-radius:38rpx; }
+.skeleton-meals { margin-bottom:32rpx; }
+.skeleton-meal-header { margin-bottom:16rpx; }
+.skeleton-food-row { display:flex; gap:16rpx; }
+.skeleton-food-card {
+  flex:1; height:220rpx; background:#e8e8e8; border-radius:20rpx;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16rpx;
+  padding:20rpx;
+}
+.skeleton-food-icon { width:80rpx; height:80rpx; background:#d0d0d0; border-radius:50%; }
+.skeleton-line { background:#e0e0e0; border-radius:8rpx; height:24rpx; animation: skeletonPulse 1.5s ease-in-out infinite; }
+.skeleton-line-short { width:140rpx; margin-bottom:12rpx; }
+.skeleton-line-shorter { width:100rpx; }
+.skeleton-line-nav { width:200rpx; }
+.skeleton-line-day { width:40rpx; height:20rpx; }
+.skeleton-line-card { width:80%; height:20rpx; }
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
 
 /* ===== Header ===== */
 .header {
