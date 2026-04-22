@@ -109,6 +109,8 @@
 </template>
 
 <script>
+import { ALL_RECIPES } from '@/utils/constants.js'
+
 export default {
   data() {
     return {
@@ -132,15 +134,16 @@ export default {
     this.checkUserReaction()
   },
   methods: {
-    async loadRecipe() {
-      try {
-        const res = await getRecipeDetail(this.recipeId)
-        if (res && res.data) {
-          this.recipe = res.data
-        } else if (res) {
-          this.recipe = res
-        }
-      } catch (e) {}
+    loadRecipe() {
+      const allRecipes = [
+        ...ALL_RECIPES.breakfast,
+        ...ALL_RECIPES.lunch,
+        ...ALL_RECIPES.dinner
+      ]
+      const found = allRecipes.find(r => r.id == this.recipeId)
+      if (found) {
+        this.recipe = found
+      }
     },
     checkUserReaction() {
       try {

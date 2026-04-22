@@ -86,17 +86,6 @@
             </view>
           </template>
           <template v-else>
-            <view class="menu-item partner-empty-card">
-              <view class="menu-icon-wrap pink"><text class="menu-icon">⌘</text></view>
-              <view class="mi-center">
-                <text class="menu-label">暂时还没吃饭搭子</text>
-                <text class="menu-desc">点击分享给TA，一起决定今天吃什么</text>
-              </view>
-              <view class="pe-action" @click.stop="startInvite">
-                <text class="pe-action-text">邀请</text>
-              </view>
-            </view>
-
             <view class="menu-item" @click="goToFamily">
               <view class="menu-icon-wrap green"><text class="menu-icon">▣</text></view>
               <view class="mi-center">
@@ -125,20 +114,11 @@
             <text class="menu-arrow">›</text>
           </view>
 
-          <view class="menu-item" @click="goToShare">
-            <view class="menu-icon-wrap red"><text class="menu-icon">↗</text></view>
-            <view class="mi-center">
-              <text class="menu-label">分享记录</text>
-              <text class="menu-desc">查看发送和收到的菜单</text>
-            </view>
-            <text class="menu-arrow">›</text>
-          </view>
-
-          <view class="menu-item" @click="openSpecialDates">
+          <view class="menu-item" @click="openMyInfo">
             <view class="menu-icon-wrap pink"><text class="menu-icon">✦</text></view>
             <view class="mi-center">
-              <text class="menu-label">特别日子</text>
-              <text class="menu-desc">生日、纪念日，特别菜单推荐</text>
+              <text class="menu-label">我的信息</text>
+              <text class="menu-desc">生日、纪念日、身高体重</text>
             </view>
             <text class="menu-arrow">›</text>
           </view>
@@ -157,15 +137,6 @@
             <text class="menu-arrow">›</text>
           </view>
 
-          <view class="menu-item" @click="clearCache">
-            <view class="menu-icon-wrap gray"><text class="menu-icon">⟲</text></view>
-            <view class="mi-center">
-              <text class="menu-label">清除缓存</text>
-              <text class="menu-desc">重新生成菜单数据</text>
-            </view>
-            <text class="menu-arrow">›</text>
-          </view>
-
           <view class="menu-item" @click="showAbout">
             <view class="menu-icon-wrap gray"><text class="menu-icon">ⓘ</text></view>
             <view class="mi-center">
@@ -179,7 +150,7 @@
     </view>
 
     <view class="pref-modal-mask" :class="{ show: showPrefModal }" @click="closePrefModal"></view>
-    <view class="pref-modal" :class="{ show: showPrefModal }">
+    <view class="pref-modal" :class="{ show: showPrefModal }" :style="{ height: prefModalHeight }">
       <view class="pm-header">
         <text class="pm-title">偏好设置</text>
         <view class="pm-close" @click="closePrefModal"><text class="pm-close-txt">✕</text></view>
@@ -469,35 +440,75 @@
       </scroll-view>
     </view>
 
-    <!-- 特别日期设置弹窗 -->
-    <view class="special-modal-mask" :class="{ show: showSpecialModal }" @click="showSpecialModal = false"></view>
-    <view class="special-modal" :class="{ show: showSpecialModal }">
+    <!-- 我的信息弹窗 -->
+    <view class="special-modal-mask" :class="{ show: showMyInfoModal }" @click="showMyInfoModal = false"></view>
+    <view class="special-modal" :class="{ show: showMyInfoModal }">
       <view class="spm-header">
-        <text class="spm-title">🎂 添加特别日子</text>
-        <view class="spm-close" @click="showSpecialModal = false"><text>✕</text></view>
+        <text class="spm-title">👤 我的信息</text>
+        <view class="spm-close" @click="showMyInfoModal = false"><text>✕</text></view>
       </view>
-      <view class="spm-body">
-        <view class="spm-row">
-          <text class="spm-label">名称</text>
-          <input class="spm-input" v-model="specialDateForm.name" placeholder="如：我的生日" maxlength="20" />
-        </view>
-        <view class="spm-row">
-          <text class="spm-label">类型</text>
-          <view class="spm-type-row">
-            <view class="spm-type-btn" :class="{ active: specialDateForm.type === 'birthday' }" @click="specialDateForm.type = 'birthday'">🎂 生日</view>
-            <view class="spm-type-btn" :class="{ active: specialDateForm.type === 'anniversary' }" @click="specialDateForm.type = 'anniversary'">💝 纪念日</view>
+      <scroll-view scroll-y class="spm-body">
+        <!-- 生日和纪念日 -->
+        <view class="spm-section-title">🎂 生日与纪念日</view>
+        <view class="spm-special-list" v-for="(d, i) in specialDates" :key="i">
+          <view class="spm-special-item">
+            <text class="spm-special-name">{{ d.type === 'birthday' ? '🎂' : '💝' }} {{ d.name }}</text>
+            <text class="spm-special-date">{{ d.month }}月{{ d.day }}日</text>
+            <view class="spm-special-del" @click="removeSpecialDate(i)">✕</view>
           </view>
         </view>
+        <view class="spm-add-date-row" @click="showAddDateForm = true">
+          <text class="spm-add-date-txt">+ 添加生日/纪念日</text>
+        </view>
+        <view class="spm-date-form" v-if="showAddDateForm">
+          <view class="spm-row">
+            <text class="spm-label">名称</text>
+            <input class="spm-input" v-model="specialDateForm.name" placeholder="如：我的生日" maxlength="20" />
+          </view>
+          <view class="spm-row">
+            <text class="spm-label">类型</text>
+            <view class="spm-type-row">
+              <view class="spm-type-btn" :class="{ active: specialDateForm.type === 'birthday' }" @click="specialDateForm.type = 'birthday'">🎂 生日</view>
+              <view class="spm-type-btn" :class="{ active: specialDateForm.type === 'anniversary' }" @click="specialDateForm.type = 'anniversary'">💝 纪念日</view>
+            </view>
+          </view>
+          <view class="spm-row">
+            <text class="spm-label">日期</text>
+            <picker mode="date" :value="specialDateForm.month + '-' + specialDateForm.day" @change="onSpecialDatePick">
+              <view class="spm-date-display">{{ specialDateForm.month }}月{{ specialDateForm.day }}日</view>
+            </picker>
+          </view>
+          <view class="spm-save-btn" @click="saveSpecialDate">
+            <text class="spm-save-txt">保存</text>
+          </view>
+        </view>
+
+        <!-- 身体信息 -->
+        <view class="spm-section-title" style="margin-top:24rpx;">📏 身体信息</view>
         <view class="spm-row">
-          <text class="spm-label">日期</text>
-          <picker mode="date" :value="specialDateForm.month + '-' + specialDateForm.day" @change="onSpecialDatePick">
-            <view class="spm-date-display">{{ specialDateForm.month }}月{{ specialDateForm.day }}日</view>
-          </picker>
+          <text class="spm-label">身高 (cm)</text>
+          <input class="spm-input" type="number" v-model.number="myInfo.height" placeholder="如：170" />
         </view>
-        <view class="spm-save-btn" @click="saveSpecialDate">
-          <text class="spm-save-txt">保存</text>
+        <view class="spm-row">
+          <text class="spm-label">体重 (kg)</text>
+          <input class="spm-input" type="number" v-model.number="myInfo.weight" placeholder="如：65" />
         </view>
-      </view>
+
+        <!-- 饮食偏好 -->
+        <view class="spm-section-title" style="margin-top:24rpx;">🥗 饮食偏好</view>
+        <view class="spm-row">
+          <text class="spm-label">过敏食物</text>
+          <input class="spm-input" v-model="myInfo.allergies" placeholder="如：花生、海鲜" maxlength="50" />
+        </view>
+        <view class="spm-row">
+          <text class="spm-label">忌口</text>
+          <input class="spm-input" v-model="myInfo.dietary" placeholder="如：不吃辣、少油" maxlength="50" />
+        </view>
+
+        <view class="spm-save-btn" style="margin-top:24rpx;" @click="saveMyInfo">
+          <text class="spm-save-txt">保存信息 ✓</text>
+        </view>
+      </scroll-view>
     </view>
   </view>
 </template>
@@ -518,6 +529,7 @@ export default {
       currentPairId: '',
       pendingInviteName: '',
       showPrefModal: false,
+      prefModalHeight: '75vh',
       pairStats: null,
       showReportModal: false,
       weeklyReportData: [],
@@ -531,8 +543,11 @@ export default {
       _myMealCount: 0,
       _weeklyNutritionCache: null,
       _familyGroup: null,
-      showSpecialModal: false,
+      showMyInfoModal: false,
+      showAddDateForm: false,
       specialDateForm: { name: '', month: 1, day: 1, type: 'birthday' },
+      myInfo: { height: '', weight: '', allergies: '', dietary: '' },
+      specialDates: [],
       prefs: {
         noCookMode: false,
         userType: 'adult',
@@ -997,14 +1012,33 @@ export default {
       })
     },
 
-    goToShare() {
-      const data = uni.getStorageSync('foodfind_share_data')
-      if (!data) { uni.showToast({ title: '暂无分享记录', icon: 'none' }); return }
-      uni.navigateTo({ url: '/pages/share/share?mode=view' })
+    openMyInfo() {
+      this.showMyInfoModal = true
+      this.showAddDateForm = false
+      this.loadSpecialDates()
+      this.loadMyInfo()
     },
-
-    openSpecialDates() {
-      this.showSpecialModal = true
+    loadSpecialDates() {
+      this.specialDates = uni.getStorageSync('foodfind_special_dates') || []
+    },
+    loadMyInfo() {
+      const saved = uni.getStorageSync('foodfind_my_info')
+      if (saved) this.myInfo = { ...this.myInfo, ...saved }
+    },
+    removeSpecialDate(i) {
+      uni.showModal({
+        title: '确认删除', content: '确定删除这条记录吗？',
+        success: (res) => {
+          if (res.confirm) {
+            const dates = uni.getStorageSync('foodfind_special_dates') || []
+            dates.splice(i, 1)
+            uni.setStorageSync('foodfind_special_dates', dates)
+            this.specialDates = dates
+            markDirty('special_dates')
+            uni.showToast({ title: '已删除', icon: 'success' })
+          }
+        }
+      })
     },
     onSpecialDatePick(e) {
       const parts = e.detail.value.split('-')
@@ -1025,24 +1059,18 @@ export default {
         type: this.specialDateForm.type
       })
       markDirty('special_dates')
-      uni.showToast({ title: '已保存', icon: 'success' })
-      this.showSpecialModal = false
+      this.loadSpecialDates()
+      this.showAddDateForm = false
       this.specialDateForm = { name: '', month: 1, day: 1, type: 'birthday' }
+      uni.showToast({ title: '已保存', icon: 'success' })
+    },
+    saveMyInfo() {
+      uni.setStorageSync('foodfind_my_info', this.myInfo)
+      markDirty('my_info')
+      uni.showToast({ title: '已保存 ✓', icon: 'success' })
+      this.showMyInfoModal = false
     },
 
-    clearCache() {
-      uni.showModal({
-        title: '清除缓存', content: '将清除所有缓存数据，重新开始？', confirmColor: '#ff4757',
-        success: (res) => {
-          if (res.confirm) {
-            uni.removeStorageSync('foodfind_meals')
-            uni.removeStorageSync('foodfind_meals_date')
-            uni.removeStorageSync('foodfind_weekly')
-            uni.showToast({ title: '已全部清除', icon: 'success' })
-          }
-        }
-      })
-    },
     showAbout() {
       uni.showModal({
         title: '关于吃点啥 v2.5.3', content: '为情侣/家人打造的共同决策吃什么的小工具\n\n✅ 智能一周菜单规划\n✅ 荤素营养均衡算法\n✅ 云端配对，跨设备同步\n✅ 分享菜单+双向确认\n✅ 互动打卡+火花系统\n✅ 本周饮食报告+营养饼图\n✅ 喜欢/不喜欢标记菜品\n✅ 生日/纪念日特别菜单\n✅ 家庭群组功能\n✅ 智能购物清单', showCancel: false, confirmText: '知道了'
@@ -1254,7 +1282,7 @@ export default {
   position:fixed; left:0; right:0; bottom:0;
   background:#fff; border-radius:32rpx 32rpx 0 0;
   z-index:1000; transform:translateY(100%); transition:transform .35s cubic-bezier(.175,.885,.32,1.275);
-  max-height:85vh; display:flex; flex-direction:column;
+  height:75vh; display:flex; flex-direction:column;
   &.show { transform:translateY(0); }
 }
 .pm-header {
@@ -1269,13 +1297,13 @@ export default {
 }
 .pm-close-txt { font-size:28rpx; color:#999; }
 
-.pm-body { flex:1; overflow:hidden; padding:0 28rpx 20rpx; }
+.pm-body { flex:1; overflow:hidden; padding:0 28rpx 20rpx; box-sizing:border-box; }
 .pm-section { margin-bottom:28rpx; }
 .pm-stitle { display:block; font-size:26rpx; font-weight:600; color:#1a1a1a; margin-bottom:16rpx; padding-left:4rpx; }
 .pm-hint { display:block; font-size:22rpx; color:#999; margin-bottom:16rpx; padding-left:4rpx; }
 .mode-toggle-row {
   display:flex; justify-content:space-between; align-items:center;
-  background:#f5f6f8; border-radius:18rpx; padding:22rpx 20rpx;
+  background:#f5f6f8; border-radius:18rpx; padding:22rpx 24rpx; margin:0 4rpx;
 }
 .mt-left { display:flex; flex-direction:column; gap:6rpx; }
 .mt-label { font-size:27rpx; font-weight:600; color:#1a1a1a; }
@@ -1603,6 +1631,31 @@ export default {
   &:active { background:#eee; }
 }
 .spm-body { flex:1; overflow:hidden; padding:0 28rpx 40rpx; }
+.spm-section-title {
+  display:block; font-size:28rpx; font-weight:700; color:#1a1a1a;
+  margin-bottom:16rpx; padding-bottom:8rpx;
+  border-bottom:1rpx solid #eee;
+}
+.spm-special-list { margin-bottom:12rpx; }
+.spm-special-item {
+  display:flex; align-items:center; gap:12rpx;
+  background:#f5f6f8; border-radius:14rpx;
+  padding:16rpx 20rpx;
+}
+.spm-special-name { font-size:26rpx; color:#333; flex:1; }
+.spm-special-date { font-size:24rpx; color:#999; }
+.spm-special-del {
+  width:40rpx; height:40rpx; display:flex; align-items:center; justify-content:center;
+  color:#ccc; font-size:24rpx; border-radius:50%;
+  &:active { background:#eee; }
+}
+.spm-add-date-row {
+  padding:20rpx; text-align:center;
+  background:#e8f7ef; border-radius:14rpx;
+  &:active { opacity:.8; }
+}
+.spm-add-date-txt { font-size:26rpx; color:#07c160; font-weight:600; }
+.spm-date-form { margin-top:16rpx; }
 .spm-row { margin-bottom:28rpx; }
 .spm-label { display:block; font-size:26rpx; font-weight:600; color:#1a1a1a; margin-bottom:14rpx; }
 .spm-input {
