@@ -2,5 +2,8 @@
   "name": "updateFamilyMember",
   "version": "1.0.0",
   "description": "更新家庭成员信息",
-  "main": "index.js"
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
 }

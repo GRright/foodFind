@@ -2,5 +2,8 @@
   "name": "recordCheckIn",
   "version": "1.0.0",
   "description": "记录家庭打卡",
-  "main": "index.js"
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
 }

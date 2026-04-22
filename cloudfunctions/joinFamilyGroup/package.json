@@ -2,5 +2,8 @@
   "name": "joinFamilyGroup",
   "version": "1.0.0",
   "description": "加入家庭群组",
-  "main": "index.js"
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
 }
