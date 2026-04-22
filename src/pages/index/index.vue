@@ -81,6 +81,22 @@
         </view>
       </view>
 
+      <view class="greeting-card-mask" :class="{ show: showGreetingCard }" @click="closeGreetingCard">
+        <view class="greeting-card" :class="{ show: showGreetingCard }" @click.stop>
+          <view class="gc-deco-top">✦ ✦ ✦</view>
+          <text class="gc-emoji">{{ greetingCardData.emoji }}</text>
+          <text class="gc-title">{{ greetingCardData.title }}</text>
+          <text class="gc-name">{{ greetingCardData.memberName }}</text>
+          <text class="gc-message">{{ greetingCardData.message }}</text>
+          <view class="gc-divider"></view>
+          <text class="gc-suggestion">{{ greetingCardData.suggestion }}</text>
+          <view class="gc-close-btn" @click="closeGreetingCard">
+            <text class="gc-close-text">知道了，去准备 🎉</text>
+          </view>
+          <view class="gc-deco-bottom">✦ ✦ ✦</view>
+        </view>
+      </view>
+
       <scroll-view scroll-y class="meal-scroll" :style="{ height: scrollHeight }" @scrolltolower="loadMore">
         <view
           class="meal-section"
@@ -458,7 +474,7 @@
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
 import { filterRecipesByHealthTags, getFamilyHealthTags } from '@/utils/family.js'
-import { getBirthdayMenuRecommendation, addSpecialDate } from '@/utils/festival.js'
+import { getBirthdayMenuRecommendation, addSpecialDate, getFamilyMemberSpecialToday } from '@/utils/festival.js'
 
 export default {
   data() {
@@ -509,6 +525,14 @@ export default {
       pageReady: false,
       _nutritionCache: null,
       specialBanner: null,
+      showGreetingCard: false,
+      greetingCardData: {
+        emoji: '🎂',
+        title: '生日快乐',
+        memberName: '',
+        message: '',
+        suggestion: ''
+      },
       showSpecialModal: false,
       specialDateForm: { name: '', month: 1, day: 1, type: 'birthday' }
     }
@@ -1027,6 +1051,33 @@ export default {
     goToShoppingList() { uni.navigateTo({ url: '/pages/shoppingList/shoppingList' }) },
     loadSpecialBanner() {
       this.specialBanner = getBirthdayMenuRecommendation()
+      this.checkFamilyGreeting()
+    },
+    checkFamilyGreeting() {
+      const memberSpecial = getFamilyMemberSpecialToday()
+      if (!memberSpecial) return
+      const lastShown = uni.getStorageSync('foodfind_greeting_shown')
+      const todayStr = new Date().toISOString().split('T')[0]
+      if (lastShown === todayStr + '_' + memberSpecial.memberName) return
+      const isBirthday = memberSpecial.eventType === 'birthday'
+      this.greetingCardData = {
+        emoji: memberSpecial.emoji,
+        title: isBirthday ? '🎂 今天是个特别的日子！' : '💝 今天是个特别的日子！',
+        memberName: isBirthday
+          ? `今天是 ${memberSpecial.memberName} 的生日！`
+          : `今天是 ${memberSpecial.memberName} 的${memberSpecial.eventName}！`,
+        message: isBirthday
+          ? '在这个特别的日子里，让TA感受到满满的爱意吧~'
+          : '在这个特别的日子里，一起创造美好回忆吧~',
+        suggestion: isBirthday
+          ? '🎁 不如给TA做一顿丰盛的生日晚餐？'
+          : '🎁 不如一起做顿特别的庆祝大餐？'
+      }
+      this.showGreetingCard = true
+      uni.setStorageSync('foodfind_greeting_shown', todayStr + '_' + memberSpecial.memberName)
+    },
+    closeGreetingCard() {
+      this.showGreetingCard = false
     },
     onSpecialBannerClick() {
       if (this.specialBanner) {
@@ -1970,6 +2021,53 @@ export default {
   padding:8rpx 16rpx; background:#fff; border-radius:20rpx;
   border:1rpx solid #ffe0e8;
 }
+
+.greeting-card-mask {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0); z-index:2000;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events:none; transition:background .35s ease;
+  &.show { background:rgba(0,0,0,.55); pointer-events:auto; }
+}
+.greeting-card {
+  width:600rpx; background:linear-gradient(180deg,#fff9f0 0%,#fff 40%);
+  border-radius:32rpx; padding:48rpx 40rpx; text-align:center;
+  transform:scale(.7) translateY(60rpx); opacity:0;
+  transition:all .4s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 16rpx 60rpx rgba(0,0,0,.15);
+  &.show { transform:scale(1) translateY(0); opacity:1; }
+}
+.gc-deco-top, .gc-deco-bottom {
+  font-size:24rpx; color:#ffd700; letter-spacing:16rpx; margin-bottom:16rpx;
+}
+.gc-deco-bottom { margin-top:16rpx; margin-bottom:0; }
+.gc-emoji { font-size:100rpx; display:block; margin-bottom:20rpx; }
+.gc-title {
+  font-size:36rpx; font-weight:800; color:#e84393; display:block;
+  margin-bottom:16rpx; letter-spacing:2rpx;
+}
+.gc-name {
+  font-size:32rpx; font-weight:700; color:#1a1a1a; display:block;
+  margin-bottom:12rpx;
+}
+.gc-message {
+  font-size:26rpx; color:#666; display:block; margin-bottom:20rpx;
+  line-height:1.6;
+}
+.gc-divider {
+  width:120rpx; height:2rpx; background:linear-gradient(90deg,transparent,#ffd700,transparent);
+  margin:0 auto 20rpx;
+}
+.gc-suggestion {
+  font-size:28rpx; font-weight:600; color:#07c160; display:block;
+  margin-bottom:28rpx;
+}
+.gc-close-btn {
+  background:linear-gradient(135deg,#07c160,#06a652);
+  border-radius:48rpx; padding:22rpx 0; margin:0 40rpx;
+  &:active { opacity:.85; transform:scale(.97); }
+}
+.gc-close-text { font-size:28rpx; font-weight:600; color:#fff; }
 
 .special-modal {
   position:fixed; left:0; right:0; bottom:0;

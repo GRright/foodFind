@@ -1,11 +1,6 @@
 <template>
   <view class="page">
     <view class="recipe-hero">
-      <view class="hero-nav">
-        <text class="nav-back" @click="goBack">‹</text>
-        <text class="nav-title">菜品详情</text>
-        <text class="nav-placeholder" style="width: 48rpx;"></text>
-      </view>
       <text class="hero-emoji scale-in">{{ recipe.image || '🍽️' }}</text>
       <view class="hero-overlay">
         <text class="hero-title">{{ recipe.name }}</text>
@@ -14,11 +9,6 @@
           <text class="hero-tag">{{ recipe.difficulty || '简单' }}</text>
           <text class="hero-tag">{{ recipe.cooking_time || 15 }}分钟</text>
         </view>
-      </view>
-
-      <view class="like-btn" :class="{ liked: isFavorited }" @click="toggleFavorite">
-        <text class="lb-icon">{{ isFavorited ? '♥' : '♡' }}</text>
-        <text class="lb-text">{{ isFavorited ? '已收藏' : '收藏' }}</text>
       </view>
     </view>
 
@@ -80,47 +70,45 @@
             <view class="step-left">
               <view class="step-num-wrap"><text class="step-num">{{ idx + 1 }}</text></view>
             </view>
-            <view class="step-right">
-              <text class="step-text">{{ step }}</text>
-            </view>
+            <view class="step-right"><text class="step-text">{{ step }}</text></view>
           </view>
         </view>
       </view>
 
-      <view class="action-area">
-        <view v-if="selectedRating === 0" class="action-btn pulse-btn" @click="showRatingPanel = true">
-        <text class="btn-icon">☆</text><text class="btn-text">评价这道菜</text>
-      </view>
-        <view v-else class="rated-bar scale-in">
-          <text class="rated-text">已评价 {{ selectedRating }} 星 · 感谢反馈！</text>
+      <view class="section-card slide-up" style="animation-delay:0.5s;opacity:0">
+        <view class="section-title-row">
+          <text class="sec-deco">"</text>
+          <text class="sec-title">小贴士</text>
+          <text class="sec-deco">"</text>
+        </view>
+        <view class="tips-content">
+          <view class="tip-item" v-for="(tip, idx) in tips" :key="idx">
+            <text class="tip-bullet">•</text>
+            <text class="tip-text">{{ tip }}</text>
+          </view>
         </view>
       </view>
 
-      <view class="bottom-spacer"></view>
+      <view class="reaction-section slide-up" style="animation-delay:0.6s;opacity:0">
+        <text class="rs-title">这道菜怎么样？</text>
+        <view class="reaction-buttons">
+          <button class="reaction-btn like-btn" :class="{ active: userReaction === 'like' }" @click="setReaction('like')">
+            <text class="reaction-icon">👍</text>
+            <text class="reaction-text">喜欢</text>
+          </button>
+          <button class="reaction-btn dislike-btn" :class="{ active: userReaction === 'dislike' }" @click="setReaction('dislike')">
+            <text class="reaction-icon">👎</text>
+            <text class="reaction-text">不喜欢</text>
+          </button>
+        </view>
+      </view>
+
+      <view style="height: 80rpx;"></view>
     </scroll-view>
-
-    <view class="rating-mask" :class="{ show: showRatingPanel }" @click="showRatingPanel = false">
-      <view class="rating-sheet" :class="{ show: showRatingPanel }" @click.stop>
-        <text class="rating-title">给这道菜打个分吧</text>
-        <view class="stars-row">
-          <text
-            class="star"
-            :class="{ active: selectedRating >= s }"
-            v-for="s in 5"
-            :key="s"
-            @click="selectStar(s)"
-          >★</text>
-        </view>
-        <textarea class="feedback-input" placeholder="说说你的感受（可选）..." :value="feedbackText" @input="e => feedbackText = e.detail.value" maxlength="200" />
-        <view class="submit-btn" @click="submitFeedback">提交评价</view>
-      </view>
-    </view>
   </view>
 </template>
 
 <script>
-import { ALL_RECIPES } from '@/utils/constants.js'
-
 export default {
   data() {
     return {
@@ -133,61 +121,90 @@ export default {
         steps: ['番茄切块', '鸡蛋打散炒熟', '放入番茄一起炒', '加盐调味即可']
       },
       detailHeight: 'calc(100vh - 420rpx)',
-      selectedRating: 0,
-      feedbackText: '',
-      showRatingPanel: false,
-      isFavorited: false
+      userReaction: null
     }
   },
   onLoad(options) {
     if (options && options.id) {
-      this.recipeId = parseInt(options.id)
-      this.loadRecipe(this.recipeId)
-      this.checkFavorite()
+      this.recipeId = options.id
+      this.loadRecipe()
     }
+    this.checkUserReaction()
   },
   methods: {
-      goBack() {
-        uni.navigateBack()
-      },
-      loadRecipe(id) {
-        const allRecipes = [...ALL_RECIPES.breakfast, ...ALL_RECIPES.lunch, ...ALL_RECIPES.dinner]
-        const found = allRecipes.find(r => r.id === id)
-        if (found) { this.recipe = found }
-      },
-    checkFavorite() {
-      const favorites = uni.getStorageSync('foodfind_favorites') || []
-      this.isFavorited = favorites.some(f => f.id === this.recipeId)
+    async loadRecipe() {
+      try {
+        const res = await getRecipeDetail(this.recipeId)
+        if (res && res.data) {
+          this.recipe = res.data
+        } else if (res) {
+          this.recipe = res
+        }
+      } catch (e) {}
     },
-    toggleFavorite() {
-      let favorites = uni.getStorageSync('foodfind_favorites') || []
-      if (this.isFavorited) {
-        favorites = favorites.filter(f => f.id !== this.recipeId)
-        uni.setStorageSync('foodfind_favorites', favorites)
-        this.isFavorited = false
-        uni.showToast({ title: '已取消收藏', icon: 'none' })
-      } else {
-        favorites.unshift({
-          id: this.recipe.id,
-          name: this.recipe.name,
-          image: this.recipe.image,
-          cuisine_type: this.recipe.cuisine_type,
-          type: this.recipe.type,
-          nutrition: this.recipe.nutrition,
-          favoritedAt: new Date().toISOString()
-        })
-        uni.setStorageSync('foodfind_favorites', favorites)
-        this.isFavorited = true
-        uni.showToast({ title: '已加入收藏 ✓', icon: 'success' })
+    checkUserReaction() {
+      try {
+        let favorites = uni.getStorageSync('foodfind_favorites') || []
+        const isLiked = favorites.some(f => f.id === this.recipeId)
+        if (isLiked) {
+          this.userReaction = 'like'
+        } else {
+          // 检查是否在dislike列表中
+          let dislikes = uni.getStorageSync('foodfind_dislikes') || []
+          if (dislikes.some(d => d.id === this.recipeId)) {
+            this.userReaction = 'dislike'
+          }
+        }
+      } catch (e) {}
+    },
+    setReaction(type) {
+      this.userReaction = type
+      try {
+        let favorites = uni.getStorageSync('foodfind_favorites') || []
+        let dislikes = uni.getStorageSync('foodfind_dislikes') || []
+        
+        if (type === 'like') {
+          // 从dislikes中移除
+          dislikes = dislikes.filter(d => d.id !== this.recipeId)
+          uni.setStorageSync('foodfind_dislikes', dislikes)
+          // 添加到favorites
+          if (!favorites.some(f => f.id === this.recipeId)) {
+            favorites.unshift(this.recipe)
+            uni.setStorageSync('foodfind_favorites', favorites)
+          }
+          uni.showToast({ title: '已标记为喜欢', icon: 'success' })
+        } else if (type === 'dislike') {
+          // 从favorites中移除
+          favorites = favorites.filter(f => f.id !== this.recipeId)
+          uni.setStorageSync('foodfind_favorites', favorites)
+          // 添加到dislikes
+          if (!dislikes.some(d => d.id === this.recipeId)) {
+            dislikes.unshift(this.recipe)
+            uni.setStorageSync('foodfind_dislikes', dislikes)
+          }
+          uni.showToast({ title: '已标记为不喜欢', icon: 'none' })
+        }
+      } catch (e) {}
+    }
+  },
+  computed: {
+    tips() {
+      const list = []
+      if (this.recipe.difficulty === '简单') {
+        list.push('新手友好，不易翻车')
+        list.push('火候控制是关键')
       }
-    },
-    selectStar(s) {
-      this.selectedRating = s
-    },
-    submitFeedback() {
-      if (this.selectedRating === 0) { uni.showToast({ title: '请选择评分', icon: 'none' }); return }
-      uni.showToast({ title: '提交成功', icon: 'success' })
-      this.showRatingPanel = false; this.selectedRating = 0; this.feedbackText = ''
+      if (this.recipe.nutrition?.protein > 15) {
+        list.push('优质蛋白来源')
+      }
+      if (this.recipe.nutrition?.calories < 300) {
+        list.push('热量适中，适合减脂期食用')
+      }
+      if (!list.length) {
+        list.push('用心烹饪，味道更佳')
+        list.push('可根据个人口味调整调料用量')
+      }
+      return list
     }
   }
 }
@@ -197,38 +214,11 @@ export default {
 .page { min-height: 100vh; background: #F5F6FA; }
 
 .recipe-hero {
-  height: 380rpx; background: #07c160;
+  height: 420rpx; background: #07c160;
   display: flex; align-items: center; justify-content: center; position: relative;
+  overflow: visible;
 }
-.like-btn {
-  position:absolute; top:calc(env(safe-area-inset-top) + 16rpx); right:24rpx;
-  display:flex; align-items:center; gap:6rpx;
-  padding:12rpx 22rpx; background:rgba(255,255,255,.2);
-  border-radius:40rpx;
-  transition:all .3s ease; z-index: 20;
-  &:active { transform:scale(.92); }
-  &.liked { background:rgba(255,255,255,.35); }
-}
-.lb-icon { font-size:28rpx; color:#fff; }
-.liked .lb-icon { color:#fff; animation: heartBeat .4s ease; }
-.lb-text { font-size:23rpx; color:#fff; font-weight:600; }
 .hero-emoji { font-size: 140rpx; }
-.hero-nav {
-  position: absolute; top: 0; left: 0; right: 0;
-  padding-top: calc(env(safe-area-inset-top) + 8rpx);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: calc(env(safe-area-inset-top) + 8rpx) 24rpx 16rpx;
-  z-index: 20;
-}
-.nav-back {
-  font-size: 56rpx; color: #fff; font-weight: 300;
-  width: 48rpx; text-align: center; line-height: 1;
-  &:active { opacity: 0.7; }
-}
-.nav-title {
-  font-size: 32rpx; color: #fff; font-weight: 600;
-  letter-spacing: 2rpx;
-}
 .hero-overlay {
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 32rpx; background: rgba(0,0,0,.2);
@@ -247,14 +237,14 @@ export default {
 .detail-scroll { padding-top: 40rpx; padding-bottom: env(safe-area-inset-bottom); }
 
 .nutrition-bar {
-  background: #fff; margin: -40rpx 28rpx 24rpx; border-radius: 20rpx;
-  padding: 28rpx 20rpx; display: flex; align-items: center; justify-content: space-around;
-  box-shadow: 0 1rpx 12rpx rgba(0,0,0,.04); position: relative; z-index: 10;
+  background: #fff; margin: 0 28rpx 24rpx; border-radius: 24rpx;
+  padding: 40rpx 28rpx; display: flex; align-items: center; justify-content: space-around;
+  box-shadow: 0 1rpx 12rpx rgba(0,0,0,.04);
 }
-.nutri-item { display: flex; flex-direction: column; align-items: center; gap: 6rpx; }
-.nutri-value { font-size: 30rpx; font-weight: 700; color: #1a1a1a; }
-.nutri-label { font-size: 21rpx; color: #999; }
-.nutri-divider { width: 1rpx; height: 48rpx; background: #eee; }
+.nutri-item { display: flex; flex-direction: column; align-items: center; gap: 10rpx; flex: 1; min-width: 0; }
+.nutri-value { font-size: 34rpx; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
+.nutri-label { font-size: 23rpx; color: #999; white-space: nowrap; }
+.nutri-divider { width: 1rpx; height: 56rpx; background: #eee; flex-shrink: 0; }
 
 .section-card {
   background: #fff; margin: 0 28rpx 24rpx; border-radius: 24rpx;
@@ -266,94 +256,84 @@ export default {
   margin-bottom: 28rpx;
 }
 .sec-deco { font-size: 32rpx; color: #ddd; font-weight: 300; line-height: 1; }
-.sec-title { font-size: 30rpx; font-weight: 700; color: #1a1a1a; letter-spacing: 2rpx; }
+.sec-title { font-size: 30rpx; font-weight: 700; color: #1a1a1a; letter-spacing: -0.5rpx; }
 
-.ing-list { display: flex; flex-direction: column; }
+.ing-list { display: flex; flex-direction: column; gap: 18rpx; }
 .ing-item {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 22rpx 0; border-bottom: 1rpx solid #f5f5f5;
-  transition: background .15s ease;
-  &:last-child { border-bottom: none; }
-  &:active { background: #f5f6f8; border-radius: 10rpx; }
+  padding-bottom: 14rpx; border-bottom: 1rpx solid #f5f5f5;
+  &:last-child { border-bottom: none; padding-bottom: 0; }
 }
-.ing-name { font-size: 28rpx; color: #333; font-weight: 500; }
-.ing-amount { font-size: 26rpx; color: #999; }
+.ing-name { font-size: 27rpx; color: #333; font-weight: 500; }
+.ing-amount { font-size: 25rpx; color: #999; }
 
-.steps-list { display: flex; flex-direction: column; gap: 28rpx; margin-top: 8rpx; }
-.step-item { display: flex; gap: 18rpx; align-items: flex-start; }
-.step-left { flex-shrink: 0; padding-top: 2rpx; }
+.steps-list { display: flex; flex-direction: column; gap: 32rpx; }
+.step-item { display: flex; gap: 20rpx; align-items: flex-start; }
+.step-left { flex-shrink: 0; }
 .step-num-wrap {
-  width: 48rpx; height: 48rpx; background: #07c160;
+  width: 52rpx; height: 52rpx; background: linear-gradient(135deg, #07c160, #06ad56);
   border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  transition: transform .2s ease;
+  box-shadow: 0 4rpx 12rpx rgba(7,193,96,.25);
 }
-.step-item:active .step-num-wrap { transform: scale(1.15); }
-.step-num { color: #fff; font-size: 26rpx; font-weight: 700; }
-.step-right { flex: 1; min-width: 0; }
-.step-text { font-size: 28rpx; color: #444; line-height: 1.7; }
+.step-num { font-size: 26rpx; color: #fff; font-weight: 700; }
+.step-right { flex: 1; padding-top: 8rpx; }
+.step-text { font-size: 27rpx; color: #333; line-height: 1.7; }
 
-.action-area { padding: 20rpx 32rpx; }
-.action-btn {
-  display:flex; align-items:center; justify-content:center; gap:10rpx;
-  text-align: center; padding: 28rpx 0;
-  background: #07c160;
-  color: #fff; font-size: 29rpx; font-weight: 600; border-radius: 48rpx;
-  box-shadow:0 2rpx 12rpx rgba(7,193,96,.2);
-  &:active { opacity: 0.85; transform: scale(0.97); transition: all 0.15s; }
-}
-.btn-icon { font-size:32rpx; }
-.btn-text { font-size:29rpx; font-weight:600; }
-.rated-bar { background: #e8f7ef; padding: 28rpx; border-radius: 20rpx; text-align: center; }
-.rated-text { font-size: 27rpx; color: #07c160; font-weight: 600; }
-.bottom-spacer { height: 60rpx; }
+.tips-content { display: flex; flex-direction: column; gap: 16rpx; }
+.tip-item { display: flex; gap: 12rpx; align-items: flex-start; }
+.tip-bullet { font-size: 30rpx; color: #07c160; font-weight: 700; line-height: 1.3; }
+.tip-text { font-size: 26rpx; color: #666; line-height: 1.6; }
 
-.rating-mask {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0);
-  display: flex; align-items: flex-end; z-index: 999;
-  pointer-events: none; transition: background .25s ease;
-  &.show { background: rgba(0,0,0,.45); pointer-events: auto; }
+.reaction-section {
+  margin: 0 28rpx 24rpx; padding: 36rpx 32rpx;
+  background: #fff; border-radius: 24rpx;
+  box-shadow: 0 1rpx 12rpx rgba(0,0,0,.04);
+  text-align: center;
 }
-.rating-sheet {
-  width: 100%; background: #fff; border-radius: 32rpx 32rpx 0 0;
-  padding: 40rpx 32rpx; padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
-  transform: translateY(100%); transition: transform .3s cubic-bezier(.4,0,.2,1);
-  &.show { transform: translateY(0); }
+.reaction-section .rs-title { font-size: 30rpx; font-weight: 700; color: #1a1a1a; display: block; margin-bottom: 28rpx; }
+.reaction-buttons { display: flex; justify-content: center; gap: 24rpx; }
+.reaction-btn {
+  flex: 1; max-width: 240rpx;
+  display: flex; align-items: center; justify-content: center; gap: 12rpx;
+  padding: 28rpx 0;
+  border-radius: 24rpx;
+  background: #f5f6f8;
+  transition: all .25s ease;
+  &::after { display: none; }
+  &:active { transform: scale(.96); }
 }
-.rating-title { display: block; text-align: center; font-size: 32rpx; font-weight: 600; color: #1a1a1a; margin-bottom: 28rpx; }
-.stars-row { display: flex; justify-content: center; gap: 20rpx; margin-bottom: 28rpx; }
-.star {
-  font-size: 56rpx; color: #ddd; transition: all .15s ease;
-  &.active { color: #07c160; transform: scale(1.15); }
-  &:active { transform: scale(1.3); }
+.reaction-btn.like-btn {
+  background: #f0f9f0;
+  &.active { background: #07c160; }
+  .reaction-icon, .reaction-text { color: #07c160; }
+  &.active .reaction-icon, &.active .reaction-text { color: #fff; }
 }
-.feedback-input {
-  width: 100%; height: 180rpx; background: #f5f6f8; border-radius: 16rpx;
-  padding: 20rpx; font-size: 27rpx; color: #333; margin-bottom: 28rpx; box-sizing: border-box;
+.reaction-btn.dislike-btn {
+  background: #fef0f0;
+  &.active { background: #ff6b6b; }
+  .reaction-icon, .reaction-text { color: #ff6b6b; }
+  &.active .reaction-icon, &.active .reaction-text { color: #fff; }
 }
-.submit-btn {
-  text-align: center; padding: 26rpx 0;
-  background: #07c160;
-  color: #fff; font-size: 29rpx; font-weight: 600; border-radius: 48rpx;
-  &:active { opacity: 0.85; }
-}
+.reaction-icon { font-size: 40rpx; }
+.reaction-text { font-size: 28rpx; font-weight: 600; }
 
+@keyframes scaleIn {
+  from { transform: scale(.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12rpx); }
+  from { opacity: 0; transform: translateY(20rpx); }
   to { opacity: 1; transform: translateY(0); }
 }
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(36rpx); }
+  from { opacity: 0; transform: translateY(30rpx); }
   to { opacity: 1; transform: translateY(0); }
-}
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.88); }
-  to { opacity: 1; transform: scale(1); }
 }
 @keyframes heartBeat {
   0% { transform: scale(1); }
-  30% { transform: scale(1.35); }
-  60% { transform: scale(0.95); }
+  50% { transform: scale(1.3); }
   100% { transform: scale(1); }
 }
+.scale-in { animation: scaleIn .5s cubic-bezier(.17,.67,.29,1.49) both; }
+.slide-up { animation: slideUp .45s ease both; }
 </style>

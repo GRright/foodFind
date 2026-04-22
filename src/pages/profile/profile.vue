@@ -117,10 +117,10 @@
           </template>
 
           <view class="menu-item" @click="openFavorites">
-            <view class="menu-icon-wrap orange"><text class="menu-icon">☆</text></view>
+            <view class="menu-icon-wrap orange"><text class="menu-icon">👍</text></view>
             <view class="mi-center">
-              <text class="menu-label">我的收藏</text>
-              <text class="menu-desc">{{ favorites.length > 0 ? `已收藏 ${favorites.length} 道菜` : '收藏喜欢的菜品' }}</text>
+              <text class="menu-label">我喜欢的</text>
+              <text class="menu-desc">{{ favorites.length > 0 ? `已喜欢 ${favorites.length} 道菜` : '标记喜欢的菜品' }}</text>
             </view>
             <text class="menu-arrow">›</text>
           </view>
@@ -432,15 +432,15 @@
     <view class="fav-modal-mask" :class="{ show: showFavoritesModal }" @click="closeFavorites"></view>
     <view class="fav-modal" :class="{ show: showFavoritesModal }">
       <view class="fm-header">
-        <text class="fm-title">♥ 我的收藏</text>
+        <text class="fm-title">👍 我喜欢的</text>
         <view class="fm-close" @click="closeFavorites"><text class="pm-close-txt">✕</text></view>
       </view>
 
       <scroll-view scroll-y class="fm-body">
         <view v-if="favorites.length === 0" class="fav-empty">
           <text class="fe-icon">💚</text>
-          <text class="fe-text">还没有收藏菜品</text>
-          <text class="fe-hint">点击菜品的收藏按钮，把喜欢的存起来~</text>
+          <text class="fe-text">还没有喜欢的菜品</text>
+          <text class="fe-hint">点击菜品的喜欢按钮，把喜欢的存起来~</text>
         </view>
 
         <view
@@ -979,7 +979,7 @@ export default {
     },
     showAbout() {
       uni.showModal({
-        title: '关于吃点啥 v2.4', content: '为情侣/家人打造的共同决策吃什么的小工具\n\n✅ 智能一周菜单规划\n✅ 荤素营养均衡算法\n✅ 云端配对，跨设备同步\n✅ 分享菜单+双向确认\n✅ 互动打卡+火花系统\n✅ 本周饮食报告+营养饼图\n✅ 收藏喜欢的菜品\n✅ 生日/纪念日特别菜单', showCancel: false, confirmText: '知道了'
+        title: '关于吃点啥 v2.4', content: '为情侣/家人打造的共同决策吃什么的小工具\n\n✅ 智能一周菜单规划\n✅ 荤素营养均衡算法\n✅ 云端配对，跨设备同步\n✅ 分享菜单+双向确认\n✅ 互动打卡+火花系统\n✅ 本周饮食报告+营养饼图\n✅ 标记喜欢的菜品\n✅ 生日/纪念日特别菜单', showCancel: false, confirmText: '知道了'
       })
     },
     loadFavorites() {
@@ -1263,7 +1263,7 @@ export default {
 }
 .report-modal {
   position:fixed; left:0; right:0; bottom:0;
-  background:#fafafa; border-radius:36rpx 36rpx 0 0;
+  background:#fafafa; border-radius:40rpx 40rpx 0 0;
   z-index:1000; transform:translateY(100%); transition:transform .4s cubic-bezier(.175,.885,.32,1.275);
   max-height:88vh; display:flex; flex-direction:column;
   box-shadow:0 -10rpx 60rpx rgba(0,0,0,.15);
@@ -1272,7 +1272,7 @@ export default {
 .rm-header {
   display:flex; justify-content:space-between; align-items:flex-start;
   padding:36rpx 32rpx 24rpx; flex-shrink:0;
-  background:#fff;
+  background:#fff; border-radius:40rpx 40rpx 0 0;
 }
 .rm-header-left { display:flex; flex-direction:column; gap:6rpx; }
 .rm-title { font-size:36rpx; font-weight:800; color:#1a1a1a; letter-spacing:-1rpx; }

@@ -372,22 +372,23 @@ export default {
 .action-card, .join-card {
   background: #fff;
   border-radius: 24rpx;
-  padding: 32rpx;
+  padding: 40rpx 36rpx;
   box-shadow: 0 2rpx 12rpx rgba(0,0,0,.04);
-  margin-bottom: 24rpx;
+  margin-bottom: 28rpx;
 }
-.ac-title, .jc-title { font-size: 32rpx; font-weight: 700; color: #1a1a1a; margin-bottom: 8rpx; }
-.ac-desc, .jc-desc { font-size: 24rpx; color: #999; margin-bottom: 24rpx; }
+.ac-title, .jc-title { font-size: 34rpx; font-weight: 700; color: #1a1a1a; margin-bottom: 12rpx; line-height: 1.4; }
+.ac-desc, .jc-desc { font-size: 26rpx; color: #999; margin-bottom: 32rpx; line-height: 1.5; }
 
-.form-section { margin-bottom: 24rpx; }
-.form-row { margin-bottom: 24rpx; }
-.fr-label { font-size: 26rpx; font-weight: 600; color: #1a1a1a; margin-bottom: 12rpx; display: block; }
+.form-section { margin-bottom: 32rpx; }
+.form-row { margin-bottom: 32rpx; }
+.fr-label { font-size: 28rpx; font-weight: 600; color: #1a1a1a; margin-bottom: 16rpx; display: block; line-height: 1.4; }
 .fr-input {
   background: #f5f6f8;
   border-radius: 16rpx;
-  padding: 20rpx 24rpx;
+  padding: 24rpx 28rpx;
   font-size: 28rpx;
   color: #1a1a1a;
+  line-height: 1.5;
 }
 
 .type-options {
@@ -400,11 +401,11 @@ export default {
   min-width: 160rpx;
   background: #f5f6f8;
   border-radius: 16rpx;
-  padding: 20rpx;
+  padding: 24rpx 16rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8rpx;
+  gap: 10rpx;
   border: 2rpx solid transparent;
   transition: all .2s ease;
   &.active {
@@ -412,8 +413,8 @@ export default {
     border-color: #07c160;
   }
 }
-.type-icon { font-size: 40rpx; }
-.type-label { font-size: 24rpx; font-weight: 600; color: #666; }
+.type-icon { font-size: 44rpx; }
+.type-label { font-size: 25rpx; font-weight: 600; color: #666; line-height: 1.4; }
 
 .create-btn {
   background: #07c160;
@@ -438,14 +439,15 @@ export default {
 .code-input-wrap {
   background: #f5f6f8;
   border-radius: 16rpx;
-  padding: 20rpx 24rpx;
+  padding: 28rpx 24rpx;
 }
 .code-input {
-  font-size: 36rpx;
+  font-size: 40rpx;
   font-weight: 700;
-  letter-spacing: 8rpx;
+  letter-spacing: 12rpx;
   text-align: center;
   color: #1a1a1a;
+  line-height: 1.5;
 }
 .join-btn {
   background: #07c160;
@@ -508,19 +510,19 @@ export default {
 .section {
   background: #fff;
   border-radius: 24rpx;
-  padding: 28rpx;
+  padding: 32rpx;
   margin-bottom: 24rpx;
   box-shadow: 0 2rpx 12rpx rgba(0,0,0,.04);
 }
-.section-title { font-size: 28rpx; font-weight: 700; color: #1a1a1a; margin-bottom: 8rpx; }
-.section-desc { font-size: 23rpx; color: #999; margin-bottom: 20rpx; }
+.section-title { font-size: 30rpx; font-weight: 700; color: #1a1a1a; margin-bottom: 12rpx; line-height: 1.4; }
+.section-desc { font-size: 25rpx; color: #999; margin-bottom: 24rpx; line-height: 1.5; }
 
-.member-list { display: flex; flex-direction: column; gap: 16rpx; }
+.member-list { display: flex; flex-direction: column; gap: 20rpx; }
 .member-item {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  padding: 16rpx;
+  gap: 20rpx;
+  padding: 20rpx;
   background: #f5f6f8;
   border-radius: 16rpx;
   &.is-me { background: #e8f7ef; }
@@ -537,7 +539,7 @@ export default {
 }
 .mi-char { font-size: 28rpx; font-weight: 700; color: #07c160; }
 .mi-info { flex: 1; }
-.mi-name { font-size: 26rpx; font-weight: 600; color: #1a1a1a; }
+.mi-name { font-size: 28rpx; font-weight: 600; color: #1a1a1a; line-height: 1.4; }
 .mi-role {
   font-size: 20rpx;
   color: #999;
@@ -547,20 +549,20 @@ export default {
   margin-left: 8rpx;
   &.me { background: #07c160; color: #fff; }
 }
-.mi-tags { display: flex; flex-wrap: wrap; gap: 8rpx; margin-top: 8rpx; }
-.mi-tag { font-size: 21rpx; color: #666; background: #f5f6f8; padding: 4rpx 12rpx; border-radius: 10rpx; }
-.mi-joined { font-size: 22rpx; color: #bbb; margin-top: 4rpx; }
+.mi-tags { display: flex; flex-wrap: wrap; gap: 10rpx; margin-top: 10rpx; }
+.mi-tag { font-size: 22rpx; color: #666; background: #f5f6f8; padding: 6rpx 14rpx; border-radius: 10rpx; line-height: 1.4; }
+.mi-joined { font-size: 24rpx; color: #bbb; margin-top: 6rpx; line-height: 1.4; }
 
-.tag-categories { display: flex; flex-direction: column; gap: 20rpx; margin-bottom: 24rpx; }
-.tag-cat-title { font-size: 24rpx; font-weight: 600; color: #666; margin-bottom: 12rpx; display: block; }
-.tag-options { display: flex; flex-wrap: wrap; gap: 12rpx; }
+.tag-categories { display: flex; flex-direction: column; gap: 28rpx; margin-bottom: 28rpx; }
+.tag-cat-title { font-size: 26rpx; font-weight: 600; color: #666; margin-bottom: 16rpx; display: block; line-height: 1.4; }
+.tag-options { display: flex; flex-wrap: wrap; gap: 14rpx; }
 .tag-opt {
   background: #f5f6f8;
   border-radius: 40rpx;
-  padding: 14rpx 20rpx;
+  padding: 16rpx 24rpx;
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 10rpx;
   border: 2rpx solid transparent;
   transition: all .2s ease;
   &.active {
@@ -568,8 +570,8 @@ export default {
     border-color: #07c160;
   }
 }
-.tag-icon { font-size: 24rpx; }
-.tag-name { font-size: 23rpx; color: #666; }
+.tag-icon { font-size: 26rpx; }
+.tag-name { font-size: 25rpx; color: #666; line-height: 1.4; }
 
 .save-tags-btn {
   background: #07c160;
@@ -580,20 +582,20 @@ export default {
 }
 .stb-text { font-size: 28rpx; font-weight: 600; color: #fff; }
 
-.func-list { display: flex; flex-direction: column; gap: 12rpx; }
+.func-list { display: flex; flex-direction: column; gap: 16rpx; }
 .func-item {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  padding: 20rpx;
+  gap: 20rpx;
+  padding: 24rpx;
   background: #f5f6f8;
   border-radius: 16rpx;
   &:active { background: #e8f7ef; }
 }
-.fi-icon-wrap { font-size: 40rpx; flex-shrink: 0; }
+.fi-icon-wrap { font-size: 44rpx; flex-shrink: 0; }
 .fi-center { flex: 1; }
-.fi-name { font-size: 26rpx; font-weight: 600; color: #1a1a1a; display: block; }
-.fi-desc { font-size: 22rpx; color: #999; margin-top: 4rpx; display: block; }
+.fi-name { font-size: 28rpx; font-weight: 600; color: #1a1a1a; display: block; line-height: 1.4; }
+.fi-desc { font-size: 24rpx; color: #999; margin-top: 6rpx; display: block; line-height: 1.4; }
 .fi-arrow { font-size: 32rpx; color: #ddd; flex-shrink: 0; }
 
 .danger-zone {

@@ -117,3 +117,27 @@ export function getBirthdayMenuRecommendation() {
     name: event.name || (isBirthday ? '生日' : '纪念日')
   }
 }
+
+export function getFamilyMemberSpecialToday() {
+  const group = uni.getStorageSync('foodfind_family_group')
+  if (!group || !group.members) return null
+  const now = new Date()
+  const month = now.getMonth() + 1
+  const day = now.getDate()
+  const myId = uni.getStorageSync('foodfind_user_id') || ''
+  for (const member of group.members) {
+    if (member.userId === myId) continue
+    if (member.specialDates && member.specialDates.length > 0) {
+      const found = member.specialDates.find(d => d.month === month && d.day === day)
+      if (found) {
+        return {
+          memberName: member.name,
+          eventType: found.type,
+          eventName: found.name,
+          emoji: found.type === 'birthday' ? '🎂' : '💝'
+        }
+      }
+    }
+  }
+  return null
+}
