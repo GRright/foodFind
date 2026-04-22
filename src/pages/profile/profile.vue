@@ -506,6 +506,7 @@
 import { ALL_RECIPES } from '@/utils/constants.js'
 import { HEALTH_TAGS, HEALTH_TAG_CATEGORIES, getFamilyGroup, getCurrentUserId } from '@/utils/family.js'
 import { addSpecialDate } from '@/utils/festival.js'
+import { callFunction, markDirty } from '@/utils/cloud.js'
 
 export default {
   data() {
@@ -790,8 +791,16 @@ export default {
         return acc
       }, { calories: 0, protein: 0, fat: 0, carbs: 0 })
     },
-    loadPairStats() {
-      return
+    async loadPairStats() {
+      if (!this.currentPairId) return
+      try {
+        const res = await callFunction('getPairStats', { pairId: this.currentPairId })
+        if (res.code === 0 && res.data) {
+          this.pairStats = res.data
+        }
+      } catch (e) {
+        console.warn('[Profile] 加载配对统计失败:', e.message)
+      }
     },
     openReport() {
       this.showReportModal = true
@@ -847,6 +856,7 @@ export default {
     savePrefs() {
       uni.setStorageSync('foodfind_detailed_prefs', this.prefs)
       uni.setStorageSync('foodfind_user_count', this.prefs.userCount)
+      markDirty('detailed_prefs')
       if (this.hasFamily) {
         const { updateMyHealthTags } = require('@/utils/family.js')
         updateMyHealthTags(this.prefs.healthTags)
@@ -865,10 +875,65 @@ export default {
       } else {
         this.hasPartner = false
       }
+      this.refreshPairFromCloud()
     },
 
-    startInvite() {
-      uni.showToast({ title: '配对功能暂时不可用', icon: 'none' })
+    async refreshPairFromCloud() {
+      try {
+        const res = await callFunction('getPairInfo', {})
+        if (res.code === 0 && res.hasPair) {
+          const d = res.data
+          const partnerInfo = {
+            nickname: d.partnerName || 'TA',
+            relationType: d.relationType || 'friend',
+            status: d.status || 'paired',
+            pairId: d.pairId || ''
+          }
+          this.hasPartner = true
+          this.pairStatus = partnerInfo.status
+          this.partnerInfo = partnerInfo
+          this.currentPairId = partnerInfo.pairId
+          uni.setStorageSync('foodfind_partner', partnerInfo)
+          const app = getApp()
+          if (app?.globalData) app.globalData.partnerInfo = partnerInfo
+          this.loadPairStats()
+        }
+      } catch (e) {
+        console.warn('[Profile] 刷新配对信息失败:', e.message)
+      }
+    },
+
+    async startInvite() {
+      uni.showLoading({ title: '创建邀请...' })
+      try {
+        const res = await callFunction('createPairInvite', {
+          inviterName: this.userInfo.nickname || '美食爱好者',
+          relationType: 'couple'
+        })
+        uni.hideLoading()
+        if (res.code === 0) {
+          this.currentPairId = res.pairId
+          this.pairStatus = 'pending'
+          uni.setStorageSync('foodfind_partner', {
+            nickname: '',
+            relationType: 'couple',
+            status: 'pending',
+            pairId: res.pairId
+          })
+          uni.showShareMenu({ withShareTicket: true })
+          uni.showToast({ title: '邀请已创建，请分享给TA', icon: 'none', duration: 2000 })
+        } else if (res.code === -2) {
+          this.currentPairId = res.pairId
+          this.pairStatus = 'pending'
+          uni.showShareMenu({ withShareTicket: true })
+          uni.showToast({ title: '已有待接受的邀请，请分享', icon: 'none', duration: 2000 })
+        } else {
+          uni.showToast({ title: res.msg || '创建失败', icon: 'none' })
+        }
+      } catch (e) {
+        uni.hideLoading()
+        uni.showToast({ title: '网络错误，请重试', icon: 'none' })
+      }
     },
 
     sendInviteMessage() {
@@ -959,6 +1024,7 @@ export default {
         day: this.specialDateForm.day,
         type: this.specialDateForm.type
       })
+      markDirty('special_dates')
       uni.showToast({ title: '已保存', icon: 'success' })
       this.showSpecialModal = false
       this.specialDateForm = { name: '', month: 1, day: 1, type: 'birthday' }
@@ -996,6 +1062,7 @@ export default {
       list = list.filter(f => f.id !== id)
       uni.setStorageSync('foodfind_favorites', list)
       this.favorites = list
+      markDirty('favorites')
       uni.showToast({ title: `已移除「${target?.name || ''}」`, icon: 'none' })
     },
     goToFavoriteDetail(item) {

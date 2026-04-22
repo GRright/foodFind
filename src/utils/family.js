@@ -91,8 +91,15 @@ export async function leaveFamilyGroup() {
     return { success: false, error: '群主不能离开，请先转让或解散' }
   }
 
-  // TODO: 调用云函数从数据库中移除
-  // 先从本地移除
+  try {
+    await uniCloud.callFunction({
+      name: 'updateFamilyMember',
+      data: { familyId: group._id, action: 'remove', userId: currentUserId }
+    })
+  } catch (e) {
+    console.warn('离开家庭云函数调用失败，仍清除本地:', e.message)
+  }
+
   uni.removeStorageSync('foodfind_family_group')
   return { success: true }
 }
@@ -106,7 +113,15 @@ export async function deleteFamilyGroup() {
     return { success: false, error: '只有群主可以解散家庭' }
   }
 
-  // TODO: 调用云函数删除数据库记录
+  try {
+    await uniCloud.callFunction({
+      name: 'updateFamilyMember',
+      data: { familyId: group._id, action: 'disband' }
+    })
+  } catch (e) {
+    console.warn('解散家庭云函数调用失败，仍清除本地:', e.message)
+  }
+
   uni.removeStorageSync('foodfind_family_group')
   uni.removeStorageSync('foodfind_family_checkins')
   uni.removeStorageSync('foodfind_family_shopping')

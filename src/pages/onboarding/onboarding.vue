@@ -83,6 +83,7 @@
 </template>
 
 <script>
+import { callFunction } from '@/utils/cloud.js'
 export default {
   data() {
     return {
@@ -191,6 +192,8 @@ export default {
       if (userCountAns) {
         uni.setStorageSync('foodfind_user_count', userCountMap[userCountAns.value] || 2)
       }
+
+      callFunction('saveOnboardingAnswers', { answers: this.answers }).catch(() => {})
 
       uni.showToast({ title: '设置完成，开始美食之旅！', icon: 'success', duration: 1500 })
       setTimeout(() => {

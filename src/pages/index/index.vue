@@ -475,6 +475,7 @@
 import { ALL_RECIPES } from '@/utils/constants.js'
 import { filterRecipesByHealthTags, getFamilyHealthTags } from '@/utils/family.js'
 import { getBirthdayMenuRecommendation, addSpecialDate, getFamilyMemberSpecialToday } from '@/utils/festival.js'
+import { callFunction, markDirty } from '@/utils/cloud.js'
 
 export default {
   data() {
@@ -715,6 +716,7 @@ export default {
       if (!personalChecks[todayStr]) personalChecks[todayStr] = { breakfast: false, lunch: false, dinner: false }
       personalChecks[todayStr][mealKey] = newState
       uni.setStorageSync('foodfind_personal_checks', personalChecks)
+      markDirty('personal_checks')
 
       if (newState) {
         uni.showToast({ title: `${mealKey === 'breakfast' ? '早餐' : mealKey === 'lunch' ? '午餐' : '晚餐'}已打卡 ✓`, icon: 'success' })
@@ -1119,6 +1121,26 @@ export default {
       }
 
       const cal = this.totalCalories
+      const meals = uni.getStorageSync('foodfind_meals')
+      const myName = uni.getStorageSync('foodfind_detailed_prefs')?.nickname || '美食爱好者'
+
+      callFunction('saveShareMenu', {
+        fromName: myName,
+        toName: partnerName,
+        meals: meals || {}
+      }).then(res => {
+        if (res.code === 0) {
+          uni.setStorageSync('foodfind_share_data', {
+            meals: meals,
+            fromName: myName,
+            toName: partnerName,
+            shareId: res.shareId,
+            time: new Date().toLocaleString(),
+            status: 'pending'
+          })
+        }
+      }).catch(() => {})
+
       return { title: `${partnerName}，今天吃这些？(${cal}kcal)`, path: '/pages/index/index', imageUrl: '' }
     },
     loadMore() {},

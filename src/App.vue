@@ -1,4 +1,6 @@
 <script>
+import { initCloud, getOpenId, batchSyncOnHide, syncOnStartup } from '@/utils/cloud.js'
+
 export default {
   onLaunch() {
     console.log('[App] 吃点啥 - 启动中...')
@@ -13,6 +15,14 @@ export default {
 
     const cached = uni.getStorageSync('foodfind_partner')
     if (cached) { this.globalData.partnerInfo = cached }
+
+    initCloud()
+    getOpenId().then(() => {
+      syncOnStartup()
+    })
+  },
+  onHide() {
+    batchSyncOnHide()
   },
   globalData: {
     userInfo: { nickname: '美食爱好者', avatar: '' },

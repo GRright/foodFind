@@ -1,5 +1,5 @@
 const cloud = require('wx-server-sdk')
-cloud.init({ env: 'cloud1-d7gvzylmp17ed1957' })
+cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
 exports.main = async (event) => {
@@ -19,7 +19,7 @@ exports.main = async (event) => {
           voters: [],
           count: 0
         })),
-        creatorName: creatorName || 'æˆ‘',
+        creatorName: creatorName || 'æˆ?,
         creatorOpenid: cloud.getWXContext().OPENID,
         status: 'active',
         createdAt: new Date()

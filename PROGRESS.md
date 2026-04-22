@@ -1,7 +1,46 @@
 # 吃点啥 - 项目进度文档
 
 > 最后更新：2026-04-22
-> 版本：v2.5.2
+> 版本：v2.6.0
+
+---
+
+### v2.6.0 - 云函数全面打通 + 降本增效 (2026-04-22)
+
+#### ☁️ 云函数全面打通
+所有 34 个云函数已与前端完整对接，之前 27 个"已实现但未调用"的云函数现在全部接入：
+
+- **配对功能**：createPairInvite / acceptPairInvite / getPairInfo / getPairStats
+  - invite.vue 完整打通：加载邀请 → 查看详情 → 接受邀请
+  - profile.vue 完整打通：创建邀请 → 分享给TA → 自动刷新配对状态 → 加载配对统计
+- **分享菜单**：saveShareMenu / getShareMenu / updateShareStatus
+  - share.vue 完整打通：云端加载菜单 → 确认/调整 → 刷新状态
+  - index.vue 分享时自动调用 saveShareMenu 保存到云端
+- **新手引导**：saveOnboardingAnswers
+  - onboarding.vue 完成问卷后异步保存到云端
+- **饮食日记**：saveFoodDiary（通过 batchSync 延迟同步）
+- **家庭群组**：leaveFamilyGroup / deleteFamilyGroup 的 TODO 已修复
+  - updateFamilyMember 云函数新增 remove/disband 操作
+
+#### 💰 降本增效策略
+核心原则：**非交互数据延迟同步，交互数据即时调用**
+
+- 新建 `cloud.js` 工具模块，统一管理云函数调用
+- **onHide 批量同步**：用户关闭小程序时，一次性提交所有脏数据
+  - 打卡数据 (personal_checks)
+  - 每日菜单 (daily_meals)
+  - 用户偏好 (detailed_prefs)
+  - 收藏列表 (favorites)
+  - 特殊日期 (special_dates)
+  - 饮食日记 (diary_list)
+  - 周菜单 (weekly)
+- **markDirty 机制**：数据变更时仅标记脏位，不立即调用云函数
+- **即时调用仅限交互场景**：配对邀请、分享菜单、家庭操作等需要他人感知的功能
+
+#### 🔧 云函数优化
+- **环境初始化统一**：所有 34 个云函数统一使用 `cloud.DYNAMIC_CURRENT_ENV`，修复之前 28 个硬编码环境 ID 的问题
+- **batchSync 升级**：支持 upsert（有则更新，无则新增）+ get 操作
+- **updateFamilyMember 增强**：新增 remove（移除成员）和 disband（解散群组）操作
 
 ---
 

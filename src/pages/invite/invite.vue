@@ -59,6 +59,8 @@
 </template>
 
 <script>
+import { callFunction } from '@/utils/cloud.js'
+
 export default {
   data() {
     return {
@@ -92,15 +94,59 @@ export default {
     }
   },
   methods: {
-    loadInvite() {
-      this.loading = false
-      this.error = true
-      this.errorTitle = '云功能暂时不可用'
-      this.errorMsg = '配对功能需要云端支持，请稍后重试'
+    async loadInvite() {
+      this.loading = true
+      this.error = false
+      try {
+        const res = await callFunction('getPairInfo', { pairId: this.pairId })
+        this.loading = false
+        if (res.code === 0 && res.hasPair) {
+          const d = res.data
+          this.inviterName = d.inviterName || '我'
+          this.relationType = d.relationType || 'couple'
+          this.createTime = d.createdAt || '刚刚'
+          if (d.status === 'paired') {
+            this.isAccepted = true
+            this.savePartnerToLocal(d)
+          }
+        } else if (res.code === 0 && !res.hasPair) {
+          this.error = true
+          this.errorTitle = '邀请不存在'
+          this.errorMsg = '该邀请可能已过期，请让对方重新发送'
+        } else {
+          this.error = true
+          this.errorTitle = '加载失败'
+          this.errorMsg = res.msg || res.error || '请检查网络后重试'
+        }
+      } catch (e) {
+        this.loading = false
+        this.error = true
+        this.errorTitle = '网络错误'
+        this.errorMsg = '请检查网络连接后重试'
+      }
     },
 
-    acceptInvite() {
-      uni.showToast({ title: '配对功能暂时不可用', icon: 'none' })
+    async acceptInvite() {
+      uni.showLoading({ title: '接受中...' })
+      try {
+        const myName = uni.getStorageSync('foodfind_detailed_prefs')?.nickname || '美食爱好者'
+        const res = await callFunction('acceptPairInvite', {
+          pairId: this.pairId,
+          accepterName: myName,
+          myName: myName
+        })
+        uni.hideLoading()
+        if (res.code === 0) {
+          this.isAccepted = true
+          this.savePartnerToLocal(res.data)
+          uni.showToast({ title: '配对成功！', icon: 'success' })
+        } else {
+          uni.showToast({ title: res.msg || '接受失败', icon: 'none' })
+        }
+      } catch (e) {
+        uni.hideLoading()
+        uni.showToast({ title: '网络错误，请重试', icon: 'none' })
+      }
     },
 
     savePartnerToLocal(data) {

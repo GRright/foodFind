@@ -90,6 +90,7 @@
 </template>
 
 <script>
+import { markDirty } from '@/utils/cloud.js'
 export default {
   data() {
     return {
@@ -213,6 +214,7 @@ export default {
         diaryList.unshift(diaryEntry)
       }
       uni.setStorageSync('foodfind_diary_list', diaryList)
+      markDirty('diary_list')
 
       uni.showToast({ title: '保存成功', icon: 'success' })
       this.meals = ['']

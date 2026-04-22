@@ -1,5 +1,5 @@
 const cloud = require('wx-server-sdk')
-cloud.init({ env: 'cloud1-d7gvzylmp17ed1957' })
+cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
 exports.main = async (event) => {
@@ -10,14 +10,14 @@ exports.main = async (event) => {
       status: 'pending'
     }).get()
     if (existing.data.length > 0) {
-      return { code: -2, msg: '你已有一个待接受的邀请', pairId: existing.data[0].pairId }
+      return { code: -2, msg: '你已有一个待接受的邀�?, pairId: existing.data[0].pairId }
     }
     const pairId = 'pair_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
     await db.collection('pairs').add({
       data: {
         pairId,
         inviterOpenid: openid,
-        inviterName: event.inviterName || '我',
+        inviterName: event.inviterName || '�?,
         accepterOpenid: '',
         accepterName: '',
         relationType: event.relationType || 'friend',

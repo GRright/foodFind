@@ -1,12 +1,11 @@
-// 云函数：更新家庭成员信息
 const cloud = require('wx-server-sdk')
-
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
+const _ = db.command
 
-exports.main = async (event, context) => {
+exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
-  const { familyId, healthTags, name } = event
+  const { familyId, healthTags, name, action, userId } = event
 
   try {
     const family = await db.collection('families').doc(familyId).get()
@@ -14,12 +13,27 @@ exports.main = async (event, context) => {
       return { success: false, error: '家庭不存在' }
     }
 
+    if (action === 'remove') {
+      const members = family.data.members.filter(m => m.userId !== userId)
+      if (members.length === family.data.members.length) {
+        return { success: false, error: '成员不存在' }
+      }
+      await db.collection('families').doc(familyId).update({
+        data: { members, updatedAt: new Date() }
+      })
+      return { success: true }
+    }
+
+    if (action === 'disband') {
+      await db.collection('families').doc(familyId).remove()
+      return { success: true }
+    }
+
     const memberIndex = family.data.members.findIndex(m => m.userId === OPENID)
     if (memberIndex === -1) {
       return { success: false, error: '不是家庭成员' }
     }
 
-    // 构建更新字段
     const updateFields = {}
     if (healthTags !== undefined) updateFields[`members.${memberIndex}.healthTags`] = healthTags
     if (name !== undefined) updateFields[`members.${memberIndex}.name`] = name
@@ -29,13 +43,8 @@ exports.main = async (event, context) => {
       data: updateFields
     })
 
-    // 返回更新后的家庭数据
     const updatedFamily = await db.collection('families').doc(familyId).get()
-
-    return {
-      success: true,
-      familyData: updatedFamily.data
-    }
+    return { success: true, familyData: updatedFamily.data }
   } catch (err) {
     console.error('更新成员信息失败:', err)
     return { success: false, error: err.message }

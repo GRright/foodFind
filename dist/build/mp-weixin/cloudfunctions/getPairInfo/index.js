@@ -1,5 +1,5 @@
 const cloud = require('wx-server-sdk')
-cloud.init({ env: 'cloud1-d7gvzylmp17ed1957' })
+cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
 exports.main = async (event) => {
@@ -32,9 +32,9 @@ exports.main = async (event) => {
       hasPair: true,
       data: {
         pairId: pair.pairId,
-        partnerName: isInviter ? (pair.accepterName || 'TA') : (pair.inviterName || 'æˆ‘'),
+        partnerName: isInviter ? (pair.accepterName || 'TA') : (pair.inviterName || 'æˆ?),
         partnerOpenid: isInviter ? pair.accepterOpenid : pair.inviterOpenid,
-        inviterName: pair.inviterName || 'æˆ‘',
+        inviterName: pair.inviterName || 'æˆ?,
         accepterName: pair.accepterName || 'TA',
         relationType: pair.relationType || 'friend',
         status: pair.status,

@@ -75,6 +75,7 @@
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
+import { callFunction } from '@/utils/cloud.js'
 
 export default {
   data() {
@@ -119,11 +120,29 @@ export default {
     }
   },
   methods: {
-    loadFromCloud(sid) {
+    async loadFromCloud(sid) {
       this.shareId = sid
-      this.loading = false
-      uni.showToast({ title: '云功能暂时不可用', icon: 'none' })
-      setTimeout(() => { uni.switchTab({ url: '/pages/index/index' }) }, 1500)
+      this.isReceiver = true
+      this.isSender = false
+      try {
+        const res = await callFunction('getShareMenu', { shareId: sid })
+        if (res.code === 0 && res.data) {
+          const d = res.data
+          this.dailyMeals = d.meals || { breakfast: [], lunch: [], dinner: [] }
+          this.fromName = d.fromName || 'TA'
+          this.partnerName = d.fromName || 'TA'
+          this.shareTime = d.createdAt ? new Date(d.createdAt).toLocaleString() : ''
+          this.status = d.status || 'pending'
+          this.loading = false
+        } else {
+          this.loading = false
+          uni.showToast({ title: '菜单不存在或已过期', icon: 'none' })
+          setTimeout(() => { uni.switchTab({ url: '/pages/index/index' }) }, 1500)
+        }
+      } catch (e) {
+        this.loading = false
+        uni.showToast({ title: '加载失败', icon: 'none' })
+      }
     },
 
     loadFromLocal() {
@@ -133,29 +152,45 @@ export default {
         this.dailyMeals = data.meals || { breakfast: [], lunch: [], dinner: [] }
         this.partnerName = data.toName || 'TA'
         this.fromName = data.fromName || ''
-        this.isSender = this.mode === 'send'
-        this.isReceiver = !this.isSender
+        this.isSender = true
+        this.isReceiver = false
         this.shareTime = data.time || ''
         this.status = data.status || 'pending'
+        this.shareId = data.shareId || ''
         this.loading = false
       } else {
         this.loading = false
       }
     },
 
-    refreshStatus() {
-      uni.showToast({ title: '已是最新状态', icon: 'none' })
+    async refreshStatus() {
+      if (!this.shareId) {
+        uni.showToast({ title: '已是最新状态', icon: 'none' })
+        return
+      }
+      try {
+        const res = await callFunction('getShareMenu', { shareId: this.shareId })
+        if (res.code === 0 && res.data) {
+          this.status = res.data.status || this.status
+          if (res.data.status === 'modified' && res.data.meals) {
+            this.dailyMeals = res.data.meals
+          }
+          uni.showToast({ title: '已刷新', icon: 'success' })
+        }
+      } catch (e) {
+        uni.showToast({ title: '刷新失败', icon: 'none' })
+      }
     },
 
     viewRecipe(r) { uni.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${r.id}` }) },
 
-    confirmMeals() {
+    async confirmMeals() {
       uni.showModal({
         title: '确认菜单',
         content: `确定使用这份菜单吗？对方会收到通知哦~`,
-        success: (res) => {
+        success: async (res) => {
           if (res.confirm) {
-            this.updateCloudStatus('confirmed')
+            await this.updateCloudStatus('confirmed')
           }
         }
       })
@@ -187,13 +222,25 @@ export default {
       return [...m.sort(()=>Math.random()-0.5).slice(0,mc),...v.sort(()=>Math.random()-0.5).slice(0,vc)].sort(()=>Math.random()-0.5)
     },
 
-    updateCloudStatus(status, meals) {
+    async updateCloudStatus(status, meals) {
       this.status = status
       if (meals) { this.dailyMeals = meals }
       uni.setStorageSync('foodfind_meals', this.dailyMeals)
       uni.setStorageSync('foodfind_meals_date', new Date().toISOString().split('T')[0])
       const app = getApp()
       if (app?.globalData) app.globalData.dailyMeals = this.dailyMeals
+
+      if (this.shareId) {
+        try {
+          await callFunction('updateShareStatus', { shareId: this.shareId, status })
+          if (status === 'modified' && meals) {
+            await callFunction('updateShareStatus', { shareId: this.shareId, status, meals })
+          }
+        } catch (e) {
+          console.warn('[Share] 更新分享状态失败:', e.message)
+        }
+      }
+
       uni.showToast({ title: status === 'confirmed' ? '已确认 ✨' : '已调整', icon: 'success' })
     },
 
