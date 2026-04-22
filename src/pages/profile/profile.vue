@@ -262,7 +262,7 @@
     </view>
 
     <view class="version-info">
-      <text class="version-text">吃点啥 v2.4 · 营养可视化+特别日子</text>
+      <text class="version-text">吃点啥 v2.5.3 · 交互体验优化版</text>
     </view>
 
     <view class="report-modal-mask" :class="{ show: showReportModal }" @click="closeReport"></view>
@@ -979,7 +979,7 @@ export default {
     },
     showAbout() {
       uni.showModal({
-        title: '关于吃点啥 v2.4', content: '为情侣/家人打造的共同决策吃什么的小工具\n\n✅ 智能一周菜单规划\n✅ 荤素营养均衡算法\n✅ 云端配对，跨设备同步\n✅ 分享菜单+双向确认\n✅ 互动打卡+火花系统\n✅ 本周饮食报告+营养饼图\n✅ 标记喜欢的菜品\n✅ 生日/纪念日特别菜单', showCancel: false, confirmText: '知道了'
+        title: '关于吃点啥 v2.5.3', content: '为情侣/家人打造的共同决策吃什么的小工具\n\n✅ 智能一周菜单规划\n✅ 荤素营养均衡算法\n✅ 云端配对，跨设备同步\n✅ 分享菜单+双向确认\n✅ 互动打卡+火花系统\n✅ 本周饮食报告+营养饼图\n✅ 喜欢/不喜欢标记菜品\n✅ 生日/纪念日特别菜单\n✅ 家庭群组功能\n✅ 智能购物清单', showCancel: false, confirmText: '知道了'
       })
     },
     loadFavorites() {
