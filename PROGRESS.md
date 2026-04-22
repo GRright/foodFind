@@ -1,7 +1,48 @@
 # 吃点啥 - 项目进度文档
 
 > 最后更新：2026-04-22
-> 版本：v2.6.1
+> 版本：v2.6.2
+
+---
+
+### v2.6.2 - 系统安全加固 (2026-04-22)
+
+#### 🛡️ 云函数安全加固
+对全部 34 个云函数进行安全审查，修复以下关键漏洞：
+
+**输入验证与防注入**
+- **batchSync**：新增集合白名单（ALLOWED_COLLECTIONS），防止恶意写入任意集合
+  - 仅允许 7 个合法集合：personal_checks / daily_meals / user_prefs / user_favorites / user_special_dates / weekly_menus / user_my_info
+  - 新增 50KB 数据大小限制，防止超大数据提交
+  - 新增 10 条批量操作上限，防止资源耗尽
+- **createFamilyGroup**：名称长度限制 30 字符，输入过滤 XSS 字符
+- **joinFamilyGroup**：邀请码格式校验 `/^[A-Z0-9]{6}$/`，防止非法注入
+- **updateFamilyMember**：输入过滤 XSS 字符，名称长度限制
+
+**权限控制**
+- **updateFamilyMember**：
+  - 移除成员：仅群主或成员本人可操作
+  - 解散群组：仅群主可操作
+  - 修改昵称：仅群主或成员本人可操作
+- **batchSync**：白名单机制阻止未授权集合写入
+
+**敏感数据保护**
+- **getShareMenu**：移除返回中的 fromOpenid 字段，防止泄露发送方身份
+- **getFamilyCheckIns**：移除返回中的 inviteCode 字段，防止邀请码泄露
+- **cloud.js**：移除前端 localStorage 存储 openid 的逻辑，防止身份伪造
+  - 云函数统一使用 `cloud.getWXContext()` 获取真实 openid
+
+**资源保护**
+- **getFamilyCheckIns**：查询限制 365 条记录，防止全表扫描
+- **batchSync**：单条数据 50KB 限制，批量 10 条上限
+- 所有云函数输入统一 XSS 过滤 `/[<>'"&]/g`
+
+#### 🔧 前端安全优化
+- **cloud.js**：
+  - 移除 openid 本地存储，防止被篡改
+  - 批量同步不再传递 openid，由云函数从微信上下文获取
+  - 新增 user_my_info 集合同步支持
+  - 添加安全注释说明各模块安全策略
 
 ---
 

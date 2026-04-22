@@ -19,12 +19,9 @@ export function initCloud() {
 export async function getOpenId() {
   if (_openid) return _openid
   try {
-    const cached = uni.getStorageSync('foodfind_openid')
-    if (cached) { _openid = cached; return _openid }
     const res = await callFunction('login', {})
     if (res.code === 0 && res.openid) {
       _openid = res.openid
-      uni.setStorageSync('foodfind_openid', _openid)
     }
   } catch (e) {
     console.warn('[Cloud] 获取openid失败:', e.message)
@@ -51,12 +48,11 @@ export function markClean(key) {
   _dirtyKeys.delete(key)
 }
 
+// 安全检查：云函数中通过 getWXContext 获取真实 openid
+// 前端不传递 openid，防止伪造
 export async function batchSyncOnHide() {
   if (_dirtyKeys.size === 0) return
   if (!_cloudReady) return
-
-  const openid = await getOpenId()
-  if (!openid) return
 
   const tasks = []
 
@@ -65,7 +61,7 @@ export async function batchSyncOnHide() {
     if (data) {
       tasks.push(callFunction('batchSync', {
         collection: 'personal_checks',
-        data: { openid, checks: data, updatedAt: new Date().toISOString() }
+        data: { checks: data }
       }))
     }
   }
@@ -76,7 +72,7 @@ export async function batchSyncOnHide() {
     if (meals && mealsDate) {
       tasks.push(callFunction('batchSync', {
         collection: 'daily_meals',
-        data: { openid, meals, date: mealsDate, updatedAt: new Date().toISOString() }
+        data: { meals, date: mealsDate }
       }))
     }
   }
@@ -86,7 +82,7 @@ export async function batchSyncOnHide() {
     if (prefs) {
       tasks.push(callFunction('batchSync', {
         collection: 'user_prefs',
-        data: { openid, prefs, updatedAt: new Date().toISOString() }
+        data: { prefs }
       }))
     }
   }
@@ -96,7 +92,7 @@ export async function batchSyncOnHide() {
     if (favs) {
       tasks.push(callFunction('batchSync', {
         collection: 'user_favorites',
-        data: { openid, favorites: favs, updatedAt: new Date().toISOString() }
+        data: { favorites: favs }
       }))
     }
   }
@@ -106,7 +102,7 @@ export async function batchSyncOnHide() {
     if (dates) {
       tasks.push(callFunction('batchSync', {
         collection: 'user_special_dates',
-        data: { openid, specialDates: dates, updatedAt: new Date().toISOString() }
+        data: { specialDates: dates }
       }))
     }
   }
@@ -130,7 +126,17 @@ export async function batchSyncOnHide() {
     if (weekly) {
       tasks.push(callFunction('batchSync', {
         collection: 'weekly_menus',
-        data: { openid, weekly, updatedAt: new Date().toISOString() }
+        data: { weekly }
+      }))
+    }
+  }
+
+  if (_dirtyKeys.has('my_info')) {
+    const info = uni.getStorageSync('foodfind_my_info')
+    if (info) {
+      tasks.push(callFunction('batchSync', {
+        collection: 'user_my_info',
+        data: { myInfo: info }
       }))
     }
   }
@@ -148,13 +154,12 @@ export async function batchSyncOnHide() {
 
 export async function syncOnStartup() {
   if (!_cloudReady) return
-  const openid = await getOpenId()
-  if (!openid) return
 
   try {
     const res = await callFunction('batchSync', {
       collection: 'personal_checks',
-      data: { openid, action: 'get' }
+      data: {},
+      action: 'get'
     })
     if (res.code === 0 && res.data) {
       const local = uni.getStorageSync('foodfind_personal_checks') || {}

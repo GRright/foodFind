@@ -1,40 +1,45 @@
-// 云函数：创建家庭群组
 const cloud = require('wx-server-sdk')
-
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
 
-exports.main = async (event, context) => {
+// 安全检查：输入清洗
+function sanitize(str, maxLen) {
+  if (typeof str !== 'string') return str
+  return str.substring(0, maxLen).replace(/[<>'"&]/g, '')
+}
+
+exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   const { name, type, userName } = event
 
   try {
+    // 安全检查：输入验证
+    if (!name || name.length > 30) {
+      return { success: false, error: '名称格式不正确' }
+    }
+
     // 检查用户是否已经属于某个家庭
     const existingFamily = await db.collection('families').where({
       members: _.elemMatch({ userId: OPENID })
     }).get()
 
     if (existingFamily.data.length > 0) {
-      return {
-        success: false,
-        error: '您已经属于一个家庭群组'
-      }
+      return { success: false, error: '您已经属于一个家庭群组' }
     }
 
-    // 生成 6 位邀请码
+    // 生成 6 位邀请码（排除易混淆字符）
     const inviteCode = generateInviteCode()
 
-    // 创建家庭
     const familyData = {
-      name,
-      type,
+      name: sanitize(name, 30),
+      type: type || 'family',
       inviteCode,
       creatorId: OPENID,
       members: [
         {
           userId: OPENID,
-          name: userName,
+          name: sanitize(userName || '群主', 20),
           role: 'admin',
           healthTags: [],
           joinedAt: new Date()
@@ -56,14 +61,10 @@ exports.main = async (event, context) => {
     }
   } catch (err) {
     console.error('创建家庭失败:', err)
-    return {
-      success: false,
-      error: err.message
-    }
+    return { success: false, error: err.message }
   }
 }
 
-// 生成 6 位邀请码
 function generateInviteCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
   let code = ''

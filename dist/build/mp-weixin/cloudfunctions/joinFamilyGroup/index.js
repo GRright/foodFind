@@ -1,65 +1,56 @@
-// 云函数：加入家庭群组
 const cloud = require('wx-server-sdk')
-
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
 
-exports.main = async (event, context) => {
+function sanitize(str, maxLen) {
+  if (typeof str !== 'string') return str
+  return str.substring(0, maxLen).replace(/[<>'"&]/g, '')
+}
+
+exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   const { inviteCode, userName } = event
 
   try {
-    // 查找对应邀请码的家庭
+    // 安全检查：邀请码格式验证（6位字母数字）
+    if (!inviteCode || !/^[A-Z0-9]{6}$/.test(inviteCode)) {
+      return { success: false, error: '邀请码格式不正确' }
+    }
+
     const familyResult = await db.collection('families').where({
       inviteCode: inviteCode
     }).get()
 
     if (familyResult.data.length === 0) {
-      return {
-        success: false,
-        error: '邀请码无效'
-      }
+      return { success: false, error: '邀请码无效' }
     }
 
     const family = familyResult.data[0]
     const familyType = getFamilyTypeConfig(family.type)
 
-    // 检查人数限制
     if (family.members.length >= familyType.maxMembers) {
-      return {
-        success: false,
-        error: `家庭人数已满（${familyType.maxMembers}人）`
-      }
+      return { success: false, error: `家庭人数已满（${familyType.maxMembers}人）` }
     }
 
-    // 检查是否已经是成员
     const isAlreadyMember = family.members.some(m => m.userId === OPENID)
     if (isAlreadyMember) {
-      return {
-        success: false,
-        error: '您已经是该家庭的成员'
-      }
+      return { success: false, error: '您已经是该家庭的成员' }
     }
 
-    // 检查用户是否属于其他家庭
     const otherFamily = await db.collection('families').where({
       members: _.elemMatch({ userId: OPENID })
     }).get()
 
     if (otherFamily.data.length > 0) {
-      return {
-        success: false,
-        error: '您已经属于另一个家庭群组'
-      }
+      return { success: false, error: '您已经属于另一个家庭群组' }
     }
 
-    // 添加新成员
     await db.collection('families').doc(family._id).update({
       data: {
         members: _.push({
           userId: OPENID,
-          name: userName || '新成员',
+          name: sanitize(userName || '新成员', 20),
           role: 'member',
           healthTags: [],
           joinedAt: new Date()
@@ -68,7 +59,6 @@ exports.main = async (event, context) => {
       }
     })
 
-    // 获取更新后的家庭数据
     const updatedFamily = await db.collection('families').doc(family._id).get()
 
     return {
@@ -78,10 +68,7 @@ exports.main = async (event, context) => {
     }
   } catch (err) {
     console.error('加入家庭失败:', err)
-    return {
-      success: false,
-      error: err.message
-    }
+    return { success: false, error: err.message }
   }
 }
 
