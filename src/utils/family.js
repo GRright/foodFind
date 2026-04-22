@@ -48,7 +48,7 @@ export function getCurrentUserId() {
 // 家庭群组 CRUD 操作（调用云函数）
 export async function createFamilyGroup(name, type, userName) {
   try {
-    const res = await uniCloud.callFunction({
+    const res = await wx.cloud.callFunction({
       name: 'createFamilyGroup',
       data: { name, type, userName }
     })
@@ -67,7 +67,7 @@ export async function createFamilyGroup(name, type, userName) {
 
 export async function joinFamilyGroup(inviteCode, userName) {
   try {
-    const res = await uniCloud.callFunction({
+    const res = await wx.cloud.callFunction({
       name: 'joinFamilyGroup',
       data: { inviteCode, userName }
     })
@@ -92,7 +92,7 @@ export async function leaveFamilyGroup() {
   }
 
   try {
-    await uniCloud.callFunction({
+    await wx.cloud.callFunction({
       name: 'updateFamilyMember',
       data: { familyId: group._id, action: 'remove', userId: currentUserId }
     })
@@ -114,7 +114,7 @@ export async function deleteFamilyGroup() {
   }
 
   try {
-    await uniCloud.callFunction({
+    await wx.cloud.callFunction({
       name: 'updateFamilyMember',
       data: { familyId: group._id, action: 'disband' }
     })
@@ -136,7 +136,7 @@ export function getFamilyGroup() {
 // 更新家庭成员信息（调用云函数）
 export async function updateFamilyMember(familyId, updates) {
   try {
-    const res = await uniCloud.callFunction({
+    const res = await wx.cloud.callFunction({
       name: 'updateFamilyMember',
       data: { familyId, ...updates }
     })
@@ -166,7 +166,7 @@ export async function recordFamilyCheckIn(date, userId, mealType) {
   if (!group) return { success: false, error: '不在任何家庭中' }
 
   try {
-    await uniCloud.callFunction({
+    await wx.cloud.callFunction({
       name: 'recordCheckIn',
       data: { familyId: group._id, date, mealType }
     })
@@ -196,7 +196,7 @@ export async function fetchFamilyCheckIns(startDate, endDate) {
   if (!group) return { success: false, error: '不在任何家庭中' }
 
   try {
-    const res = await uniCloud.callFunction({
+    const res = await wx.cloud.callFunction({
       name: 'getFamilyCheckIns',
       data: { familyId: group._id, startDate, endDate }
     })
@@ -231,7 +231,7 @@ export async function getFamilyShoppingList() {
   
   // 同步获取云端数据
   try {
-    const res = await uniCloud.callFunction({
+    const res = await wx.cloud.callFunction({
       name: 'syncFamilyShopping',
       data: { familyId: group._id, action: 'get' }
     })
@@ -260,7 +260,7 @@ export async function saveFamilyShoppingList(list, userId) {
 
   // 异步同步到云端
   try {
-    await uniCloud.callFunction({
+    await wx.cloud.callFunction({
       name: 'syncFamilyShopping',
       data: { familyId: group._id, action: 'update', items: list.items }
     })
@@ -277,7 +277,7 @@ export async function sendFamilyNotification(type, content, targetUserId) {
   if (!group) return { success: false, error: '不在任何家庭中' }
 
   try {
-    await uniCloud.callFunction({
+    await wx.cloud.callFunction({
       name: 'sendFamilyNotification',
       data: { familyId: group._id, type, content, targetUserId }
     })

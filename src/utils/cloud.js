@@ -35,7 +35,7 @@ export async function getOpenId() {
 export async function callFunction(name, data = {}) {
   if (!_cloudReady) initCloud()
   try {
-    const res = await uniCloud.callFunction({ name, data })
+    const res = await wx.cloud.callFunction({ name, data })
     return res.result
   } catch (e) {
     console.error(`[Cloud] callFunction(${name}) 失败:`, e.message)
