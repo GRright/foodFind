@@ -18,6 +18,13 @@ export default {
     const cached = uni.getStorageSync('foodfind_partner')
     if (cached) { this.globalData.partnerInfo = cached }
 
+    // 确保用餐配置有默认值（工作日和周末都是三餐）
+    const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+    if (!prefs.mealConfig) {
+      prefs.mealConfig = { weekday: ['breakfast', 'lunch', 'dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
+      uni.setStorageSync('foodfind_detailed_prefs', prefs)
+    }
+
     this.performLogin()
   },
   onHide() {

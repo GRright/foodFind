@@ -193,6 +193,13 @@ export default {
         uni.setStorageSync('foodfind_user_count', userCountMap[userCountAns.value] || 2)
       }
 
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      prefs.userCount = userCountMap[userCountAns?.value] || 2
+      if (!prefs.mealConfig) {
+        prefs.mealConfig = { weekday: ['breakfast', 'lunch', 'dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
+      }
+      uni.setStorageSync('foodfind_detailed_prefs', prefs)
+
       callFunction('saveOnboardingAnswers', { answers: this.answers }).catch(() => {})
 
       uni.showToast({ title: '设置完成，开始美食之旅！', icon: 'success', duration: 1500 })

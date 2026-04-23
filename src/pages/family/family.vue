@@ -407,8 +407,8 @@ export default {
   box-shadow: 0 2rpx 12rpx rgba(0,0,0,.04);
   margin-bottom: 28rpx;
 }
-.ac-title, .jc-title { font-size: 34rpx; font-weight: 700; color: #1a1a1a; margin-bottom: 12rpx; line-height: 1.4; }
-.ac-desc, .jc-desc { font-size: 26rpx; color: #999; margin-bottom: 32rpx; line-height: 1.5; }
+.ac-title, .jc-title { font-size: 34rpx; font-weight: 700; color: #1a1a1a; margin-bottom: 18rpx; line-height: 1.4; }
+.ac-desc, .jc-desc { font-size: 26rpx; color: #999; margin-bottom: 36rpx; line-height: 1.6; }
 
 .form-section { margin-bottom: 32rpx; }
 .form-row { margin-bottom: 32rpx; }

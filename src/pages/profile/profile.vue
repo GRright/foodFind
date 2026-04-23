@@ -1241,8 +1241,8 @@ export default {
         uni.showToast({ title: '请输入反馈内容', icon: 'none' })
         return
       }
-      const sanitized = text.replace(/[<>'"&\/\\]/g, '').substring(0, 500)
-      if (sanitized.length < 5) {
+      const sanitized = text.replace(/[<>'"&\/\\\{\}\(\)\[\]#%]/g, '').substring(0, 500)
+      if (sanitized.length < 2) {
         uni.showToast({ title: '反馈内容太短', icon: 'none' })
         return
       }
@@ -1559,23 +1559,24 @@ export default {
   padding:32rpx 36rpx 16rpx; border-bottom:1rpx solid #f0f0f0;
 }
 .am-title { font-size:32rpx; font-weight:700; color:#1a1a1a; }
-.am-body { padding:32rpx 36rpx; max-height:60vh; }
-.am-info { text-align:center; padding:16rpx 0; }
-.am-version { font-size:26rpx; font-weight:600; color:#07c160; display:block; margin-bottom:12rpx; }
-.am-desc { font-size:24rpx; color:#666; display:block; margin-bottom:8rpx; line-height:1.6; }
-.am-features { font-size:22rpx; color:#999; display:block; }
-.am-divider { height:1rpx; background:#f0f0f0; margin:24rpx 0; }
-.amf-title { font-size:28rpx; font-weight:700; color:#1a1a1a; display:block; margin-bottom:8rpx; }
-.amf-hint { font-size:22rpx; color:#999; display:block; margin-bottom:16rpx; }
+.am-body { padding:40rpx 44rpx 48rpx; max-height:68vh; }
+.am-info { text-align:center; padding:24rpx 16rpx; }
+.am-version { font-size:28rpx; font-weight:700; color:#07c160; display:block; margin-bottom:16rpx; }
+.am-desc { font-size:24rpx; color:#666; display:block; margin-bottom:12rpx; line-height:1.7; }
+.am-features { font-size:22rpx; color:#999; display:block; margin-bottom:8rpx; }
+.am-divider { height:1rpx; background:#f0f0f0; margin:32rpx 0; }
+.am-feedback { padding:4rpx 8rpx; }
+.amf-title { font-size:28rpx; font-weight:700; color:#1a1a1a; display:block; margin-bottom:12rpx; }
+.amf-hint { font-size:22rpx; color:#999; display:block; margin-bottom:20rpx; line-height:1.5; }
 .amf-input {
   width:100%; height:200rpx; background:#f5f6f8; border-radius:16rpx;
-  padding:20rpx; font-size:26rpx; color:#1a1a1a; line-height:1.6;
+  padding:24rpx; font-size:26rpx; color:#1a1a1a; line-height:1.6;
   box-sizing:border-box;
 }
-.amf-count { font-size:20rpx; color:#ccc; display:block; text-align:right; margin-top:8rpx; }
+.amf-count { font-size:20rpx; color:#bbb; display:block; text-align:right; margin-top:10rpx; margin-bottom:6rpx; }
 .amf-submit {
-  margin-top:20rpx; background:#07c160; border-radius:48rpx;
-  padding:22rpx 0; text-align:center;
+  margin-top:28rpx; background:#07c160; border-radius:48rpx;
+  padding:26rpx 0; text-align:center;
   &:active { opacity:.85; transform:scale(.98); }
 }
 .amf-submit-text { font-size:28rpx; font-weight:600; color:#fff; }
