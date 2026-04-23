@@ -309,11 +309,13 @@ export default {
         this.myHealthTags.push(tagId)
       }
     },
-    saveMyHealthTags() {
-      const result = updateMyHealthTags(this.myHealthTags)
+    async saveMyHealthTags() {
+      const result = await updateMyHealthTags(this.myHealthTags)
       if (result.success) {
         this.loadFamily()
         uni.showToast({ title: '健康标签已保存', icon: 'success' })
+      } else {
+        uni.showToast({ title: result.error || '保存失败', icon: 'none' })
       }
     },
     setIndependentMode(val) {
