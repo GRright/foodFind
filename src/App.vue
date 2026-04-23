@@ -30,6 +30,26 @@ export default {
             console.log('[Auth] 微信登录成功，code:', loginRes.code)
             this.globalData.loginCode = loginRes.code
             
+            // 获取用户信息
+            wx.getUserProfile({
+              desc: '用于完善用户资料',
+              success: (profileRes) => {
+                const userInfo = {
+                  nickname: profileRes.userInfo.nickName || '美食爱好者',
+                  avatar: profileRes.userInfo.avatarUrl || ''
+                }
+                this.globalData.userInfo = userInfo
+                uni.setStorageSync('foodfind_user_info', userInfo)
+                console.log('[Auth] 用户信息已获取:', userInfo)
+              },
+              fail: () => {
+                console.log('[Auth] 用户信息获取失败，使用默认昵称')
+                const userInfo = { nickname: '美食爱好者', avatar: '' }
+                this.globalData.userInfo = userInfo
+                uni.setStorageSync('foodfind_user_info', userInfo)
+              }
+            })
+            
             initCloud()
             getOpenId().then((openid) => {
               if (openid) {

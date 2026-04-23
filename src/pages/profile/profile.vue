@@ -510,7 +510,7 @@ import { callFunction, markDirty } from '@/utils/cloud.js'
 export default {
   data() {
     return {
-      userInfo: { nickname: '美食爱好者', avatar: '' },
+      userInfo: { nickname: '', avatar: '' },
       hasPartner: false,
       pairStatus: '',
       partnerInfo: {},
@@ -732,6 +732,7 @@ export default {
     }
   },
   onLoad() {
+    this.loadUserInfo()
     this.loadPairInfo()
     this.loadPrefs()
     this.loadCachedStats()
@@ -740,10 +741,24 @@ export default {
     setTimeout(() => { this.isLoading = false }, 500)
   },
   onShow() {
+    this.loadUserInfo()
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
   },
   methods: {
+    loadUserInfo() {
+      const app = getApp()
+      if (app?.globalData?.userInfo?.nickname) {
+        this.userInfo = app.globalData.userInfo
+      } else {
+        const cached = uni.getStorageSync('foodfind_user_info')
+        if (cached) {
+          this.userInfo = cached
+        } else {
+          this.userInfo = { nickname: '美食爱好者', avatar: '' }
+        }
+      }
+    },
     loadCachedStats() {
       const checks = uni.getStorageSync('foodfind_personal_checks') || {}
       let days = 0
