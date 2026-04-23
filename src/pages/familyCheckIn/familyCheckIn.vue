@@ -11,6 +11,15 @@
     </view>
 
     <scroll-view scroll-y class="list-scroll">
+      <view class="empty-state" v-if="!familyGroup">
+        <text class="empty-icon">🏠</text>
+        <text class="empty-title">还未加入家庭群组</text>
+        <text class="empty-hint">加入群组后即可查看家人打卡状态</text>
+        <view class="empty-btn" @click="goToFamily">
+          <text class="empty-btn-text">加入群组</text>
+        </view>
+      </view>
+      <template v-else>
       <view class="member-checkin-section slide-up" style="animation-delay:0.1s;opacity:0">
         <text class="section-title">今日打卡状态</text>
         <view class="member-checkin-list">
@@ -85,6 +94,7 @@
           </view>
         </view>
       </view>
+      </template>
     </scroll-view>
   </view>
 </template>
@@ -156,6 +166,9 @@ export default {
     this.checkIns = getFamilyCheckIns()
   },
   methods: {
+    goToFamily() {
+      uni.navigateTo({ url: '/pages/family/family' })
+    },
     initWeekDays() {
       const days = []
       const dayNames = ['日', '一', '二', '三', '四', '五', '六']
@@ -196,6 +209,19 @@ export default {
   background: #F5F6FA;
   padding: 0 28rpx;
 }
+
+.empty-state {
+  display:flex; flex-direction:column; align-items:center;
+  padding:120rpx 0 80rpx;
+}
+.empty-icon { font-size:100rpx; margin-bottom:24rpx; }
+.empty-title { font-size:32rpx; font-weight:700; color:#1a1a1a; margin-bottom:12rpx; }
+.empty-hint { font-size:24rpx; color:#999; margin-bottom:32rpx; }
+.empty-btn {
+  background:#07c160; border-radius:48rpx; padding:20rpx 48rpx;
+  &:active { opacity:.85; }
+}
+.empty-btn-text { font-size:28rpx; font-weight:600; color:#fff; }
 
 .header { padding: 56rpx 0 24rpx; }
 .header-title { display: block; font-size: 44rpx; font-weight: 800; color: #1a1a1a; margin-bottom: 8rpx; }

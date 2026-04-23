@@ -239,6 +239,31 @@
       <text class="share-stats" v-if="shareViewCount > 0">📊 菜谱已被查看 {{ shareViewCount }} 次</text>
     </view>
 
+    <view class="about-modal-mask" :class="{ show: showAboutModal }" @click="closeAboutModal"></view>
+    <view class="about-modal" :class="{ show: showAboutModal }">
+      <view class="am-header">
+        <text class="am-title">关于吃点啥</text>
+        <view class="am-close" @click="closeAboutModal"><text class="pm-close-txt">✕</text></view>
+      </view>
+      <scroll-view scroll-y class="am-body">
+        <view class="am-info">
+          <text class="am-version">v2.7.0 · 智能推荐版</text>
+          <text class="am-desc">为情侣/家人打造的共同决策「今天吃什么」的微信小程序</text>
+          <text class="am-features">智能推荐 · 个性偏好 · 季节时令 · 家庭共享</text>
+        </view>
+        <view class="am-divider"></view>
+        <view class="am-feedback">
+          <text class="amf-title">📝 意见反馈</text>
+          <text class="amf-hint">您的建议对我们非常重要（500字以内）</text>
+          <textarea class="amf-input" v-model="feedbackText" placeholder="请输入您的建议或问题..." maxlength="500" :auto-height="false" />
+          <text class="amf-count">{{ feedbackText.length }}/500</text>
+          <view class="amf-submit" @click="submitFeedback">
+            <text class="amf-submit-text">提交反馈</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
     <view class="report-modal-mask" :class="{ show: showReportModal }" @click="closeReport"></view>
     <view class="report-modal" :class="{ show: showReportModal }">
       <view class="rm-header">
@@ -364,14 +389,16 @@
             <text class="rms-title">🤝 互动趋势</text>
           </view>
           <view class="rm-chart-card">
-            <view class="rm-chart-bars">
-              <view class="rm-chart-bar" v-for="(day, idx) in weeklyReportData" :key="idx">
-                <view class="rm-bar" :style="{ height: Math.max(10, (day.mealCount / 3) * 100) + '%' }">
-                  <text class="rm-bar-meals" v-if="day.mealCount > 0">{{ day.mealCount }}</text>
+            <scroll-view scroll-x class="rm-chart-scroll" :class="{ month: reportPeriod === 'month' }">
+              <view class="rm-chart-bars" :class="{ month: reportPeriod === 'month' }">
+                <view class="rm-chart-bar" v-for="(day, idx) in weeklyReportData" :key="idx" :style="{ animationDelay: (idx * 0.05) + 's' }">
+                  <view class="rm-bar bar-anim" :style="{ height: Math.max(10, (day.mealCount / 3) * 100) + '%' }">
+                    <text class="rm-bar-meals" v-if="day.mealCount > 0">{{ day.mealCount }}</text>
+                  </view>
+                  <text class="rm-bar-label">{{ formatDayDate(day.date) }}</text>
                 </view>
-                <text class="rm-bar-label">{{ formatDayDate(day.date) }}</text>
               </view>
-            </view>
+            </scroll-view>
           </view>
         </view>
 
@@ -381,14 +408,16 @@
             <text class="rms-desc">每日热量变化</text>
           </view>
           <view class="rm-chart-card">
-            <view class="rm-chart-bars">
-              <view class="rm-chart-bar" v-for="(day, idx) in weeklyReportData" :key="idx">
-                <view class="rm-bar nutrient-bar" :style="{ height: getNutritionBarHeight(day) + '%' }">
-                  <text class="rm-bar-meals" v-if="day.calories > 0">{{ day.calories }}</text>
+            <scroll-view scroll-x class="rm-chart-scroll" :class="{ month: reportPeriod === 'month' }">
+              <view class="rm-chart-bars" :class="{ month: reportPeriod === 'month' }">
+                <view class="rm-chart-bar" v-for="(day, idx) in weeklyReportData" :key="idx" :style="{ animationDelay: (idx * 0.05) + 's' }">
+                  <view class="rm-bar nutrient-bar bar-anim" :style="{ height: getNutritionBarHeight(day) + '%' }">
+                    <text class="rm-bar-meals" v-if="day.calories > 0">{{ day.calories }}</text>
+                  </view>
+                  <text class="rm-bar-label">{{ formatDayDate(day.date) }}</text>
                 </view>
-                <text class="rm-bar-label">{{ formatDayDate(day.date) }}</text>
               </view>
-            </view>
+            </scroll-view>
           </view>
         </view>
 
@@ -397,12 +426,24 @@
             <text class="rms-title">🏆 打卡成就</text>
           </view>
           <view class="rm-achieve-grid">
-            <view class="rm-achieve-item" v-for="(a, ai) in reportAchievements" :key="ai" :class="{ unlocked: a.unlocked }">
+            <view class="rm-achieve-item" v-for="(a, ai) in reportAchievements" :key="ai" :class="{ unlocked: a.unlocked }" @click="onAchievementClick(a)">
               <text class="rai-icon">{{ a.icon }}</text>
               <text class="rai-name">{{ a.name }}</text>
               <text class="rai-status">{{ a.unlocked ? '✓' : '🔒' }}</text>
             </view>
           </view>
+        </view>
+
+        <view class="achieve-detail-mask" :class="{ show: showAchieveDetail }" @click="showAchieveDetail = false"></view>
+        <view class="achieve-detail-popup" :class="{ show: showAchieveDetail }">
+          <view class="adp-deco" v-if="selectedAchievement && selectedAchievement.unlocked">✨ 🎉 ✨</view>
+          <text class="adp-icon" v-if="selectedAchievement">{{ selectedAchievement.icon }}</text>
+          <text class="adp-name" v-if="selectedAchievement">{{ selectedAchievement.name }}</text>
+          <text class="adp-status" v-if="selectedAchievement && selectedAchievement.unlocked">🏆 已获得</text>
+          <text class="adp-status locked" v-if="selectedAchievement && !selectedAchievement.unlocked">🔒 未解锁</text>
+          <text class="adp-desc" v-if="selectedAchievement">{{ selectedAchievement.desc }}</text>
+          <text class="adp-hint" v-if="selectedAchievement && !selectedAchievement.unlocked">继续加油，你一定可以的！</text>
+          <view class="adp-close" @click="showAchieveDetail = false"><text class="adp-close-text">知道了</text></view>
         </view>
 
         <view class="rm-section" v-if="hasPartner && pairStatus === 'paired'">
@@ -578,6 +619,10 @@ export default {
       reportPeriod: 'week',
       reportAchievements: [],
       shareViewCount: 0,
+      showAboutModal: false,
+      feedbackText: '',
+      showAchieveDetail: false,
+      selectedAchievement: null,
       prefs: {
         noCookMode: false,
         userType: 'adult',
@@ -715,20 +760,20 @@ export default {
     },
     proteinPercent() {
       const t = this.nutritionTotal
-      return t > 0 ? Math.round((this.weeklyProtein / t) * 100) : 33
+      return t > 0 ? Math.round((this.weeklyProtein / t) * 100) : 0
     },
     fatPercent() {
       const t = this.nutritionTotal
-      return t > 0 ? Math.round((this.weeklyFat / t) * 100) : 33
+      return t > 0 ? Math.round((this.weeklyFat / t) * 100) : 0
     },
     carbsPercent() {
       const t = this.nutritionTotal
-      return t > 0 ? 100 - this.proteinPercent - this.fatPercent : 34
+      return t > 0 ? 100 - this.proteinPercent - this.fatPercent : 0
     },
     pieChartStyle() {
       const p = this.proteinPercent
       const f = this.fatPercent
-      const c = this.carbsPercent
+      if (p === 0 && f === 0) return 'background:#f0f0f0'
       return `background: conic-gradient(#07c160 0% ${p}%, #ff9f43 ${p}% ${p + f}%, #5b9bd5 ${p + f}% 100%)`
     },
     myMealCount() {
@@ -793,17 +838,21 @@ export default {
   },
   methods: {
     loadUserInfo() {
-      const app = getApp()
-      if (app?.globalData?.userInfo?.nickname) {
-        this.userInfo = app.globalData.userInfo
-      } else {
-        const cached = uni.getStorageSync('foodfind_user_info')
-        if (cached) {
-          this.userInfo = cached
-        } else {
-          this.userInfo = { nickname: '美食爱好者', avatar: '' }
-        }
+      const cached = uni.getStorageSync('foodfind_user_info')
+      if (cached && cached.nickname && cached.nickname !== '美食爱好者') {
+        this.userInfo = cached
+        return
       }
+      const app = getApp()
+      if (app?.globalData?.userInfo?.nickname && app.globalData.userInfo.nickname !== '美食爱好者') {
+        this.userInfo = app.globalData.userInfo
+        return
+      }
+      if (cached) {
+        this.userInfo = cached
+        return
+      }
+      this.userInfo = { nickname: '美食爱好者', avatar: '' }
     },
     loadCachedStats() {
       const checks = uni.getStorageSync('foodfind_personal_checks') || {}
@@ -906,13 +955,17 @@ export default {
       const checks = uni.getStorageSync('foodfind_personal_checks') || {}
       const totalCheckDays = Object.keys(checks).length
       this.reportAchievements = [
-        { icon: '🌱', name: '初出茅庐', desc: '连续3天', unlocked: streak.days >= 3 },
-        { icon: '🔥', name: '坚持不懈', desc: '连续7天', unlocked: streak.days >= 7 },
-        { icon: '⭐', name: '美食达人', desc: '连续14天', unlocked: streak.days >= 14 },
-        { icon: '👑', name: '食神', desc: '连续30天', unlocked: streak.days >= 30 },
-        { icon: '📊', name: '记录者', desc: '打卡5天', unlocked: totalCheckDays >= 5 },
-        { icon: '📤', name: '分享使者', desc: '分享5次', unlocked: shareCount >= 5 }
+        { icon: '🌱', name: '初出茅庐', desc: '连续打卡3天即可解锁', unlocked: streak.days >= 3 },
+        { icon: '🔥', name: '坚持不懈', desc: '连续打卡7天即可解锁', unlocked: streak.days >= 7 },
+        { icon: '⭐', name: '美食达人', desc: '连续打卡14天即可解锁', unlocked: streak.days >= 14 },
+        { icon: '👑', name: '食神', desc: '连续打卡30天即可解锁', unlocked: streak.days >= 30 },
+        { icon: '📊', name: '记录者', desc: '累计打卡5天即可解锁', unlocked: totalCheckDays >= 5 },
+        { icon: '📤', name: '分享使者', desc: '分享菜谱5次即可解锁', unlocked: shareCount >= 5 }
       ]
+    },
+    onAchievementClick(a) {
+      this.selectedAchievement = a
+      this.showAchieveDetail = true
     },
     loadWeeklyReport() {
       this.generateLocalWeekData()
@@ -1177,9 +1230,33 @@ export default {
     },
 
     showAbout() {
-      uni.showModal({
-        title: '关于吃点啥 v2.7.0', content: '为情侣/家人打造的共同决策「今天吃什么」的微信小程序\n\n智能推荐 · 个性偏好 · 季节时令 · 家庭共享', showCancel: false, confirmText: '知道了'
+      this.showAboutModal = true
+    },
+    closeAboutModal() {
+      this.showAboutModal = false
+    },
+    submitFeedback() {
+      const text = this.feedbackText.trim()
+      if (!text) {
+        uni.showToast({ title: '请输入反馈内容', icon: 'none' })
+        return
+      }
+      const sanitized = text.replace(/[<>'"&\/\\]/g, '').substring(0, 500)
+      if (sanitized.length < 5) {
+        uni.showToast({ title: '反馈内容太短', icon: 'none' })
+        return
+      }
+      const feedbackList = uni.getStorageSync('foodfind_feedbacks') || []
+      feedbackList.unshift({
+        content: sanitized,
+        time: new Date().toISOString(),
+        userId: uni.getStorageSync('foodfind_user_id') || ''
       })
+      if (feedbackList.length > 20) feedbackList.length = 20
+      uni.setStorageSync('foodfind_feedbacks', feedbackList)
+      this.feedbackText = ''
+      this.showAboutModal = false
+      uni.showToast({ title: '感谢您的反馈！', icon: 'success' })
     },
     loadFavorites() {
       this.favorites = uni.getStorageSync('foodfind_favorites') || []
@@ -1463,6 +1540,46 @@ export default {
 .version-text { font-size:24rpx; color:#ccc; display:block; }
 .share-stats { font-size:22rpx; color:#07c160; display:block; margin-top:8rpx; }
 
+.about-modal-mask {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0); z-index:2000;
+  transition:background .35s ease; pointer-events:none;
+  &.show { background:rgba(0,0,0,.5); pointer-events:auto; }
+}
+.about-modal {
+  position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.7);
+  width:640rpx; background:#fff; border-radius:32rpx;
+  opacity:0; pointer-events:none; z-index:2001;
+  transition:all .35s cubic-bezier(.175,.885,.32,1.275);
+  overflow:hidden;
+  &.show { transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto; }
+}
+.am-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:32rpx 36rpx 16rpx; border-bottom:1rpx solid #f0f0f0;
+}
+.am-title { font-size:32rpx; font-weight:700; color:#1a1a1a; }
+.am-body { padding:32rpx 36rpx; max-height:60vh; }
+.am-info { text-align:center; padding:16rpx 0; }
+.am-version { font-size:26rpx; font-weight:600; color:#07c160; display:block; margin-bottom:12rpx; }
+.am-desc { font-size:24rpx; color:#666; display:block; margin-bottom:8rpx; line-height:1.6; }
+.am-features { font-size:22rpx; color:#999; display:block; }
+.am-divider { height:1rpx; background:#f0f0f0; margin:24rpx 0; }
+.amf-title { font-size:28rpx; font-weight:700; color:#1a1a1a; display:block; margin-bottom:8rpx; }
+.amf-hint { font-size:22rpx; color:#999; display:block; margin-bottom:16rpx; }
+.amf-input {
+  width:100%; height:200rpx; background:#f5f6f8; border-radius:16rpx;
+  padding:20rpx; font-size:26rpx; color:#1a1a1a; line-height:1.6;
+  box-sizing:border-box;
+}
+.amf-count { font-size:20rpx; color:#ccc; display:block; text-align:right; margin-top:8rpx; }
+.amf-submit {
+  margin-top:20rpx; background:#07c160; border-radius:48rpx;
+  padding:22rpx 0; text-align:center;
+  &:active { opacity:.85; transform:scale(.98); }
+}
+.amf-submit-text { font-size:28rpx; font-weight:600; color:#fff; }
+
 /* ===== Report Modal ===== */
 .report-modal-mask {
   position:fixed; top:0; left:0; right:0; bottom:0;
@@ -1593,10 +1710,23 @@ export default {
 .rm-legend-info { display:flex; flex-direction:column; gap:2rpx; }
 .rm-legend-name { font-size:24rpx; font-weight:600; color:#1a1a1a; }
 .rm-legend-val { font-size:21rpx; color:#999; }
-.rm-chart-bars { display:flex; justify-content:space-between; align-items:flex-end; gap:10rpx; height:180rpx; }
+.rm-chart-scroll {
+  width:100%; white-space:nowrap;
+  &.month { -webkit-overflow-scrolling:touch; }
+}
+.rm-chart-bars {
+  display:inline-flex; justify-content:space-between; align-items:flex-end;
+  gap:10rpx; height:180rpx; min-width:100%;
+  &.month { min-width:fit-content; }
+}
 .rm-chart-bar {
   flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
-  gap:8rpx; height:100%;
+  gap:8rpx; height:100%; min-width:60rpx;
+  animation:barFadeIn .4s ease both;
+}
+@keyframes barFadeIn {
+  from { opacity:0; transform:translateY(20rpx); }
+  to { opacity:1; transform:translateY(0); }
 }
 .rm-bar {
   width:100%; background:linear-gradient(180deg,#07c160 0%,#06a552 100%);
@@ -1605,6 +1735,8 @@ export default {
   transition:height .6s cubic-bezier(.4,0,.2,1);
   min-height:20rpx;
 }
+.bar-anim { animation:barGrow .6s cubic-bezier(.175,.885,.32,1.275) both; }
+@keyframes barGrow { from { height:0 !important; } }
 .rm-bar-meals { font-size:22rpx; color:#fff; font-weight:700; }
 .rm-bar-label { font-size:20rpx; color:#999; font-weight:500; }
 
@@ -1696,6 +1828,35 @@ export default {
 .rai-name { font-size:20rpx; font-weight:600; color:#333; }
 .rai-status { font-size:18rpx; color:#ccc; }
 .rm-achieve-item.unlocked .rai-status { color:#07c160; }
+
+.achieve-detail-mask {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0); z-index:3000;
+  transition:background .3s ease; pointer-events:none;
+  &.show { background:rgba(0,0,0,.5); pointer-events:auto; }
+}
+.achieve-detail-popup {
+  position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.5);
+  width:520rpx; background:#fff; border-radius:36rpx;
+  padding:48rpx 36rpx 36rpx; text-align:center;
+  opacity:0; pointer-events:none; z-index:3001;
+  transition:all .4s cubic-bezier(.175,.885,.32,1.275);
+  &.show { transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto; }
+}
+.adp-deco { font-size:28rpx; letter-spacing:12rpx; margin-bottom:12rpx; animation:adpShine 1s ease infinite alternate; }
+@keyframes adpShine { 0%{opacity:.6;transform:scale(1)} 100%{opacity:1;transform:scale(1.05)} }
+.adp-icon { font-size:80rpx; display:block; margin-bottom:16rpx; }
+.adp-name { font-size:34rpx; font-weight:800; color:#1a1a1a; display:block; margin-bottom:12rpx; }
+.adp-status { font-size:26rpx; font-weight:600; color:#07c160; display:block; margin-bottom:8rpx; }
+.adp-status.locked { color:#ccc; }
+.adp-desc { font-size:24rpx; color:#666; display:block; margin-bottom:8rpx; line-height:1.6; }
+.adp-hint { font-size:22rpx; color:#f0a020; display:block; margin-bottom:20rpx; }
+.adp-close {
+  margin-top:16rpx; background:#f5f6f8; border-radius:48rpx;
+  padding:20rpx 0; text-align:center;
+  &:active { opacity:.85; }
+}
+.adp-close-text { font-size:26rpx; font-weight:600; color:#666; }
 
 .rm-footer-spacer { height:80rpx; }
 

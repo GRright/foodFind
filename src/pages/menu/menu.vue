@@ -118,7 +118,7 @@
             >
               <view class="fc-icon-wrap"><text class="fc-icon">{{ food.image || '🍽️' }}</text></view>
               <text class="fc-name">{{ food.name }}</text>
-              <text class="fc-kcal">{{ food.nutrition.calories * userCount }} kcal</text>
+              <text class="fc-kcal">{{ food.nutrition.calories * effectiveUserCount }} kcal</text>
             </view>
           </view>
         </view>
@@ -138,6 +138,7 @@
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
 import { filterRecipesByHealthTags, getFamilyHealthTags } from '@/utils/family.js'
+import { getPersonalizedRecipes } from '@/utils/festival.js'
 
 export default {
   data() {
@@ -155,6 +156,10 @@ export default {
     }
   },
   computed: {
+    effectiveUserCount() {
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      return prefs.independentMode ? 1 : this.userCount
+    },
     calMonth() {
       if (!this.currentMonday) return ''
       const m = this.currentMonday.getMonth() + 1
@@ -233,7 +238,7 @@ export default {
       ].filter(s => activeMeals.includes(s.key))
       return sections.map(m => ({
         ...m,
-        cal: m.recipes.reduce((s, r) => s + (r.nutrition?.calories||0) * this.userCount, 0)
+        cal: m.recipes.reduce((s, r) => s + (r.nutrition?.calories||0) * this.effectiveUserCount, 0)
       }))
     },
     selectedDayCal() {
@@ -244,7 +249,7 @@ export default {
       const activeMeals = isWeekend ? mealConfig.weekend : mealConfig.weekday
       let c = 0
       activeMeals.forEach(k => {
-        (this.selectedDayMeals[k]||[]).forEach(r => { c += (r.nutrition?.calories||0) * this.userCount })
+        (this.selectedDayMeals[k]||[]).forEach(r => { c += (r.nutrition?.calories||0) * this.effectiveUserCount })
       })
       return Math.round(c)
     },
@@ -264,7 +269,7 @@ export default {
         })
       })
       if (days === 0) return ''
-      return `日均${Math.round(totalC/days*this.userCount)}kcal · 蛋白${Math.round(totalP/days)}g`
+      return `日均${Math.round(totalC/days*this.effectiveUserCount)}kcal · 蛋白${Math.round(totalP/days)}g`
     }
   },
   onLoad() {
@@ -350,6 +355,8 @@ export default {
       return
     },
     getRecipeCount() {
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      if (prefs.independentMode) return 2
       const c = this.userCount
       if (c === 1) return 2
       if (c === 2) return 3
@@ -380,6 +387,10 @@ export default {
       availableBreakfast = filterRecipesByHealthTags(availableBreakfast, allHealthTags)
       availableLunch = filterRecipesByHealthTags(availableLunch, allHealthTags)
       availableDinner = filterRecipesByHealthTags(availableDinner, allHealthTags)
+
+      availableBreakfast = getPersonalizedRecipes(availableBreakfast)
+      availableLunch = getPersonalizedRecipes(availableLunch)
+      availableDinner = getPersonalizedRecipes(availableDinner)
 
       const n = this.getRecipeCount()
 

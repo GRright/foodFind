@@ -299,9 +299,9 @@ export default {
 .reaction-buttons { display: flex; justify-content: center; gap: 24rpx; }
 .reaction-btn {
   flex: 1; max-width: 240rpx;
-  display: flex; align-items: center; justify-content: center; gap: 12rpx;
-  padding: 28rpx 0;
-  border-radius: 24rpx;
+  display: flex; align-items: center; justify-content: center; gap: 10rpx;
+  padding: 16rpx 0;
+  border-radius: 20rpx;
   background: #f5f6f8;
   transition: all .25s ease;
   &::after { display: none; }
@@ -319,8 +319,8 @@ export default {
   .reaction-icon, .reaction-text { color: #ff6b6b; }
   &.active .reaction-icon, &.active .reaction-text { color: #fff; }
 }
-.reaction-icon { font-size: 40rpx; }
-.reaction-text { font-size: 28rpx; font-weight: 600; }
+.reaction-icon { font-size: 32rpx; }
+.reaction-text { font-size: 26rpx; font-weight: 600; }
 
 @keyframes scaleIn {
   from { transform: scale(.5); opacity: 0; }

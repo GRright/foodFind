@@ -124,6 +124,27 @@
       </view>
 
       <view class="section slide-up" style="animation-delay:0.2s;opacity:0">
+        <text class="section-title">菜谱模式</text>
+        <text class="section-desc">选择是否与家人共享同一份菜谱</text>
+        <view class="mode-toggle-row">
+          <view class="mtr-option" :class="{ active: !independentMode }" @click="setIndependentMode(false)">
+            <text class="mtr-icon">👨‍👩‍👧‍👦</text>
+            <view class="mtr-text">
+              <text class="mtr-label">共享菜谱</text>
+              <text class="mtr-desc">全家统一菜谱，按人数配菜</text>
+            </view>
+          </view>
+          <view class="mtr-option" :class="{ active: independentMode }" @click="setIndependentMode(true)">
+            <text class="mtr-icon">👤</text>
+            <view class="mtr-text">
+              <text class="mtr-label">独立菜谱</text>
+              <text class="mtr-desc">按单人配菜，互不影响</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="section slide-up" style="animation-delay:0.25s;opacity:0">
         <text class="section-title">群组功能</text>
         <view class="func-list">
           <view class="func-item" @click="goToFamilyShopping">
@@ -198,6 +219,7 @@ export default {
       joinCode: '',
       showInviteCard: false,
       myHealthTags: [],
+      independentMode: false,
       familyTypes: FAMILY_TYPES,
       healthTags: HEALTH_TAGS,
       healthTagCategories: HEALTH_TAG_CATEGORIES
@@ -230,6 +252,8 @@ export default {
         if (me) {
           this.myHealthTags = [...(me.healthTags || [])]
         }
+        const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+        this.independentMode = !!prefs.independentMode
       } else {
         this.hasFamily = false
       }
@@ -291,6 +315,13 @@ export default {
         this.loadFamily()
         uni.showToast({ title: '健康标签已保存', icon: 'success' })
       }
+    },
+    setIndependentMode(val) {
+      this.independentMode = val
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      prefs.independentMode = val
+      uni.setStorageSync('foodfind_detailed_prefs', prefs)
+      uni.showToast({ title: val ? '已切换为独立菜谱' : '已切换为共享菜谱', icon: 'success' })
     },
     showInviteCode() {
       this.showInviteCard = !this.showInviteCard
@@ -581,6 +612,20 @@ export default {
   &:active { opacity: .85; transform: scale(.98); }
 }
 .stb-text { font-size: 28rpx; font-weight: 600; color: #fff; }
+
+.mode-toggle-row { display:flex; gap:16rpx; }
+.mtr-option {
+  flex:1; padding:24rpx 20rpx; background:#f5f6f8; border-radius:20rpx;
+  display:flex; align-items:center; gap:16rpx;
+  border:2rpx solid transparent; transition:all .25s ease;
+  &.active { background:#e8f7ef; border-color:#07c160; }
+  &:active { opacity:.85; }
+}
+.mtr-icon { font-size:40rpx; flex-shrink:0; }
+.mtr-text { display:flex; flex-direction:column; gap:4rpx; }
+.mtr-label { font-size:26rpx; font-weight:700; color:#1a1a1a; }
+.mtr-desc { font-size:22rpx; color:#999; }
+.mtr-option.active .mtr-label { color:#07c160; }
 
 .func-list { display: flex; flex-direction: column; gap: 16rpx; }
 .func-item {

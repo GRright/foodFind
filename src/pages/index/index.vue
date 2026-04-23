@@ -67,7 +67,7 @@
           </view>
         </view>
 
-        <view class="family-checkin-bar" v-if="familyCheckInList.length > 0">
+        <view class="family-checkin-bar" v-if="familyCheckInList.length > 1">
           <text class="fcb-title">今日打卡</text>
           <view class="fcb-members">
             <view class="fcb-member" v-for="(m, mi) in familyCheckInList" :key="mi">
@@ -644,7 +644,8 @@ export default {
           cb += r.nutrition?.carbs||0
         })
       })
-      this._nutritionCache = { calories: Math.round(c * this.userCount), protein: Math.round(p), fat: Math.round(f), carbs: Math.round(cb) }
+      const effectiveUserCount = prefs.independentMode ? 1 : this.userCount
+      this._nutritionCache = { calories: Math.round(c * effectiveUserCount), protein: Math.round(p), fat: Math.round(f), carbs: Math.round(cb) }
       return this._nutritionCache.calories
     },
     totalProtein() {
@@ -1056,6 +1057,8 @@ export default {
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
     },
     getRecipeCount() {
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      if (prefs.independentMode) return 2
       const c = this.userCount
       if (c === 1) return 2; if (c === 2) return 3; if (c <= 4) return 4; return 5
     },
@@ -1409,10 +1412,18 @@ export default {
     },
     checkNeedLogin() {
       const cached = uni.getStorageSync('foodfind_user_info')
+      if (cached) return
       const app = getApp()
-      if (!cached && app?.globalData?.needLogin) {
+      if (app?.globalData?.needLogin) {
         setTimeout(() => { this.showLoginModal = true }, 800)
+        return
       }
+      setTimeout(() => {
+        const app2 = getApp()
+        if (app2?.globalData?.needLogin && !uni.getStorageSync('foodfind_user_info')) {
+          this.showLoginModal = true
+        }
+      }, 2000)
     },
     onGetUserInfo(e) {
       const detail = e.mp?.detail || e.detail
