@@ -2,9 +2,6 @@
   <view class="page" :class="{ 'page-enter': pageEnter }">
     <view class="header fade-in">
       <view class="header-top">
-        <view class="back-btn" @click="goBack">
-          <text class="back-icon">‹</text>
-        </view>
         <text class="header-title">用餐配置</text>
       </view>
     </view>
@@ -109,7 +106,7 @@ export default {
     return {
       pageEnter: true,
       mealConfig: {
-        weekday: ['dinner'],
+        weekday: ['breakfast', 'lunch', 'dinner'],
         weekend: ['breakfast', 'lunch', 'dinner']
       }
     }
@@ -154,9 +151,7 @@ export default {
       }
       this.saveConfig()
     },
-    goBack() {
-      uni.navigateBack()
-    }
+
   }
 }
 </script>
@@ -172,11 +167,7 @@ export default {
 
 .header { padding: 56rpx 28rpx 20rpx; background: #fff; width: 100%; box-sizing: border-box; }
 .header-top { display: flex; align-items: center; gap: 16rpx; }
-.back-btn {
-  width: 64rpx; height: 64rpx; display: flex; align-items: center; justify-content: center;
-  background: #f5f6f8; border-radius: 50%; transition: all .25s ease; &:active { background: #e8e8e8; transform: scale(.97); }
-}
-.back-icon { font-size: 40rpx; color: #666; font-weight: 700; }
+
 .header-title { display: block; font-size: 36rpx; font-weight: 800; color: #1a1a1a; }
 
 .content-scroll { flex: 1; padding: 20rpx 28rpx; width: 100%; box-sizing: border-box; }

@@ -209,19 +209,28 @@ export default {
     },
     mealSections() {
       if (!this.selectedDayMeals) return []
-      return [
-        { title: '早餐', icon: '☀', recipes: this.selectedDayMeals.breakfast || [] },
-        { title: '午餐', icon: '🌞', recipes: this.selectedDayMeals.lunch || [] },
-        { title: '晚餐', icon: '🌙', recipes: this.selectedDayMeals.dinner || [] }
-      ].map(m => ({
+      const isWeekend = this.selectedDate && (this.selectedDate.getDay() === 0 || this.selectedDate.getDay() === 6)
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      const mealConfig = prefs.mealConfig || { weekday: ['breakfast', 'lunch', 'dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
+      const activeMeals = isWeekend ? mealConfig.weekend : mealConfig.weekday
+      const sections = [
+        { key: 'breakfast', title: '早餐', icon: '☀', recipes: this.selectedDayMeals.breakfast || [] },
+        { key: 'lunch', title: '午餐', icon: '🌞', recipes: this.selectedDayMeals.lunch || [] },
+        { key: 'dinner', title: '晚餐', icon: '🌙', recipes: this.selectedDayMeals.dinner || [] }
+      ].filter(s => activeMeals.includes(s.key))
+      return sections.map(m => ({
         ...m,
         cal: m.recipes.reduce((s, r) => s + (r.nutrition?.calories||0) * this.userCount, 0)
       }))
     },
     selectedDayCal() {
       if (!this.selectedDayMeals) return 0
+      const isWeekend = this.selectedDate && (this.selectedDate.getDay() === 0 || this.selectedDate.getDay() === 6)
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      const mealConfig = prefs.mealConfig || { weekday: ['breakfast', 'lunch', 'dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
+      const activeMeals = isWeekend ? mealConfig.weekend : mealConfig.weekday
       let c = 0
-      ;['breakfast','lunch','dinner'].forEach(k => {
+      activeMeals.forEach(k => {
         (this.selectedDayMeals[k]||[]).forEach(r => { c += (r.nutrition?.calories||0) * this.userCount })
       })
       return Math.round(c)
