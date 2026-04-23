@@ -10,26 +10,53 @@ export default {
       partnerInfo: null,
       dailyMeals: null,
       weeklyMeals: null,
-      currentShareId: null
+      currentShareId: null,
+      openid: ''
     }
 
     const cached = uni.getStorageSync('foodfind_partner')
     if (cached) { this.globalData.partnerInfo = cached }
 
-    initCloud()
-    getOpenId().then(() => {
-      syncOnStartup()
-    })
+    this.performLogin()
   },
   onHide() {
     batchSyncOnHide()
+  },
+  methods: {
+    performLogin() {
+      wx.login({
+        success: (loginRes) => {
+          if (loginRes.code) {
+            console.log('[Auth] 微信登录成功，code:', loginRes.code)
+            this.globalData.loginCode = loginRes.code
+            
+            initCloud()
+            getOpenId().then((openid) => {
+              if (openid) {
+                this.globalData.openid = openid
+                console.log('[Auth] 用户身份已获取:', openid)
+              }
+              syncOnStartup()
+            })
+          } else {
+            console.error('[Auth] 微信登录失败:', loginRes.errMsg)
+            uni.showToast({ title: '登录失败，请重试', icon: 'none' })
+          }
+        },
+        fail: (err) => {
+          console.error('[Auth] 微信登录异常:', err)
+          uni.showToast({ title: '登录异常，请重试', icon: 'none' })
+        }
+      })
+    }
   },
   globalData: {
     userInfo: { nickname: '美食爱好者', avatar: '' },
     partnerInfo: null,
     dailyMeals: null,
     weeklyMeals: null,
-    currentShareId: null
+    currentShareId: null,
+    openid: ''
   }
 }
 </script>

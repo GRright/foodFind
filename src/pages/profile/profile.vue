@@ -34,7 +34,7 @@
 
     <view class="menu-section" v-if="!isLoading">
       <view class="menu-group slide-up" style="animation-delay:0.05s;opacity:0">
-        <text class="group-title">搭子</text>
+        <text class="group-title">互动</text>
         <view class="menu-list">
           <template v-if="hasPartner && pairStatus === 'paired'">
             <view class="menu-item partner-card bounce-in" @click="showPartnerDetail">

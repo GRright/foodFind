@@ -674,7 +674,22 @@ export default {
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
     this._nutritionCache = null
-    this.loadMeals()
+    
+    // 检查用餐配置是否变更
+    const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+    const mealConfig = prefs.mealConfig || { weekday: ['breakfast', 'lunch', 'dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
+    const lastMealConfig = uni.getStorageSync('foodfind_last_meal_config')
+    const configChanged = JSON.stringify(mealConfig) !== JSON.stringify(lastMealConfig)
+    
+    if (configChanged) {
+      // 配置已变更，重新生成菜单
+      this.dailyMeals = null
+      this.preloadMeals()
+      uni.setStorageSync('foodfind_last_meal_config', mealConfig)
+    } else {
+      this.loadMeals()
+    }
+    
     this.loadTodayCheckIn()
     const openSpecial = uni.getStorageSync('foodfind_open_special')
     if (openSpecial === '1') {

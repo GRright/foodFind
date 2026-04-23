@@ -11,6 +11,7 @@
     "pages/shoppingList/shoppingList",
     "pages/mealConfig/mealConfig",
     "pages/family/family",
+    "pages/friend-menu/friend-menu",
     "pages/familyCheckIn/familyCheckIn",
     "pages/familyReport/familyReport"
   ],
@@ -34,7 +35,7 @@
       },
       {
         "pagePath": "pages/menu/menu",
-        "text": "菜单",
+        "text": "菜谱",
         "iconPath": "static/tabbar/menu.png",
         "selectedIconPath": "static/tabbar/menu-active.png"
       },
