@@ -316,7 +316,7 @@
                 <view class="rmh-avatar fam-av"><text class="rmhav-txt">{{ (partnerInfo.nickname || 'TA').charAt(0) }}</text></view>
               </view>
               <view class="rmh-streak-wrap">
-                <text class="rmhfs-num">{{ reportStreakDays }}</text>
+                <text class="rmhfs-num">{{ displayStreak }}</text>
                 <text class="rmhfs-label">天全家坚持</text>
               </view>
             </view>
@@ -699,8 +699,8 @@ export default {
       const meals = this.myMealCount
       if (days === 0) return '开始打卡，记录每一餐的美好~'
       if (days < 3) return `已坚持${days}天，下周也要好好吃饭哦！`
-      if (days < 7) return `${days}天连续打卡，你比想象中更自律！`
-      return `连续${days}天好好吃饭，太棒了！继续加油！`
+      if (days < 7) return `${days}天有在好好吃饭，你比想象中更自律！`
+      return `${days}天好好吃饭，太棒了！继续加油！`
     },
     weeklyCheckInDays() {
       return this._weeklyCheckInDays
@@ -723,8 +723,7 @@ export default {
       return parts.length > 0 ? parts.join(' · ') : '点击设置你的饮食偏好'
     },
     reportStreakDays() {
-      const streak = uni.getStorageSync('foodfind_streak') || { days: 0, lastDate: '' }
-      return streak.days || 0
+      return this._weeklyCheckInDays
     },
     displayStreak() {
       const days = this.reportStreakDays
