@@ -621,9 +621,9 @@ export default {
       const mealConfig = prefs.mealConfig || { weekday: ['breakfast', 'lunch', 'dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
       const activeMeals = isWeekend ? mealConfig.weekend : mealConfig.weekday
       const sections = [
-        { key: 'breakfast', title: '早餐', icon: '☀', recipes: this.dailyMeals.breakfast || [] },
-        { key: 'lunch', title: '午餐', icon: '🌞', recipes: this.dailyMeals.lunch || [] },
-        { key: 'dinner', title: '晚餐', icon: '🌙', recipes: this.dailyMeals.dinner || [] }
+        { key: 'breakfast', title: '早餐', icon: '☀', iconImg: '/static/icons/breakfast.png', recipes: this.dailyMeals.breakfast || [] },
+        { key: 'lunch', title: '午餐', icon: '🌞', iconImg: '/static/icons/lunch.png', recipes: this.dailyMeals.lunch || [] },
+        { key: 'dinner', title: '晚餐', icon: '🌙', iconImg: '/static/icons/dinner.png', recipes: this.dailyMeals.dinner || [] }
       ]
       return sections.filter(s => activeMeals.includes(s.key))
     },
