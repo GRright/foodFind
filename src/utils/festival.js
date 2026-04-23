@@ -141,3 +141,112 @@ export function getFamilyMemberSpecialToday() {
   }
   return null
 }
+
+export function getCurrentSeason() {
+  const month = new Date().getMonth() + 1
+  if (month >= 3 && month <= 5) return 'spring'
+  if (month >= 6 && month <= 8) return 'summer'
+  if (month >= 9 && month <= 11) return 'autumn'
+  return 'winter'
+}
+
+export const SEASONAL_FOODS = {
+  spring: {
+    name: '春季',
+    keywords: ['春笋', '菠菜', '韭菜', '荠菜', '豌豆', '香椿', '莴笋', '草莓'],
+    tags: ['清淡', '养肝', '新鲜'],
+    avoid: ['火锅', '啤酒']
+  },
+  summer: {
+    name: '夏季',
+    keywords: ['黄瓜', '番茄', '丝瓜', '冬瓜', '苦瓜', '西瓜', '绿豆', '凉面'],
+    tags: ['清淡', '消暑', '凉拌'],
+    avoid: ['红烧肉', '啤酒鸭']
+  },
+  autumn: {
+    name: '秋季',
+    keywords: ['南瓜', '莲藕', '山药', '板栗', '柿子', '螃蟹', '银耳', '百合'],
+    tags: ['润燥', '滋补', '养肺'],
+    avoid: []
+  },
+  winter: {
+    name: '冬季',
+    keywords: ['萝卜', '白菜', '羊肉', '牛肉', '红薯', '火锅', '饺子', '汤圆'],
+    tags: ['暖胃', '滋补', '炖煮'],
+    avoid: ['凉拌']
+  }
+}
+
+export function filterRecipesBySeason(recipes) {
+  const season = getCurrentSeason()
+  const seasonData = SEASONAL_FOODS[season]
+  if (!seasonData) return recipes
+
+  return recipes.map(recipe => {
+    let score = 0
+    const name = recipe.name || ''
+    const ingredients = (recipe.ingredients || []).map(i => i.name).join(',')
+    const tags = recipe.tags || []
+    const text = name + ingredients
+
+    seasonData.keywords.forEach(kw => {
+      if (text.includes(kw)) score += 3
+    })
+    seasonData.tags.forEach(tag => {
+      if (tags.includes(tag)) score += 2
+    })
+    seasonData.avoid.forEach(avoid => {
+      if (name.includes(avoid)) score -= 2
+    })
+
+    return { ...recipe, _seasonScore: score }
+  }).sort((a, b) => b._seasonScore - a._seasonScore)
+}
+
+export function filterRecipesByPreference(recipes) {
+  const favorites = uni.getStorageSync('foodfind_favorites') || []
+  const dislikes = uni.getStorageSync('foodfind_dislikes') || []
+  const likedIds = new Set(favorites.map(f => f.id))
+  const dislikedIds = new Set(dislikes.map(d => d.id))
+
+  const likedCuisineTypes = {}
+  const likedTags = {}
+  favorites.forEach(f => {
+    if (f.cuisine_type) likedCuisineTypes[f.cuisine_type] = (likedCuisineTypes[f.cuisine_type] || 0) + 1
+    if (f.tags) f.tags.forEach(t => { likedTags[t] = (likedTags[t] || 0) + 1 })
+  })
+
+  const dislikedNames = new Set()
+  dislikes.forEach(d => {
+    if (d.name) dislikedNames.add(d.name)
+  })
+
+  return recipes.map(recipe => {
+    if (dislikedIds.has(recipe.id) || dislikedNames.has(recipe.name)) {
+      return { ...recipe, _prefScore: -100 }
+    }
+    if (likedIds.has(recipe.id)) {
+      return { ...recipe, _prefScore: 10 }
+    }
+
+    let score = 0
+    if (recipe.cuisine_type && likedCuisineTypes[recipe.cuisine_type]) {
+      score += likedCuisineTypes[recipe.cuisine_type] * 2
+    }
+    if (recipe.tags) {
+      recipe.tags.forEach(t => {
+        if (likedTags[t]) score += likedTags[t]
+      })
+    }
+    return { ...recipe, _prefScore: score }
+  }).sort((a, b) => b._prefScore - a._prefScore)
+}
+
+export function getPersonalizedRecipes(recipes) {
+  const withPref = filterRecipesByPreference(recipes)
+  const withSeason = filterRecipesBySeason(withPref)
+  return withSeason.map(r => {
+    const { _prefScore, _seasonScore, ...clean } = r
+    return clean
+  })
+}

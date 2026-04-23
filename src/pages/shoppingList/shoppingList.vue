@@ -126,7 +126,7 @@
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
-import { getFamilyGroup, getCurrentUserId, getFamilyShoppingList, saveFamilyShoppingList, recordFamilyCheckIn } from '@/utils/family.js'
+import { getFamilyGroup, getCurrentUserId, getFamilyShoppingList, saveFamilyShoppingList, recordFamilyCheckIn, notifyShoppingChange } from '@/utils/family.js'
 
 const CATEGORY_MAP = {
   vegetable: { name: '蔬菜', icon: '🥬' },
@@ -530,6 +530,7 @@ export default {
     },
     toggleItem(item) {
       item.checked = !item.checked
+      notifyShoppingChange(item.checked ? 'buy' : 'remove', item.name)
       if (this.isFamilyMode) {
         this.saveFamilyShoppingListData()
       } else {
@@ -537,9 +538,11 @@ export default {
       }
     },
     deleteItem(id) {
+      const target = this.items.find(i => i.id === id)
       const idx = this.items.findIndex(i => i.id === id)
       if (idx > -1) {
         this.items.splice(idx, 1)
+        if (target) notifyShoppingChange('remove', target.name)
         if (this.isFamilyMode) {
           this.saveFamilyShoppingListData()
         } else {
@@ -565,6 +568,7 @@ export default {
       this.newItemName = ''
       this.newItemAmount = ''
       
+      notifyShoppingChange('add', name)
       if (this.isFamilyMode) {
         this.saveFamilyShoppingListData()
       } else {

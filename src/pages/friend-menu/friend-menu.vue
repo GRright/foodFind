@@ -138,11 +138,12 @@ export default {
   },
   methods: {
     loadSharedMenu() {
-      // 从本地存储获取分享数据
       const shareData = uni.getStorageSync('foodfind_share_data')
       if (shareData && shareData.meals) {
         this.meals = shareData.meals
         this.shareTime = shareData.time || ''
+        shareData.viewCount = (shareData.viewCount || 0) + 1
+        uni.setStorageSync('foodfind_share_data', shareData)
       }
       this.loading = false
     },

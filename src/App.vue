@@ -11,7 +11,8 @@ export default {
       dailyMeals: null,
       weeklyMeals: null,
       currentShareId: null,
-      openid: ''
+      openid: '',
+      needLogin: false
     }
 
     const cached = uni.getStorageSync('foodfind_partner')
@@ -24,36 +25,26 @@ export default {
   },
   methods: {
     performLogin() {
-      // 静默登录 - 只获取 openid
       wx.login({
         success: (loginRes) => {
           if (loginRes.code) {
-            console.log('[Auth] 微信登录成功，code:', loginRes.code)
             this.globalData.loginCode = loginRes.code
-            
             initCloud()
             getOpenId().then((openid) => {
               if (openid) {
                 this.globalData.openid = openid
-                console.log('[Auth] 用户身份已获取:', openid)
               }
-              
-              // 尝试从本地加载用户信息
               const cached = uni.getStorageSync('foodfind_user_info')
               if (cached) {
                 this.globalData.userInfo = cached
-                console.log('[Auth] 已加载缓存用户信息:', cached)
+              } else {
+                this.globalData.needLogin = true
               }
-              
               syncOnStartup()
             })
-          } else {
-            console.error('[Auth] 微信登录失败:', loginRes.errMsg)
           }
         },
-        fail: (err) => {
-          console.error('[Auth] 微信登录异常:', err)
-        }
+        fail: () => {}
       })
     }
   },
@@ -63,7 +54,8 @@ export default {
     dailyMeals: null,
     weeklyMeals: null,
     currentShareId: null,
-    openid: ''
+    openid: '',
+    needLogin: false
   }
 }
 </script>

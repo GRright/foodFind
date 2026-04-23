@@ -413,3 +413,108 @@ export function clearFamilyData() {
   uni.removeStorageSync('foodfind_family_checkins')
   uni.removeStorageSync('foodfind_family_shopping')
 }
+
+export function addLocalNotification(notif) {
+  const list = uni.getStorageSync('foodfind_notifications') || []
+  list.unshift({
+    id: 'n_' + Date.now(),
+    read: false,
+    createdAt: new Date().toISOString(),
+    ...notif
+  })
+  if (list.length > 50) list.length = 50
+  uni.setStorageSync('foodfind_notifications', list)
+  return list
+}
+
+export function getLocalNotifications() {
+  return uni.getStorageSync('foodfind_notifications') || []
+}
+
+export function markNotificationRead(id) {
+  const list = uni.getStorageSync('foodfind_notifications') || []
+  const item = list.find(n => n.id === id)
+  if (item) item.read = true
+  uni.setStorageSync('foodfind_notifications', list)
+}
+
+export function markAllNotificationsRead() {
+  const list = uni.getStorageSync('foodfind_notifications') || []
+  list.forEach(n => { n.read = true })
+  uni.setStorageSync('foodfind_notifications', list)
+}
+
+export function getUnreadNotificationCount() {
+  const list = uni.getStorageSync('foodfind_notifications') || []
+  return list.filter(n => !n.read).length
+}
+
+export function notifyShoppingChange(action, itemName) {
+  const app = getApp()
+  const myName = app?.globalData?.userInfo?.nickname || '我'
+  addLocalNotification({
+    type: 'shopping',
+    fromName: myName,
+    content: action === 'add' ? `添加了「${itemName}」到购物清单` : action === 'buy' ? `购买了「${itemName}」` : `从购物清单移除了「${itemName}」`
+  })
+}
+
+export function notifyCheckIn(mealType) {
+  const app = getApp()
+  const myName = app?.globalData?.userInfo?.nickname || '我'
+  const mealName = mealType === 'breakfast' ? '早餐' : mealType === 'lunch' ? '午餐' : '晚餐'
+  addLocalNotification({
+    type: 'checkin',
+    fromName: myName,
+    content: `完成了${mealName}打卡 🎉`
+  })
+}
+
+export function notifyRecipeLike(recipeName) {
+  const app = getApp()
+  const myName = app?.globalData?.userInfo?.nickname || '我'
+  addLocalNotification({
+    type: 'like',
+    fromName: myName,
+    content: `喜欢了「${recipeName}」`
+  })
+}
+
+export function getFamilyCheckInToday() {
+  const todayStr = new Date().toISOString().split('T')[0]
+  const familyCheckins = uni.getStorageSync('foodfind_family_checkins') || {}
+  const personalChecks = uni.getStorageSync('foodfind_personal_checks') || {}
+  const myChecks = personalChecks[todayStr] || {}
+  const group = getFamilyGroup()
+  const result = []
+  result.push({
+    name: '我',
+    isSelf: true,
+    checks: myChecks
+  })
+  if (group && group.members) {
+    group.members.forEach(m => {
+      if (m.userId && m.userId !== getCurrentUserId()) {
+        const memberChecks = familyCheckins[todayStr]?.[m.userId] || {}
+        result.push({
+          name: m.name || 'TA',
+          isSelf: false,
+          checks: memberChecks
+        })
+      }
+    })
+  }
+  const partner = uni.getStorageSync('foodfind_partner')
+  if (partner && partner.nickname) {
+    const existing = result.find(r => r.name === partner.nickname)
+    if (!existing) {
+      const partnerChecks = familyCheckins[todayStr]?.['partner'] || {}
+      result.push({
+        name: partner.nickname,
+        isSelf: false,
+        checks: partnerChecks
+      })
+    }
+  }
+  return result
+}

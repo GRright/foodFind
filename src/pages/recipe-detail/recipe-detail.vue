@@ -110,6 +110,7 @@
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
+import { notifyRecipeLike } from '@/utils/family.js'
 
 export default {
   data() {
@@ -175,6 +176,7 @@ export default {
             favorites.unshift(this.recipe)
             uni.setStorageSync('foodfind_favorites', favorites)
           }
+          notifyRecipeLike(this.recipe.name)
           uni.showToast({ title: '已标记为喜欢', icon: 'success' })
         } else if (type === 'dislike') {
           // 从favorites中移除

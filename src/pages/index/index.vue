@@ -66,6 +66,22 @@
             <text class="cb-item">碳水 {{ totalCarbs }}g</text>
           </view>
         </view>
+
+        <view class="family-checkin-bar" v-if="familyCheckInList.length > 0">
+          <text class="fcb-title">今日打卡</text>
+          <view class="fcb-members">
+            <view class="fcb-member" v-for="(m, mi) in familyCheckInList" :key="mi">
+              <view class="fcb-avatar" :class="{ self: m.isSelf }">
+                <text class="fcb-char">{{ m.name.charAt(0) }}</text>
+              </view>
+              <view class="fcb-meals">
+                <text class="fcb-meal" :class="{ done: m.checks.breakfast }">早</text>
+                <text class="fcb-meal" :class="{ done: m.checks.lunch }">午</text>
+                <text class="fcb-meal" :class="{ done: m.checks.dinner }">晚</text>
+              </view>
+            </view>
+          </view>
+        </view>
       </view>
 
       <view class="special-banner" v-if="specialBanner" @click="onSpecialBannerClick">
@@ -79,6 +95,15 @@
         <view class="sp-banner-action">
           <text class="sp-banner-btn">查看推荐 →</text>
         </view>
+      </view>
+
+      <view class="smart-reminder" v-if="smartReminder" @click="onSmartReminderClick">
+        <text class="sr-icon">{{ smartReminder.icon }}</text>
+        <view class="sr-content">
+          <text class="sr-title">{{ smartReminder.title }}</text>
+          <text class="sr-desc">{{ smartReminder.desc }}</text>
+        </view>
+        <text class="sr-action">›</text>
       </view>
 
       <view class="greeting-card-mask" :class="{ show: showGreetingCard }" @click="closeGreetingCard">
@@ -107,7 +132,7 @@
         >
           <view class="meal-header">
             <view class="mh-left">
-              <text class="mh-icon">{{ section.icon }}</text>
+              <image class="mh-icon-img" :src="section.iconImg" mode="aspectFit"></image>
               <text class="mh-title">{{ section.title }}</text>
             </view>
             <view class="mh-right">
@@ -438,6 +463,21 @@
       <text class="ae-text">成就</text>
     </view>
 
+    <!-- 登录弹窗 -->
+    <view class="login-modal-mask" :class="{ show: showLoginModal }" @click.stop>
+      <view class="login-modal" :class="{ show: showLoginModal }">
+        <view class="lm-deco">✦ ✦ ✦</view>
+        <text class="lm-emoji">🍽️</text>
+        <text class="lm-title">欢迎来到吃点啥</text>
+        <text class="lm-desc">登录后享受完整体验</text>
+        <text class="lm-features">智能推荐 · 营养均衡 · 家庭共享</text>
+        <button class="lm-login-btn" open-type="getUserInfo" @getuserinfo="onGetUserInfo">
+          <text class="lm-btn-text">微信一键登录</text>
+        </button>
+        <view class="lm-skip" @click="skipLogin"><text class="lm-skip-text">暂不登录</text></view>
+      </view>
+    </view>
+
     <!-- 特别日期设置弹窗 -->
     <view class="modal-mask" :class="{ show: showSpecialModal }" @click="showSpecialModal = false"></view>
     <view class="special-modal" :class="{ show: showSpecialModal }">
@@ -473,8 +513,8 @@
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
-import { filterRecipesByHealthTags, getFamilyHealthTags } from '@/utils/family.js'
-import { getBirthdayMenuRecommendation, addSpecialDate, getFamilyMemberSpecialToday } from '@/utils/festival.js'
+import { filterRecipesByHealthTags, getFamilyHealthTags, getLocalNotifications, markAllNotificationsRead, getUnreadNotificationCount, notifyCheckIn, getFamilyCheckInToday } from '@/utils/family.js'
+import { getBirthdayMenuRecommendation, addSpecialDate, getFamilyMemberSpecialToday, getPersonalizedRecipes, getUpcomingSpecialDates, getCurrentSeason, SEASONAL_FOODS } from '@/utils/festival.js'
 import { callFunction, markDirty } from '@/utils/cloud.js'
 
 export default {
@@ -535,7 +575,10 @@ export default {
         suggestion: ''
       },
       showSpecialModal: false,
-      specialDateForm: { name: '', month: 1, day: 1, type: 'birthday' }
+      specialDateForm: { name: '', month: 1, day: 1, type: 'birthday' },
+      showLoginModal: false,
+      familyCheckInList: [],
+      smartReminder: null
     }
   },
   computed: {
@@ -665,6 +708,7 @@ export default {
         setTimeout(() => { this.showSpecialModal = true }, 500)
       }
     })
+    this.checkNeedLogin()
   },
   onReady() {
     this.pageReady = true
@@ -675,14 +719,12 @@ export default {
     setTimeout(() => { this.pageEnter = false }, 300)
     this._nutritionCache = null
     
-    // 检查用餐配置是否变更
     const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
     const mealConfig = prefs.mealConfig || { weekday: ['breakfast', 'lunch', 'dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
     const lastMealConfig = uni.getStorageSync('foodfind_last_meal_config')
     const configChanged = JSON.stringify(mealConfig) !== JSON.stringify(lastMealConfig)
     
     if (configChanged) {
-      // 配置已变更，重新生成菜单
       this.dailyMeals = null
       this.preloadMeals()
       uni.setStorageSync('foodfind_last_meal_config', mealConfig)
@@ -691,6 +733,9 @@ export default {
     }
     
     this.loadTodayCheckIn()
+    this.loadNotifications()
+    this.checkSmartReminders()
+    
     const openSpecial = uni.getStorageSync('foodfind_open_special')
     if (openSpecial === '1') {
       uni.removeStorageSync('foodfind_open_special')
@@ -733,6 +778,7 @@ export default {
       if (personalChecks[todayStr]) {
         this.mealCheckIn = { ...personalChecks[todayStr] }
       }
+      this.familyCheckInList = getFamilyCheckInToday()
     },
     markMealEaten(mealKey) {
       const newState = !this.mealCheckIn[mealKey]
@@ -746,6 +792,8 @@ export default {
       markDirty('personal_checks')
 
       if (newState) {
+        notifyCheckIn(mealKey)
+        this.updateStreak()
         uni.showToast({ title: `${mealKey === 'breakfast' ? '早餐' : mealKey === 'lunch' ? '午餐' : '晚餐'}已打卡 ✓`, icon: 'success' })
       }
     },
@@ -1038,6 +1086,10 @@ export default {
       if (breakfastPool.length === 0) breakfastPool = ALL_RECIPES.breakfast
       if (lunchPool.length === 0) lunchPool = ALL_RECIPES.lunch
       if (dinnerPool.length === 0) dinnerPool = ALL_RECIPES.dinner
+
+      breakfastPool = getPersonalizedRecipes(breakfastPool)
+      lunchPool = getPersonalizedRecipes(lunchPool)
+      dinnerPool = getPersonalizedRecipes(dinnerPool)
       
       const dailyMeals = {
         breakfast: this.shuffle(breakfastPool, n),
@@ -1138,19 +1190,23 @@ export default {
     onShareClick() {
       this.shareBtnClicked = true
       const meals = uni.getStorageSync('foodfind_meals')
-      const myName = uni.getStorageSync('foodfind_detailed_prefs')?.nickname || '美食爱好者'
+      const app = getApp()
+      const myName = app?.globalData?.userInfo?.nickname || '美食爱好者'
       const todayStr = this.getTodayStr()
       
-      // 保存分享数据到本地，用于好友查看
       const shareData = {
         meals: meals || {},
         fromName: myName,
         date: todayStr,
-        time: new Date().toLocaleString()
+        time: new Date().toLocaleString(),
+        viewCount: 0
       }
       uni.setStorageSync('foodfind_share_data', shareData)
       
-      // 调用系统分享
+      let shareCount = uni.getStorageSync('foodfind_share_count') || 0
+      shareCount++
+      uni.setStorageSync('foodfind_share_count', shareCount)
+      
       uni.showShareMenu({
         withShareTicket: true,
         menus: ['shareAppMessage', 'shareTimeline']
@@ -1158,8 +1214,7 @@ export default {
     },
     onShareAppMessage() {
       const app = getApp()
-      const partnerName = app?.globalData?.partnerInfo?.nickname || 'TA'
-      const myName = uni.getStorageSync('foodfind_detailed_prefs')?.nickname || '美食爱好者'
+      const myName = app?.globalData?.userInfo?.nickname || '美食爱好者'
 
       if (this.noCookMode) {
         return { title: `来看看我今天吃了什么~`, path: '/pages/friend-menu/friend-menu?from=' + encodeURIComponent(myName), imageUrl: '' }
@@ -1168,17 +1223,32 @@ export default {
       const cal = this.totalCalories
       const meals = uni.getStorageSync('foodfind_meals')
 
-      // 保存分享数据
       uni.setStorageSync('foodfind_share_data', {
         meals: meals,
         fromName: myName,
-        time: new Date().toLocaleString()
+        time: new Date().toLocaleString(),
+        viewCount: 0
       })
 
       return { 
         title: `${myName} 今天吃这些~ (${cal}kcal)`, 
         path: '/pages/friend-menu/friend-menu?from=' + encodeURIComponent(myName),
         imageUrl: '' 
+      }
+    },
+    onShareTimeline() {
+      const app = getApp()
+      const myName = app?.globalData?.userInfo?.nickname || '美食爱好者'
+      const cal = this.totalCalories
+      
+      let shareCount = uni.getStorageSync('foodfind_share_count') || 0
+      shareCount++
+      uni.setStorageSync('foodfind_share_count', shareCount)
+      
+      return {
+        title: `${myName}的今日菜单 (${cal}kcal) - 吃点啥`,
+        query: 'from=' + encodeURIComponent(myName),
+        imageUrl: ''
       }
     },
     loadMore() {},
@@ -1189,10 +1259,16 @@ export default {
       }
     },
     loadNotifications() {
-      return
+      this.notifList = getLocalNotifications()
+      this.unreadCount = getUnreadNotificationCount()
     },
     showNotifications() {
+      this.loadNotifications()
       this.showNotifPanel = true
+      this.$nextTick(() => {
+        markAllNotificationsRead()
+        this.unreadCount = 0
+      })
     },
     openComment(item) {
       this.currentFeedItem = item
@@ -1330,6 +1406,99 @@ export default {
         uni.setStorageSync('foodfind_achievements', unlocked)
         uni.showToast({ title: '🏆 解锁新成就！', icon: 'none', duration: 2000 })
       }
+    },
+    checkNeedLogin() {
+      const cached = uni.getStorageSync('foodfind_user_info')
+      const app = getApp()
+      if (!cached && app?.globalData?.needLogin) {
+        setTimeout(() => { this.showLoginModal = true }, 800)
+      }
+    },
+    onGetUserInfo(e) {
+      const detail = e.mp?.detail || e.detail
+      if (detail.userInfo) {
+        const userInfo = {
+          nickname: detail.userInfo.nickName || '美食爱好者',
+          avatar: detail.userInfo.avatarUrl || ''
+        }
+        this.saveUserLogin(userInfo)
+      } else {
+        this.skipLogin()
+      }
+    },
+    saveUserLogin(userInfo) {
+      const app = getApp()
+      if (app?.globalData) {
+        app.globalData.userInfo = userInfo
+        app.globalData.needLogin = false
+      }
+      uni.setStorageSync('foodfind_user_info', userInfo)
+      this.showLoginModal = false
+      uni.showToast({ title: '登录成功 ✨', icon: 'success' })
+    },
+    skipLogin() {
+      const app = getApp()
+      if (app?.globalData) {
+        app.globalData.needLogin = false
+      }
+      this.showLoginModal = false
+    },
+    checkSmartReminders() {
+      const h = new Date().getHours()
+      const todayStr = new Date().toISOString().split('T')[0]
+      const checks = uni.getStorageSync('foodfind_personal_checks') || {}
+      const todayChecks = checks[todayStr] || {}
+      const reminderShown = uni.getStorageSync('foodfind_reminder_shown') || {}
+      const reminderKey = todayStr + '_' + h
+
+      if (reminderShown[reminderKey]) {
+        this.smartReminder = null
+        return
+      }
+
+      if (h >= 6 && h < 9 && !todayChecks.breakfast) {
+        this.smartReminder = { icon: '☀️', title: '早餐时间到！', desc: '别忘了打卡早餐~', action: 'checkin', mealKey: 'breakfast' }
+      } else if (h >= 11 && h < 13 && !todayChecks.lunch) {
+        this.smartReminder = { icon: '🌞', title: '午餐时间到！', desc: '午饭吃了没？记得打卡~', action: 'checkin', mealKey: 'lunch' }
+      } else if (h >= 17 && h < 19 && !todayChecks.dinner) {
+        this.smartReminder = { icon: '🌙', title: '晚餐时间到！', desc: '晚饭安排了吗？记得打卡~', action: 'checkin', mealKey: 'dinner' }
+      } else {
+        const upcoming = getUpcomingSpecialDates(3)
+        if (upcoming.length > 0) {
+          const event = upcoming[0]
+          this.smartReminder = { icon: event.type === 'birthday' ? '🎂' : '💝', title: `${event.name}即将到来`, desc: `${event.month}月${event.day}日，提前准备吧~`, action: 'special' }
+        } else {
+          const shoppingList = uni.getStorageSync('foodfind_shopping_list')
+          if (shoppingList && shoppingList.items && shoppingList.items.length > 0) {
+            const unchecked = shoppingList.items.filter(i => !i.checked)
+            if (unchecked.length > 0 && h >= 8 && h < 18) {
+              this.smartReminder = { icon: '🛒', title: '购物提醒', desc: `还有${unchecked.length}项食材未购买`, action: 'shopping' }
+            } else {
+              this.smartReminder = null
+            }
+          } else {
+            this.smartReminder = null
+          }
+        }
+      }
+
+      if (this.smartReminder) {
+        reminderShown[reminderKey] = true
+        uni.setStorageSync('foodfind_reminder_shown', reminderShown)
+      }
+    },
+    onSmartReminderClick() {
+      if (!this.smartReminder) return
+      const action = this.smartReminder.action
+      if (action === 'checkin') {
+        this.markMealEaten(this.smartReminder.mealKey)
+        this.smartReminder = null
+      } else if (action === 'shopping') {
+        uni.navigateTo({ url: '/pages/shoppingList/shoppingList' })
+      } else if (action === 'special') {
+        this.showSpecialModal = true
+      }
+      this.smartReminder = null
     }
   }
 }
@@ -1420,6 +1589,28 @@ export default {
 .cb-item { font-size:20rpx; color:#999; font-weight:400; }
 .cb-dot { font-size:20rpx; color:#ddd; }
 
+.family-checkin-bar {
+  display:flex; align-items:center; gap:16rpx;
+  background:#fff; padding:18rpx 24rpx; border-radius:20rpx;
+  box-shadow:0 1rpx 8rpx rgba(0,0,0,.04); margin-top:12rpx;
+}
+.fcb-title { font-size:22rpx; color:#999; font-weight:600; flex-shrink:0; }
+.fcb-members { display:flex; align-items:center; gap:20rpx; flex:1; overflow-x:auto; }
+.fcb-member { display:flex; align-items:center; gap:8rpx; flex-shrink:0; }
+.fcb-avatar {
+  width:40rpx; height:40rpx; border-radius:50%;
+  background:#f0f0f0; display:flex; align-items:center; justify-content:center;
+  &.self { background:#e8f7ef; }
+}
+.fcb-char { font-size:20rpx; font-weight:700; color:#666; }
+.fcb-avatar.self .fcb-char { color:#07c160; }
+.fcb-meals { display:flex; gap:4rpx; }
+.fcb-meal {
+  font-size:18rpx; color:#ccc; padding:2rpx 8rpx;
+  background:#f5f5f5; border-radius:8rpx; font-weight:500;
+  &.done { color:#fff; background:#07c160; }
+}
+
 /* ===== Scroll ===== */
 .meal-scroll { }
 .feed-scroll { }
@@ -1436,6 +1627,7 @@ export default {
 }
 .mh-left { display:flex; align-items:center; gap:10rpx; }
 .mh-icon { font-size:28rpx; }
+.mh-icon-img { width:36rpx; height:36rpx; }
 .mh-title { font-size:26rpx; font-weight:700; color:#1a1a1a; }
 .mh-right { display:flex; align-items:center; gap:10rpx; }
 
@@ -2082,6 +2274,20 @@ export default {
   border:1rpx solid #ffe0e8;
 }
 
+.smart-reminder {
+  display:flex; align-items:center; gap:16rpx;
+  margin:0 28rpx 16rpx; padding:20rpx 24rpx;
+  background:linear-gradient(135deg,#f0f7ff,#e8f4fd);
+  border-radius:20rpx; border:2rpx solid #c8e0f4;
+  transition:all .25s ease;
+  &:active { transform:scale(.98); }
+}
+.sr-icon { font-size:36rpx; flex-shrink:0; }
+.sr-content { flex:1; display:flex; flex-direction:column; gap:4rpx; }
+.sr-title { font-size:26rpx; font-weight:700; color:#1a6fb5; }
+.sr-desc { font-size:22rpx; color:#5a9ec4; }
+.sr-action { font-size:32rpx; color:#5a9ec4; flex-shrink:0; }
+
 .greeting-card-mask {
   position:fixed; top:0; left:0; right:0; bottom:0;
   background:rgba(0,0,0,0); z-index:2000;
@@ -2167,4 +2373,35 @@ export default {
   &:active { opacity:.85; }
 }
 .spm-save-txt { font-size:28rpx; font-weight:700; color:#fff; }
+
+.login-modal-mask {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0); z-index:3000;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events:none; transition:background .35s ease;
+  &.show { background:rgba(0,0,0,.55); pointer-events:auto; }
+}
+.login-modal {
+  width:580rpx; background:#fff; border-radius:36rpx;
+  padding:56rpx 40rpx 40rpx; text-align:center;
+  transform:scale(.7) translateY(60rpx); opacity:0;
+  transition:all .4s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 16rpx 60rpx rgba(0,0,0,.15);
+  &.show { transform:scale(1) translateY(0); opacity:1; }
+}
+.lm-deco { font-size:22rpx; color:#ffd700; letter-spacing:16rpx; margin-bottom:20rpx; }
+.lm-emoji { font-size:88rpx; display:block; margin-bottom:24rpx; }
+.lm-title { font-size:38rpx; font-weight:800; color:#1a1a1a; display:block; margin-bottom:12rpx; letter-spacing:-1rpx; }
+.lm-desc { font-size:26rpx; color:#666; display:block; margin-bottom:16rpx; }
+.lm-features { font-size:22rpx; color:#07c160; display:block; margin-bottom:40rpx; letter-spacing:2rpx; }
+.lm-login-btn {
+  width:100%; padding:26rpx 0; background:#07c160;
+  border-radius:48rpx; border:none; line-height:1;
+  box-shadow:0 4rpx 20rpx rgba(7,193,96,.25);
+  &::after { display:none; }
+  &:active { opacity:.85; transform:scale(.98); }
+}
+.lm-btn-text { font-size:30rpx; font-weight:600; color:#fff; }
+.lm-skip { margin-top:24rpx; padding:12rpx; }
+.lm-skip-text { font-size:24rpx; color:#bbb; }
 </style>

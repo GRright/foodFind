@@ -25,15 +25,14 @@
     </view>
 
     <view class="profile-header fade-in" v-if="!isLoading">
-      <view class="avatar-large">
+      <view class="avatar-large" v-if="userInfo.avatar">
+        <image class="avatar-img" :src="userInfo.avatar" mode="aspectFill"></image>
+      </view>
+      <view class="avatar-large" v-else>
         <text class="avatar-char">{{ userInfo.nickname ? userInfo.nickname.charAt(0) : '美' }}</text>
       </view>
       <text class="user-name">{{ userInfo.nickname || '美食爱好者' }}</text>
       <text class="user-desc">享受每一餐的美好时光</text>
-      <view class="auth-hint" v-if="!userInfo.nickname || userInfo.nickname === '美食爱好者'" @click="getUserProfile">
-        <text class="ah-icon">🔐</text>
-        <text class="ah-text">点击获取微信昵称</text>
-      </view>
     </view>
 
     <view class="menu-section" v-if="!isLoading">
@@ -236,20 +235,26 @@
     </view>
 
     <view class="version-info">
-      <text class="version-text">吃点啥 v2.6.3 · 系统安全加固版</text>
+      <text class="version-text">吃点啥 v2.7.0 · 智能推荐版</text>
+      <text class="share-stats" v-if="shareViewCount > 0">📊 菜谱已被查看 {{ shareViewCount }} 次</text>
     </view>
 
     <view class="report-modal-mask" :class="{ show: showReportModal }" @click="closeReport"></view>
     <view class="report-modal" :class="{ show: showReportModal }">
       <view class="rm-header">
         <view class="rm-header-left">
-          <text class="rm-title">📊 本周饮食报告</text>
-          <text class="rm-subtitle">{{ formatWeekDateRange() }}</text>
+          <text class="rm-title">📊 {{ reportPeriod === 'week' ? '本周' : '本月' }}饮食报告</text>
+          <text class="rm-subtitle">{{ reportPeriod === 'week' ? formatWeekDateRange() : formatMonthDateRange() }}</text>
         </view>
         <view class="rm-close" @click="closeReport"><text class="pm-close-txt">✕</text></view>
       </view>
 
-      <scroll-view scroll-y class="rm-body" :style="{ height: 'calc(88vh - 200rpx)' }">
+      <view class="rm-period-toggle">
+        <view class="rpt-btn" :class="{ active: reportPeriod === 'week' }" @click="switchReportPeriod('week')"><text class="rpt-text">周报</text></view>
+        <view class="rpt-btn" :class="{ active: reportPeriod === 'month' }" @click="switchReportPeriod('month')"><text class="rpt-text">月报</text></view>
+      </view>
+
+      <scroll-view scroll-y class="rm-body" :style="{ height: 'calc(88vh - 260rpx)' }">
         <view class="rm-hero">
           <view class="rmh-content">
             <view v-if="reportMode === 'solo'" class="rmh-solo">
@@ -366,6 +371,36 @@
                 </view>
                 <text class="rm-bar-label">{{ formatDayDate(day.date) }}</text>
               </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="rm-section">
+          <view class="rm-section-header">
+            <text class="rms-title">📈 营养摄入趋势</text>
+            <text class="rms-desc">每日热量变化</text>
+          </view>
+          <view class="rm-chart-card">
+            <view class="rm-chart-bars">
+              <view class="rm-chart-bar" v-for="(day, idx) in weeklyReportData" :key="idx">
+                <view class="rm-bar nutrient-bar" :style="{ height: getNutritionBarHeight(day) + '%' }">
+                  <text class="rm-bar-meals" v-if="day.calories > 0">{{ day.calories }}</text>
+                </view>
+                <text class="rm-bar-label">{{ formatDayDate(day.date) }}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="rm-section">
+          <view class="rm-section-header">
+            <text class="rms-title">🏆 打卡成就</text>
+          </view>
+          <view class="rm-achieve-grid">
+            <view class="rm-achieve-item" v-for="(a, ai) in reportAchievements" :key="ai" :class="{ unlocked: a.unlocked }">
+              <text class="rai-icon">{{ a.icon }}</text>
+              <text class="rai-name">{{ a.name }}</text>
+              <text class="rai-status">{{ a.unlocked ? '✓' : '🔒' }}</text>
             </view>
           </view>
         </view>
@@ -540,6 +575,9 @@ export default {
       specialDateForm: { name: '', month: 1, day: 1, type: 'birthday' },
       myInfo: { height: '', weight: '', allergies: '', dietary: '' },
       specialDates: [],
+      reportPeriod: 'week',
+      reportAchievements: [],
+      shareViewCount: 0,
       prefs: {
         noCookMode: false,
         userType: 'adult',
@@ -748,6 +786,10 @@ export default {
     this.loadUserInfo()
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
+    const shareData = uni.getStorageSync('foodfind_share_data')
+    if (shareData && shareData.viewCount) {
+      this.shareViewCount = shareData.viewCount
+    }
   },
   methods: {
     loadUserInfo() {
@@ -762,27 +804,6 @@ export default {
           this.userInfo = { nickname: '美食爱好者', avatar: '' }
         }
       }
-    },
-    getUserProfile() {
-      wx.getUserProfile({
-        desc: '用于完善用户资料，提供更好的个性化服务',
-        success: (profileRes) => {
-          const userInfo = {
-            nickname: profileRes.userInfo.nickName || '美食爱好者',
-            avatar: profileRes.userInfo.avatarUrl || ''
-          }
-          this.userInfo = userInfo
-          const app = getApp()
-          if (app?.globalData) {
-            app.globalData.userInfo = userInfo
-          }
-          uni.setStorageSync('foodfind_user_info', userInfo)
-          uni.showToast({ title: '昵称已获取 ✨', icon: 'success' })
-        },
-        fail: () => {
-          uni.showToast({ title: '已取消授权', icon: 'none' })
-        }
-      })
     },
     loadCachedStats() {
       const checks = uni.getStorageSync('foodfind_personal_checks') || {}
@@ -858,26 +879,74 @@ export default {
       this.loadWeeklyReport()
       this.loadMyWeeklyMeals()
       this.loadCachedStats()
+      this.loadReportAchievements()
     },
     closeReport() { this.showReportModal = false },
+    switchReportPeriod(period) {
+      this.reportPeriod = period
+      this._weeklyNutritionCache = null
+      this.loadWeeklyReport()
+      this.loadMyWeeklyMeals()
+      this.loadCachedStats()
+    },
+    formatMonthDateRange() {
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = now.getMonth() + 1
+      return `${year}年${month}月`
+    },
+    getNutritionBarHeight(day) {
+      const cal = day.calories || 0
+      if (cal === 0) return 10
+      return Math.min(100, Math.max(10, (cal / 2000) * 100))
+    },
+    loadReportAchievements() {
+      const streak = uni.getStorageSync('foodfind_streak') || { days: 0, lastDate: '' }
+      const shareCount = uni.getStorageSync('foodfind_share_count') || 0
+      const checks = uni.getStorageSync('foodfind_personal_checks') || {}
+      const totalCheckDays = Object.keys(checks).length
+      this.reportAchievements = [
+        { icon: '🌱', name: '初出茅庐', desc: '连续3天', unlocked: streak.days >= 3 },
+        { icon: '🔥', name: '坚持不懈', desc: '连续7天', unlocked: streak.days >= 7 },
+        { icon: '⭐', name: '美食达人', desc: '连续14天', unlocked: streak.days >= 14 },
+        { icon: '👑', name: '食神', desc: '连续30天', unlocked: streak.days >= 30 },
+        { icon: '📊', name: '记录者', desc: '打卡5天', unlocked: totalCheckDays >= 5 },
+        { icon: '📤', name: '分享使者', desc: '分享5次', unlocked: shareCount >= 5 }
+      ]
+    },
     loadWeeklyReport() {
       this.generateLocalWeekData()
     },
     generateLocalWeekData() {
       const checks = uni.getStorageSync('foodfind_personal_checks') || {}
+      const allRecipes = [...ALL_RECIPES.breakfast, ...ALL_RECIPES.lunch, ...ALL_RECIPES.dinner]
+      const days = this.reportPeriod === 'month' ? 30 : 7
       const data = []
-      for (let i = 6; i >= 0; i--) {
+      for (let i = days - 1; i >= 0; i--) {
         const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0]
         const dayChecks = checks[d]
         let sparkLevel = 0
         let mealCount = 0
+        let calories = 0
         if (dayChecks) {
           const eatenCount = [dayChecks.breakfast, dayChecks.lunch, dayChecks.dinner].filter(v => v).length
           mealCount = eatenCount
           if (eatenCount >= 2) sparkLevel = 2
           else if (eatenCount >= 1) sparkLevel = 1
         }
-        data.push({ date: d, sparkLevel, mealCount, allOpened: sparkLevel > 0, allShared: false })
+        const weekly = uni.getStorageSync('foodfind_weekly') || {}
+        const dayMeals = weekly[d] || {}
+        if (dayMeals && dayChecks) {
+          ['breakfast', 'lunch', 'dinner'].forEach(mealType => {
+            if (dayChecks[mealType] && dayMeals[mealType]) {
+              dayMeals[mealType].forEach(food => {
+                const recipe = allRecipes.find(r => r.id === food.id)
+                if (recipe) calories += recipe.nutrition?.calories || 0
+              })
+            }
+          })
+        }
+        data.push({ date: d, sparkLevel, mealCount, calories: Math.round(calories), allOpened: sparkLevel > 0, allShared: false })
       }
       this.weeklyReportData = data
     },
@@ -1109,7 +1178,7 @@ export default {
 
     showAbout() {
       uni.showModal({
-        title: '关于吃点啥 v2.6.3', content: '为情侣/家人打造的共同决策「今天吃什么」的微信小程序\n\n智能推荐 · 营养均衡 · 云端同步 · 家庭共享', showCancel: false, confirmText: '知道了'
+        title: '关于吃点啥 v2.7.0', content: '为情侣/家人打造的共同决策「今天吃什么」的微信小程序\n\n智能推荐 · 个性偏好 · 季节时令 · 家庭共享', showCancel: false, confirmText: '知道了'
       })
     },
     loadFavorites() {
@@ -1196,19 +1265,12 @@ export default {
   background:#fff;
   display:flex; align-items:center; justify-content:center; margin-bottom:24rpx;
   box-shadow:0 4rpx 24rpx rgba(0,0,0,.06);
+  overflow:hidden;
 }
+.avatar-img { width:100%; height:100%; }
 .avatar-char { color:#07c160; font-size:52rpx; font-weight:700; }
 .user-name { font-size:40rpx; font-weight:800; color:#1a1a1a; margin-bottom:8rpx; letter-spacing:-1rpx; }
 .user-desc { font-size:24rpx; color:#999; }
-.auth-hint {
-  margin-top:16rpx; padding:12rpx 20rpx;
-  background:linear-gradient(135deg, #07c160, #05a050);
-  border-radius:24rpx; display:flex; align-items:center; justify-content:center; gap:8rpx;
-  width:fit-content;
-  &:active { opacity:.85; transform:scale(.98); transition:all .2s ease; }
-}
-.ah-icon { font-size:28rpx; }
-.ah-text { font-size:24rpx; color:#fff; font-weight:600; }
 
 /* ===== Menu Section ===== */
 .menu-section { padding:16rpx 0 28rpx; }
@@ -1398,7 +1460,8 @@ export default {
 .pm-save-txt { font-size:30rpx; font-weight:600; color:#fff; }
 
 .version-info { text-align:center; padding:36rpx 0 60rpx; }
-.version-text { font-size:24rpx; color:#ccc; }
+.version-text { font-size:24rpx; color:#ccc; display:block; }
+.share-stats { font-size:22rpx; color:#07c160; display:block; margin-top:8rpx; }
 
 /* ===== Report Modal ===== */
 .report-modal-mask {
@@ -1602,6 +1665,37 @@ export default {
 .rm-tip-icon { font-size:28rpx; }
 .rm-tip-content { flex:1; }
 .rm-tip-text { font-size:24rpx; color:#666; line-height:1.7; font-weight:500; }
+
+.rm-period-toggle {
+  display:flex; gap:0; padding:0 32rpx 16rpx;
+  background:#fff; flex-shrink:0;
+}
+.rpt-btn {
+  flex:1; padding:14rpx 0; text-align:center;
+  background:#f5f6f8; transition:all .25s ease;
+  &:first-child { border-radius:24rpx 0 0 24rpx; }
+  &:last-child { border-radius:0 24rpx 24rpx 0; }
+  &.active { background:#07c160; }
+  &:active { opacity:.85; }
+}
+.rpt-text { font-size:24rpx; font-weight:600; color:#666; }
+.rpt-btn.active .rpt-text { color:#fff; }
+
+.nutrient-bar { background:linear-gradient(180deg,#ff9f43 0%,#f08c00 100%) !important; }
+
+.rm-achieve-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:12rpx;
+}
+.rm-achieve-item {
+  display:flex; flex-direction:column; align-items:center; gap:6rpx;
+  padding:20rpx 12rpx; background:#fff; border-radius:16rpx;
+  box-shadow:0 1rpx 6rpx rgba(0,0,0,.04);
+  &.unlocked { background:#e8f7ef; }
+}
+.rai-icon { font-size:36rpx; }
+.rai-name { font-size:20rpx; font-weight:600; color:#333; }
+.rai-status { font-size:18rpx; color:#ccc; }
+.rm-achieve-item.unlocked .rai-status { color:#07c160; }
 
 .rm-footer-spacer { height:80rpx; }
 
