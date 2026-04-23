@@ -102,7 +102,7 @@
         >
           <view class="meal-header">
             <view class="mh-left">
-              <text class="mh-icon">{{ meal.icon }}</text>
+              <image class="mh-icon" :src="meal.icon" mode="aspectFit"></image>
               <text class="mh-title">{{ meal.title }}</text>
             </view>
             <text class="mh-cal">{{ meal.cal }} kcal</text>
@@ -232,9 +232,9 @@ export default {
       const mealConfig = prefs.mealConfig || { weekday: ['breakfast', 'lunch', 'dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
       const activeMeals = isWeekend ? mealConfig.weekend : mealConfig.weekday
       const sections = [
-        { key: 'breakfast', title: '早餐', icon: '☀', recipes: this.selectedDayMeals.breakfast || [] },
-        { key: 'lunch', title: '午餐', icon: '🌞', recipes: this.selectedDayMeals.lunch || [] },
-        { key: 'dinner', title: '晚餐', icon: '🌙', recipes: this.selectedDayMeals.dinner || [] }
+        { key: 'breakfast', title: '早餐', icon: '/static/icons/breakfast.png', recipes: this.selectedDayMeals.breakfast || [] },
+        { key: 'lunch', title: '午餐', icon: '/static/icons/lunch.png', recipes: this.selectedDayMeals.lunch || [] },
+        { key: 'dinner', title: '晚餐', icon: '/static/icons/dinner.png', recipes: this.selectedDayMeals.dinner || [] }
       ].filter(s => activeMeals.includes(s.key))
       return sections.map(m => ({
         ...m,
@@ -320,15 +320,37 @@ export default {
       const d = new Date(this.currentMonday)
       d.setDate(d.getDate() - 7)
       this.currentMonday = d
-      // 切换到上一周时，默认选中周一
-      this.selectedDate = new Date(d)
+      // 切换到上一周后，如果是当前周则选中今天，否则选中周一
+      const now = new Date()
+      const day = now.getDay()
+      const diff = day === 0 ? -6 : 1 - day
+      const thisMonday = new Date(now)
+      thisMonday.setDate(now.getDate() + diff)
+      thisMonday.setHours(0, 0, 0, 0)
+      if (d.getTime() === thisMonday.getTime()) {
+        now.setHours(0, 0, 0, 0)
+        this.selectedDate = now
+      } else {
+        this.selectedDate = new Date(d)
+      }
     },
     nextWeek() {
       const d = new Date(this.currentMonday)
       d.setDate(d.getDate() + 7)
       this.currentMonday = d
-      // 切换到下一周时，默认选中周一
-      this.selectedDate = new Date(d)
+      // 切换到下一周后，如果是当前周则选中今天，否则选中周一
+      const now = new Date()
+      const day = now.getDay()
+      const diff = day === 0 ? -6 : 1 - day
+      const thisMonday = new Date(now)
+      thisMonday.setDate(now.getDate() + diff)
+      thisMonday.setHours(0, 0, 0, 0)
+      if (d.getTime() === thisMonday.getTime()) {
+        now.setHours(0, 0, 0, 0)
+        this.selectedDate = now
+      } else {
+        this.selectedDate = new Date(d)
+      }
     },
     backToThisWeek() {
       const now = new Date()
@@ -611,7 +633,7 @@ export default {
   padding:24rpx 28rpx 16rpx;
 }
 .mh-left { display:flex; align-items:center; gap:12rpx; }
-.mh-icon { font-size:32rpx; }
+.mh-icon { width:40rpx; height:40rpx; }
 .mh-title { font-size:26rpx; font-weight:700; color:#1a1a1a; }
 .mh-cal { font-size:24rpx; color:#999; font-weight:600; }
 

@@ -407,6 +407,74 @@ export function filterRecipesByHealthTags(recipes, healthTags) {
   })
 }
 
+const ALLERGY_MAP = {
+  peanut: ['花生'],
+  dairy: ['牛奶', '奶油', '芝士', '奶酪', '黄油', '酸奶'],
+  seafood: ['虾', '蟹', '贝', '蛤', '牡蛎', '鲍鱼', '鱼翅', '海参', '鱿鱼', '章鱼', '鲈鱼'],
+  gluten: ['面粉', '中筋面粉', '面包', '面条', '馒头', '包子', '饺子', '馄饨', '蛋糕', '饼干', '油条', '饼皮'],
+  egg: ['鸡蛋'],
+  soy: ['黄豆', '大豆', '豆腐', '豆浆']
+}
+
+const RESTRICTION_MAP = {
+  no_red_meat: ['五花肉', '猪里脊', '牛肉', '羊肉', '排骨', '肋排'],
+  no_poultry: ['鸡胸肉', '鸡翅', '鸭', '禽类'],
+  no_fish: ['鲈鱼', '鱼', '海鲜'],
+  no_garlic: ['大蒜', '蒜蓉', '蒜末'],
+  vegan: ['肉', '鸡', '鸭', '鱼', '牛', '羊', '猪', '虾', '蟹', '排骨', '蛋', '奶', '奶油', '芝士', '奶酪', '黄油'],
+  vegetarian: ['肉', '鸡', '鸭', '鱼', '牛', '羊', '猪', '虾', '蟹', '排骨']
+}
+
+const CUISINE_MAP = {
+  home_cooking: ['家常菜'],
+  sichuan: ['川菜', '川湘菜'],
+  cantonese: ['粤菜'],
+  northern: ['面食', '北方面食'],
+  healthy: [],
+  asian_fusion: []
+}
+
+export function filterRecipesByUserPrefs(recipes, userPrefs) {
+  if (!userPrefs) return recipes
+  const { allergies, restrictions, cuisines } = userPrefs
+
+  return recipes.filter(recipe => {
+    const name = recipe.name || ''
+    const ingredients = (recipe.ingredients || []).map(i => i.name || '').join(',')
+    const cuisineType = recipe.cuisine_type || ''
+    const text = name + ',' + ingredients
+
+    if (allergies && allergies.length > 0) {
+      for (const a of allergies) {
+        const keywords = ALLERGY_MAP[a]
+        if (keywords && keywords.some(k => text.includes(k))) {
+          return false
+        }
+      }
+    }
+
+    if (restrictions && restrictions.length > 0) {
+      for (const r of restrictions) {
+        const keywords = RESTRICTION_MAP[r]
+        if (keywords && keywords.some(k => text.includes(k))) {
+          return false
+        }
+      }
+    }
+
+    if (cuisines && cuisines.length > 0) {
+      const matchedCuisine = cuisines.some(c => {
+        const keywords = CUISINE_MAP[c]
+        if (!keywords || keywords.length === 0) return true
+        return keywords.some(k => cuisineType.includes(k))
+      })
+      if (!matchedCuisine) return false
+    }
+
+    return true
+  })
+}
+
 // 清除家庭相关数据
 export function clearFamilyData() {
   uni.removeStorageSync('foodfind_family_group')

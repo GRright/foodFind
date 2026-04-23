@@ -513,7 +513,7 @@
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
-import { filterRecipesByHealthTags, getFamilyHealthTags, getLocalNotifications, markAllNotificationsRead, getUnreadNotificationCount, notifyCheckIn, getFamilyCheckInToday } from '@/utils/family.js'
+import { filterRecipesByHealthTags, filterRecipesByUserPrefs, getFamilyHealthTags, getLocalNotifications, markAllNotificationsRead, getUnreadNotificationCount, notifyCheckIn, getFamilyCheckInToday } from '@/utils/family.js'
 import { getBirthdayMenuRecommendation, addSpecialDate, getFamilyMemberSpecialToday, getPersonalizedRecipes, getUpcomingSpecialDates, getCurrentSeason, SEASONAL_FOODS } from '@/utils/festival.js'
 import { callFunction, markDirty } from '@/utils/cloud.js'
 
@@ -1086,6 +1086,10 @@ export default {
         dinnerPool = filterRecipesByHealthTags(dinnerPool, allHealthTags)
       }
       
+      breakfastPool = filterRecipesByUserPrefs(breakfastPool, userPrefs)
+      lunchPool = filterRecipesByUserPrefs(lunchPool, userPrefs)
+      dinnerPool = filterRecipesByUserPrefs(dinnerPool, userPrefs)
+      
       if (breakfastPool.length === 0) breakfastPool = ALL_RECIPES.breakfast
       if (lunchPool.length === 0) lunchPool = ALL_RECIPES.lunch
       if (dinnerPool.length === 0) dinnerPool = ALL_RECIPES.dinner
@@ -1115,7 +1119,12 @@ export default {
       this.isRefreshing = mealKey
       setTimeout(() => {
         const n = this.getRecipeCount()
-        const pool = ALL_RECIPES[mealKey] || []
+        const userPrefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+        const familyTags = getFamilyHealthTags()
+        const allHealthTags = [...new Set([...familyTags, ...(userPrefs.healthTags || [])])]
+        let pool = ALL_RECIPES[mealKey] || []
+        if (allHealthTags.length > 0) pool = filterRecipesByHealthTags(pool, allHealthTags)
+        pool = filterRecipesByUserPrefs(pool, userPrefs)
         const currentIds = new Set((this.dailyMeals[mealKey] || []).map(r => r.id))
         const available = pool.filter(r => !currentIds.has(r.id))
         this.dailyMeals[mealKey] = available.length >= n ? (mealKey === 'breakfast' ? this.shuffle(available, n) : this.balanced(available, n)) : (mealKey === 'breakfast' ? this.shuffle(pool, n) : this.balanced(pool, n))

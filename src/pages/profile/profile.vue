@@ -1548,24 +1548,25 @@ export default {
 }
 .about-modal {
   position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.7);
-  width:640rpx; background:#fff; border-radius:32rpx;
+  width:620rpx; max-width:90vw; background:#fff; border-radius:32rpx;
   opacity:0; pointer-events:none; z-index:2001;
   transition:all .35s cubic-bezier(.175,.885,.32,1.275);
-  overflow:hidden;
+  overflow:hidden; box-sizing:border-box;
   &.show { transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto; }
 }
 .am-header {
   display:flex; justify-content:space-between; align-items:center;
   padding:32rpx 36rpx 16rpx; border-bottom:1rpx solid #f0f0f0;
+  flex-shrink:0;
 }
 .am-title { font-size:32rpx; font-weight:700; color:#1a1a1a; }
-.am-body { padding:40rpx 44rpx 48rpx; max-height:68vh; }
-.am-info { text-align:center; padding:24rpx 16rpx; }
-.am-version { font-size:28rpx; font-weight:700; color:#07c160; display:block; margin-bottom:16rpx; }
-.am-desc { font-size:24rpx; color:#666; display:block; margin-bottom:12rpx; line-height:1.7; }
-.am-features { font-size:22rpx; color:#999; display:block; margin-bottom:8rpx; }
-.am-divider { height:1rpx; background:#f0f0f0; margin:32rpx 0; }
-.am-feedback { padding:4rpx 8rpx; }
+.am-body { padding:32rpx 36rpx 40rpx; max-height:65vh; box-sizing:border-box; word-wrap:break-word; overflow-wrap:break-word; }
+.am-info { text-align:center; padding:20rpx 8rpx; }
+.am-version { font-size:28rpx; font-weight:700; color:#07c160; display:block; margin-bottom:16rpx; word-break:break-all; }
+.am-desc { font-size:24rpx; color:#666; display:block; margin-bottom:12rpx; line-height:1.7; word-break:break-all; }
+.am-features { font-size:22rpx; color:#999; display:block; margin-bottom:8rpx; word-break:break-all; }
+.am-divider { height:1rpx; background:#f0f0f0; margin:28rpx 16rpx; }
+.am-feedback { padding:4rpx 4rpx; }
 .amf-title { font-size:28rpx; font-weight:700; color:#1a1a1a; display:block; margin-bottom:12rpx; }
 .amf-hint { font-size:22rpx; color:#999; display:block; margin-bottom:20rpx; line-height:1.5; }
 .amf-input {
