@@ -68,7 +68,7 @@
       <view class="header-actions">
         <view class="action-btn" @click="generateFromMenu" v-if="!isFamilyMode">
           <text class="btn-icon">✦</text>
-          <text class="btn-text">从菜单生成</text>
+          <text class="btn-text">从菜谱生成</text>
         </view>
         <view class="action-btn secondary" @click="clearCompleted" v-if="completedCount > 0">
           <text class="btn-icon">🗑️</text>
@@ -108,7 +108,7 @@
       <view class="empty-state" v-else>
         <text class="empty-icon">🛒</text>
         <text class="empty-title">购物清单为空</text>
-        <text class="empty-hint">点击「从菜单生成」自动添加食材</text>
+        <text class="empty-hint">点击「从菜谱生成」自动添加食材</text>
       </view>
 
       <view class="bottom-spacer"></view>
@@ -338,7 +338,7 @@ export default {
       const dailyMeals = uni.getStorageSync('foodfind_meals')
 
       if (!weeklyData && !dailyMeals) {
-        uni.showToast({ title: '请先生成菜单', icon: 'none' })
+        uni.showToast({ title: '请先生成菜谱', icon: 'none' })
         return
       }
 

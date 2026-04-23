@@ -34,7 +34,7 @@
     </view>
 
     <view class="header fade-in" v-if="!isLoading">
-      <text class="header-title">一周菜单</text>
+      <text class="header-title">一周菜谱</text>
       <text class="header-sub">点击日期查看 · 智能荤素搭配</text>
     </view>
 
@@ -50,7 +50,10 @@
     <view class="calendar-wrap slide-up" style="animation-delay:0.08s" v-if="!isLoading">
       <view class="cal-nav">
         <view class="nav-btn" @click="prevWeek"><text class="nav-arrow">◀</text><text class="nav-txt">上一周</text></view>
-        <text class="cal-month">{{ calMonth }}</text>
+        <view class="cal-center">
+          <text class="cal-month">{{ calMonth }}</text>
+          <text class="back-today" v-if="!isThisWeek" @click="backToThisWeek">回本周</text>
+        </view>
         <view class="nav-btn" @click="nextWeek"><text class="nav-txt">下一周</text><text class="nav-arrow">▶</text></view>
       </view>
 
@@ -78,7 +81,7 @@
     <view class="action-bar pop-in" style="animation-delay:0.15s" v-if="!isLoading">
       <view class="gen-btn" @click="generateWeekPlan">
         <text class="gen-icon">✦</text>
-        <text class="gen-text">生成本周菜单</text>
+        <text class="gen-text">生成本周菜谱</text>
       </view>
       <text class="gen-hint" v-if="weeklyData && weeklyData[selectedDateStr]">已生成 · {{ weekNutriSummary }}</text>
     </view>
@@ -123,8 +126,8 @@
 
       <view v-else class="empty-state scale-in">
         <text class="empty-icon">📅</text>
-        <text class="empty-title">该日暂无菜单</text>
-        <text class="empty-hint">点击上方「生成本周菜单」一键规划</text>
+        <text class="empty-title">该日暂无菜谱</text>
+        <text class="empty-hint">点击上方「生成本周菜谱」一键规划</text>
       </view>
 
       <view class="bottom-spacer"></view>
@@ -157,6 +160,16 @@ export default {
       const m = this.currentMonday.getMonth() + 1
       const y = this.currentMonday.getFullYear()
       return `${y}年${m}月`
+    },
+    isThisWeek() {
+      if (!this.currentMonday) return true
+      const now = new Date()
+      const day = now.getDay()
+      const diff = day === 0 ? -6 : 1 - day
+      const thisMonday = new Date(now)
+      thisMonday.setDate(now.getDate() + diff)
+      thisMonday.setHours(0,0,0,0)
+      return this.currentMonday.getTime() === thisMonday.getTime()
     },
     weekDays() {
       if (!this.currentMonday) return []
@@ -302,13 +315,26 @@ export default {
       const d = new Date(this.currentMonday)
       d.setDate(d.getDate() - 7)
       this.currentMonday = d
+      // 切换到上一周时，默认选中周一
       this.selectedDate = new Date(d)
     },
     nextWeek() {
       const d = new Date(this.currentMonday)
       d.setDate(d.getDate() + 7)
       this.currentMonday = d
+      // 切换到下一周时，默认选中周一
       this.selectedDate = new Date(d)
+    },
+    backToThisWeek() {
+      const now = new Date()
+      const day = now.getDay()
+      const diff = day === 0 ? -6 : 1 - day
+      this.currentMonday = new Date(now)
+      this.currentMonday.setDate(now.getDate() + diff)
+      this.currentMonday.setHours(0,0,0,0)
+      // 回到本周时，自动选中今天
+      this.selectedDate = new Date(now)
+      this.selectedDate.setHours(0,0,0,0)
     },
     selectDay(d) {
       this.selectedDate = new Date(d.date)
@@ -396,7 +422,7 @@ export default {
         }
 
         uni.hideLoading()
-        uni.showToast({ title: '本周菜单已生成', icon: 'success' })
+        uni.showToast({ title: '本周菜谱已生成', icon: 'success' })
       }, 800)
     },
     viewRecipe(r) {

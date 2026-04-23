@@ -169,7 +169,7 @@
         <view class="bottom-actions">
           <view class="action-btn primary-action bounce-in" @click="regenerateAll">
             <text class="ab-icon">✦</text>
-            <text class="ab-text">重新生成今日菜单</text>
+            <text class="ab-text">重新生成今日菜谱</text>
           </view>
           <view class="action-hint">
             <text class="ah-text">点击查看详情 · 上滑换菜 · 下滑删除</text>
@@ -183,7 +183,7 @@
       <view class="delete-modal" :class="{ show: showDeleteModal }">
         <text class="dm-title">确定删除这道菜？</text>
         <text class="dm-food-name">{{ deleteTargetFood?.name }}</text>
-        <text class="dm-desc">删除后将从今日菜单中移除，可稍后重新生成</text>
+        <text class="dm-desc">删除后将从今日菜谱中移除，可稍后重新生成</text>
         <view class="dm-btns">
           <view class="dm-btn cancel" @click="showDeleteModal = false"><text class="dmb-text">取消</text></view>
           <view class="dm-btn confirm" @click="confirmDelete"><text class="dmb-text">确认删除</text></view>
@@ -673,6 +673,7 @@ export default {
     this.shareBtnClicked = false
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
+    this._nutritionCache = null
     this.loadMeals()
     this.loadTodayCheckIn()
     const openSpecial = uni.getStorageSync('foodfind_open_special')
@@ -1121,38 +1122,49 @@ export default {
     },
     onShareClick() {
       this.shareBtnClicked = true
-      uni.showToast({ title: '请点击右上角分享', icon: 'none' })
+      const meals = uni.getStorageSync('foodfind_meals')
+      const myName = uni.getStorageSync('foodfind_detailed_prefs')?.nickname || '美食爱好者'
+      const todayStr = this.getTodayStr()
+      
+      // 保存分享数据到本地，用于好友查看
+      const shareData = {
+        meals: meals || {},
+        fromName: myName,
+        date: todayStr,
+        time: new Date().toLocaleString()
+      }
+      uni.setStorageSync('foodfind_share_data', shareData)
+      
+      // 调用系统分享
+      uni.showShareMenu({
+        withShareTicket: true,
+        menus: ['shareAppMessage', 'shareTimeline']
+      })
     },
     onShareAppMessage() {
       const app = getApp()
       const partnerName = app?.globalData?.partnerInfo?.nickname || 'TA'
+      const myName = uni.getStorageSync('foodfind_detailed_prefs')?.nickname || '美食爱好者'
 
       if (this.noCookMode) {
-        return { title: `来看看我今天吃了什么~`, path: '/pages/index/index', imageUrl: '' }
+        return { title: `来看看我今天吃了什么~`, path: '/pages/friend-menu/friend-menu?from=' + encodeURIComponent(myName), imageUrl: '' }
       }
 
       const cal = this.totalCalories
       const meals = uni.getStorageSync('foodfind_meals')
-      const myName = uni.getStorageSync('foodfind_detailed_prefs')?.nickname || '美食爱好者'
 
-      callFunction('saveShareMenu', {
+      // 保存分享数据
+      uni.setStorageSync('foodfind_share_data', {
+        meals: meals,
         fromName: myName,
-        toName: partnerName,
-        meals: meals || {}
-      }).then(res => {
-        if (res.code === 0) {
-          uni.setStorageSync('foodfind_share_data', {
-            meals: meals,
-            fromName: myName,
-            toName: partnerName,
-            shareId: res.shareId,
-            time: new Date().toLocaleString(),
-            status: 'pending'
-          })
-        }
-      }).catch(() => {})
+        time: new Date().toLocaleString()
+      })
 
-      return { title: `${partnerName}，今天吃这些？(${cal}kcal)`, path: '/pages/index/index', imageUrl: '' }
+      return { 
+        title: `${myName} 今天吃这些~ (${cal}kcal)`, 
+        path: '/pages/friend-menu/friend-menu?from=' + encodeURIComponent(myName),
+        imageUrl: '' 
+      }
     },
     loadMore() {},
     loadPairId() {

@@ -104,7 +104,12 @@
               <text class="menu-arrow">›</text>
             </view>
           </template>
+        </view>
+      </view>
 
+      <view class="menu-group slide-up" style="animation-delay:0.1s;opacity:0">
+        <text class="group-title">我的</text>
+        <view class="menu-list">
           <view class="menu-item" @click="openFavorites">
             <view class="menu-icon-wrap orange"><text class="menu-icon">👍</text></view>
             <view class="mi-center">
@@ -122,12 +127,6 @@
             </view>
             <text class="menu-arrow">›</text>
           </view>
-        </view>
-      </view>
-
-      <view class="menu-group slide-up" style="animation-delay:0.1s;opacity:0">
-        <text class="group-title">我的</text>
-        <view class="menu-list">
           <view class="menu-item" @click="openPrefModal">
             <view class="menu-icon-wrap gray"><text class="menu-icon">⚙</text></view>
             <view class="mi-center">

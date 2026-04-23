@@ -34,9 +34,9 @@
       <view class="success-card slide-up" style="animation-delay:0.15s;opacity:0" v-if="isAccepted">
         <text class="success-icon">✓</text>
         <text class="success-title">你和 {{ inviterName }} 已成为{{ relationLabel }}！</text>
-        <text class="success-desc">现在你们可以互相分享菜单、确认菜品啦~</text>
+        <text class="success-desc">现在你们可以互相分享菜谱、确认菜品啦~</text>
         <view class="success-features">
-          <view class="sf-item"><text class="sf-icon">↗</text><text class="sf-txt">分享每日菜单</text></view>
+          <view class="sf-item"><text class="sf-icon">↗</text><text class="sf-txt">分享每日菜谱</text></view>
           <view class="sf-item"><text class="sf-icon">◉</text><text class="sf-txt">查看对方选择</text></view>
           <view class="sf-item"><text class="sf-icon">✎</text><text class="sf-txt">调整并反馈</text></view>
         </view>

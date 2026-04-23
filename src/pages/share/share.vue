@@ -2,10 +2,10 @@
   <view class="page">
     <view class="share-hero">
       <text class="hero-emoji">{{ isReceiver ? '✉' : '♥' }}</text>
-      <text class="hero-text" v-if="isReceiver">{{ fromName }} 给你分享了今日菜单！</text>
+      <text class="hero-text" v-if="isReceiver">{{ fromName }} 给你分享了今日菜谱！</text>
       <text class="hero-text" v-else>已发送给 {{ partnerName }}</text>
       <text class="hero-sub" v-if="isReceiver">看看喜不喜欢，可以确认或调整哦~</text>
-      <text class="hero-sub" v-else>等待TA确认菜单...</text>
+      <text class="hero-sub" v-else>等待TA确认菜谱...</text>
       <text class="hero-time">{{ shareTime }}</text>
       <view class="refresh-hint" v-if="isSender && shareId">
         <text class="refresh-icon">🔄</text>
@@ -21,7 +21,7 @@
 
       <view class="loading-card" v-if="loading">
         <text class="loading-icon">⏳</text>
-        <text class="loading-text">正在加载菜单...</text>
+        <text class="loading-text">正在加载菜谱...</text>
       </view>
 
       <template v-else>
@@ -43,7 +43,7 @@
         <view class="action-area" v-if="isReceiver">
           <view class="primary-btn" @click="confirmMeals">
           <text class="btn-icon">✓</text>
-          <text class="btn-text">这个菜单不错，就它了！</text>
+          <text class="btn-text">这个菜谱不错，就它了！</text>
         </view>
         <view class="secondary-btn" @click="modifyMeals">
           <text class="btn-icon">✎</text>
@@ -51,7 +51,7 @@
         </view>
         <view class="tertiary-btn" @click="shareBack">
           <text class="btn-icon">↩</text>
-          <text class="btn-text">我也用这个菜单</text>
+          <text class="btn-text">我也用这个菜谱</text>
         </view>
         </view>
 
@@ -136,7 +136,7 @@ export default {
           this.loading = false
         } else {
           this.loading = false
-          uni.showToast({ title: '菜单不存在或已过期', icon: 'none' })
+          uni.showToast({ title: '菜谱不存在或已过期', icon: 'none' })
           setTimeout(() => { uni.switchTab({ url: '/pages/index/index' }) }, 1500)
         }
       } catch (e) {
@@ -186,8 +186,8 @@ export default {
 
     async confirmMeals() {
       uni.showModal({
-        title: '确认菜单',
-        content: `确定使用这份菜单吗？对方会收到通知哦~`,
+        title: '确认菜谱',
+        content: `确定使用这份菜谱吗？对方会收到通知哦~`,
         success: async (res) => {
           if (res.confirm) {
             await this.updateCloudStatus('confirmed')
@@ -198,7 +198,7 @@ export default {
 
     modifyMeals() {
       uni.showModal({
-        title: '调整菜单',
+        title: '调整菜谱',
         content: '将为你重新随机生成菜品',
         success: (res) => {
           if (res.confirm) {
@@ -249,7 +249,7 @@ export default {
       uni.setStorageSync('foodfind_meals_date', new Date().toISOString().split('T')[0])
       const app = getApp()
       if (app?.globalData) app.globalData.dailyMeals = this.dailyMeals
-      uni.showToast({ title: '已设为今日菜单 ✨', icon: 'success', duration: 2000 })
+      uni.showToast({ title: '已设为今日菜谱 ✨', icon: 'success', duration: 2000 })
     },
 
     resendShare() {
