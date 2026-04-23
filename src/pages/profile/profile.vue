@@ -30,6 +30,10 @@
       </view>
       <text class="user-name">{{ userInfo.nickname || '美食爱好者' }}</text>
       <text class="user-desc">享受每一餐的美好时光</text>
+      <view class="auth-hint" v-if="!userInfo.nickname || userInfo.nickname === '美食爱好者'" @click="getUserProfile">
+        <text class="ah-icon">🔐</text>
+        <text class="ah-text">点击获取微信昵称</text>
+      </view>
     </view>
 
     <view class="menu-section" v-if="!isLoading">
@@ -759,6 +763,27 @@ export default {
         }
       }
     },
+    getUserProfile() {
+      wx.getUserProfile({
+        desc: '用于完善用户资料，提供更好的个性化服务',
+        success: (profileRes) => {
+          const userInfo = {
+            nickname: profileRes.userInfo.nickName || '美食爱好者',
+            avatar: profileRes.userInfo.avatarUrl || ''
+          }
+          this.userInfo = userInfo
+          const app = getApp()
+          if (app?.globalData) {
+            app.globalData.userInfo = userInfo
+          }
+          uni.setStorageSync('foodfind_user_info', userInfo)
+          uni.showToast({ title: '昵称已获取 ✨', icon: 'success' })
+        },
+        fail: () => {
+          uni.showToast({ title: '已取消授权', icon: 'none' })
+        }
+      })
+    },
     loadCachedStats() {
       const checks = uni.getStorageSync('foodfind_personal_checks') || {}
       let days = 0
@@ -1175,6 +1200,15 @@ export default {
 .avatar-char { color:#07c160; font-size:52rpx; font-weight:700; }
 .user-name { font-size:40rpx; font-weight:800; color:#1a1a1a; margin-bottom:8rpx; letter-spacing:-1rpx; }
 .user-desc { font-size:24rpx; color:#999; }
+.auth-hint {
+  margin-top:16rpx; padding:12rpx 20rpx;
+  background:linear-gradient(135deg, #07c160, #05a050);
+  border-radius:24rpx; display:flex; align-items:center; justify-content:center; gap:8rpx;
+  width:fit-content;
+  &:active { opacity:.85; transform:scale(.98); transition:all .2s ease; }
+}
+.ah-icon { font-size:28rpx; }
+.ah-text { font-size:24rpx; color:#fff; font-weight:600; }
 
 /* ===== Menu Section ===== */
 .menu-section { padding:16rpx 0 28rpx; }

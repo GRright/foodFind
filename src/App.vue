@@ -24,31 +24,12 @@ export default {
   },
   methods: {
     performLogin() {
+      // 静默登录 - 只获取 openid
       wx.login({
         success: (loginRes) => {
           if (loginRes.code) {
             console.log('[Auth] 微信登录成功，code:', loginRes.code)
             this.globalData.loginCode = loginRes.code
-            
-            // 获取用户信息
-            wx.getUserProfile({
-              desc: '用于完善用户资料',
-              success: (profileRes) => {
-                const userInfo = {
-                  nickname: profileRes.userInfo.nickName || '美食爱好者',
-                  avatar: profileRes.userInfo.avatarUrl || ''
-                }
-                this.globalData.userInfo = userInfo
-                uni.setStorageSync('foodfind_user_info', userInfo)
-                console.log('[Auth] 用户信息已获取:', userInfo)
-              },
-              fail: () => {
-                console.log('[Auth] 用户信息获取失败，使用默认昵称')
-                const userInfo = { nickname: '美食爱好者', avatar: '' }
-                this.globalData.userInfo = userInfo
-                uni.setStorageSync('foodfind_user_info', userInfo)
-              }
-            })
             
             initCloud()
             getOpenId().then((openid) => {
@@ -56,16 +37,22 @@ export default {
                 this.globalData.openid = openid
                 console.log('[Auth] 用户身份已获取:', openid)
               }
+              
+              // 尝试从本地加载用户信息
+              const cached = uni.getStorageSync('foodfind_user_info')
+              if (cached) {
+                this.globalData.userInfo = cached
+                console.log('[Auth] 已加载缓存用户信息:', cached)
+              }
+              
               syncOnStartup()
             })
           } else {
             console.error('[Auth] 微信登录失败:', loginRes.errMsg)
-            uni.showToast({ title: '登录失败，请重试', icon: 'none' })
           }
         },
         fail: (err) => {
           console.error('[Auth] 微信登录异常:', err)
-          uni.showToast({ title: '登录异常，请重试', icon: 'none' })
         }
       })
     }
