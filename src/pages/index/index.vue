@@ -1118,7 +1118,8 @@ export default {
       if (this.isRefreshing) return
       this.isRefreshing = mealKey
       setTimeout(() => {
-        const n = this.getRecipeCount()
+        const currentRecipes = this.dailyMeals[mealKey] || []
+        const n = currentRecipes.length || this.getRecipeCount()
         const userPrefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
         const familyTags = getFamilyHealthTags()
         const allHealthTags = [...new Set([...familyTags, ...(userPrefs.healthTags || [])])]

@@ -286,7 +286,7 @@
               <view class="rmh-avatar-wrap">
                 <view class="rmh-avatar solo-av"><text class="rmhav-txt">{{ (userInfo.nickname || '我').charAt(0) }}</text></view>
                 <view class="rmh-streak-circle">
-                  <text class="rmh-solo-streak">{{ reportStreakDays }}</text>
+                  <text class="rmh-solo-streak">{{ displayStreak }}</text>
                 </view>
               </view>
               <text class="rmh-solo-label">天连续打卡</text>
@@ -302,7 +302,7 @@
                 <view class="rmh-avatar"><text class="rmhav-txt">{{ (partnerInfo.nickname || 'TA').charAt(0) }}</text></view>
               </view>
               <view class="rmh-streak-wrap">
-                <text class="rmhps-num">{{ reportStreakDays }}</text>
+                <text class="rmhps-num">{{ displayStreak }}</text>
                 <text class="rmhps-label">天连续互动</text>
               </view>
             </view>
@@ -723,7 +723,20 @@ export default {
       return parts.length > 0 ? parts.join(' · ') : '点击设置你的饮食偏好'
     },
     reportStreakDays() {
-      return this.pairStats ? (this.pairStats.consecutiveShareDays || 0) : 0
+      const streak = uni.getStorageSync('foodfind_streak') || { days: 0, lastDate: '' }
+      return streak.days || 0
+    },
+    displayStreak() {
+      const days = this.reportStreakDays
+      return days >= 100 ? '99+' : days
+    },
+    displayMealCount() {
+      const count = this._myMealCount
+      return count >= 1000 ? '999+' : count
+    },
+    displayCheckInDays() {
+      const days = this._weeklyCheckInDays
+      return days >= 1000 ? '999+' : days
     },
     weeklyMeatCount() {
       return this.myWeeklyMeals.filter(m => m.type === 'meat' || m.type === 'mixed').length
@@ -835,6 +848,13 @@ export default {
     if (shareData && shareData.viewCount) {
       this.shareViewCount = shareData.viewCount
     }
+  },
+  onHide() {
+    this.showPrefModal = false
+    this.showReportModal = false
+    this.showFavoritesModal = false
+    this.showAboutModal = false
+    this.showMyInfoModal = false
   },
   methods: {
     loadUserInfo() {

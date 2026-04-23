@@ -149,13 +149,12 @@ export default {
     checkUserReaction() {
       try {
         let favorites = uni.getStorageSync('foodfind_favorites') || []
-        const isLiked = favorites.some(f => f.id === this.recipeId)
+        const isLiked = favorites.some(f => String(f.id) === String(this.recipeId))
         if (isLiked) {
           this.userReaction = 'like'
         } else {
-          // 检查是否在dislike列表中
           let dislikes = uni.getStorageSync('foodfind_dislikes') || []
-          if (dislikes.some(d => d.id === this.recipeId)) {
+          if (dislikes.some(d => String(d.id) === String(this.recipeId))) {
             this.userReaction = 'dislike'
           }
         }
@@ -168,22 +167,18 @@ export default {
         let dislikes = uni.getStorageSync('foodfind_dislikes') || []
         
         if (type === 'like') {
-          // 从dislikes中移除
-          dislikes = dislikes.filter(d => d.id !== this.recipeId)
+          dislikes = dislikes.filter(d => String(d.id) !== String(this.recipeId))
           uni.setStorageSync('foodfind_dislikes', dislikes)
-          // 添加到favorites
-          if (!favorites.some(f => f.id === this.recipeId)) {
+          if (!favorites.some(f => String(f.id) === String(this.recipeId))) {
             favorites.unshift(this.recipe)
             uni.setStorageSync('foodfind_favorites', favorites)
           }
           notifyRecipeLike(this.recipe.name)
           uni.showToast({ title: '已标记为喜欢', icon: 'success' })
         } else if (type === 'dislike') {
-          // 从favorites中移除
-          favorites = favorites.filter(f => f.id !== this.recipeId)
+          favorites = favorites.filter(f => String(f.id) !== String(this.recipeId))
           uni.setStorageSync('foodfind_favorites', favorites)
-          // 添加到dislikes
-          if (!dislikes.some(d => d.id === this.recipeId)) {
+          if (!dislikes.some(d => String(d.id) === String(this.recipeId))) {
             dislikes.unshift(this.recipe)
             uni.setStorageSync('foodfind_dislikes', dislikes)
           }
