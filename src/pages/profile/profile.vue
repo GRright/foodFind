@@ -114,7 +114,7 @@
         <text class="group-title">我的</text>
         <view class="menu-list">
           <view class="menu-item" @click="openFavorites">
-            <view class="menu-icon-wrap orange"><image class="menu-icon-img" src="/static/image/icons/喜欢.png" mode="aspectFit"></image></view>
+            <view class="menu-icon-wrap orange"><image class="menu-icon-img" src="/image/icons/喜欢.png" mode="aspectFit"></image></view>
             <view class="mi-center">
               <text class="menu-label">我喜欢的</text>
               <text class="menu-desc">{{ favorites.length > 0 ? `已喜欢 ${favorites.length} 道菜` : '标记喜欢的菜品' }}</text>
@@ -123,7 +123,7 @@
           </view>
 
           <view class="menu-item" @click="openMyInfo">
-            <view class="menu-icon-wrap pink"><image class="menu-icon-img" src="/static/image/icons/我的信息.png" mode="aspectFit"></image></view>
+            <view class="menu-icon-wrap pink"><image class="menu-icon-img" src="/image/icons/我的信息.png" mode="aspectFit"></image></view>
             <view class="mi-center">
               <text class="menu-label">我的信息</text>
               <text class="menu-desc">生日、纪念日、身高体重</text>
@@ -131,7 +131,7 @@
             <text class="menu-arrow">›</text>
           </view>
           <view class="menu-item" @click="openPrefModal">
-            <view class="menu-icon-wrap gray"><image class="menu-icon-img" src="/static/image/icons/设置.png" mode="aspectFit"></image></view>
+            <view class="menu-icon-wrap gray"><image class="menu-icon-img" src="/image/icons/设置.png" mode="aspectFit"></image></view>
             <view class="mi-center">
               <text class="menu-label">偏好设置</text>
               <text class="menu-desc">{{ prefSummaryText }}</text>
@@ -140,7 +140,7 @@
           </view>
 
           <view class="menu-item" @click="showAbout">
-            <view class="menu-icon-wrap gray"><image class="menu-icon-img" src="/static/image/icons/关于.png" mode="aspectFit"></image></view>
+            <view class="menu-icon-wrap gray"><image class="menu-icon-img" src="/image/icons/关于.png" mode="aspectFit"></image></view>
             <view class="mi-center">
               <text class="menu-label">关于我们</text>
               <text class="menu-desc">关于吃点啥</text>
