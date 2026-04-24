@@ -34,8 +34,8 @@
     </view>
 
     <view class="header fade-in" v-if="!isLoading">
-      <text class="header-title">一周菜谱</text>
-      <text class="header-sub">点击日期查看 · 智能荤素搭配</text>
+      <text class="header-title">{{ familyMode ? '家庭菜谱' : '一周菜谱' }}</text>
+      <text class="header-sub">{{ familyMode ? '以群主菜谱为准 · 全家共享' : '点击日期查看 · 智能荤素搭配' }}</text>
     </view>
 
     <view class="spark-banner pop-in" v-if="!isLoading && pairStats && pairStats.consecutiveShareDays > 0" style="animation-delay:0.1s;opacity:0">
@@ -78,7 +78,7 @@
       </view>
     </view>
 
-    <view class="action-bar pop-in" style="animation-delay:0.15s" v-if="!isLoading">
+    <view class="action-bar pop-in" style="animation-delay:0.15s" v-if="!isLoading && !familyMode">
       <view class="gen-btn" @click="generateWeekPlan">
         <text class="gen-icon">✦</text>
         <text class="gen-text">{{ genBtnText }}</text>
@@ -137,7 +137,7 @@
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
-import { filterRecipesByHealthTags, getFamilyHealthTags } from '@/utils/family.js'
+import { filterRecipesByHealthTags, getFamilyHealthTags, getCurrentUserId, getFamilyGroup } from '@/utils/family.js'
 import { getPersonalizedRecipes } from '@/utils/festival.js'
 
 export default {
@@ -152,7 +152,9 @@ export default {
       pairStats: null,
       pageEnter: true,
       todayHomeMeals: null,
-      isLoading: true
+      isLoading: true,
+      familyMode: false,
+      adminId: ''
     }
   },
   computed: {
@@ -193,6 +195,9 @@ export default {
       return this.weekHasData ? '已刷新' : '已生成'
     },
     emptyHintText() {
+      if (this.familyMode) {
+        return this.weekHasData ? '等待群主更新本周菜谱' : '群主还未生成本周菜谱，请联系群主'
+      }
       return this.weekHasData ? '点击上方「刷新本周菜谱」重新规划' : '点击上方「生成本周菜谱」一键规划'
     },
     weekDays() {
@@ -291,8 +296,13 @@ export default {
       return `日均${Math.round(totalC/days*this.effectiveUserCount)}kcal · 蛋白${Math.round(totalP/days)}g`
     }
   },
-  onLoad() {
+  onLoad(options) {
     this.initCalendar()
+    // 判断是否家庭模式
+    if (options && options.mode === 'family') {
+      this.familyMode = true
+      this.adminId = options.adminId || ''
+    }
     this.loadWeeklyCache()
     this.loadUserPrefs()
     setTimeout(() => { this.isLoading = false }, 500)
@@ -302,8 +312,13 @@ export default {
     setTimeout(() => { this.pageEnter = false }, 300)
     this.todayHomeMeals = uni.getStorageSync('foodfind_meals') || null
     if (this.currentMonday) {
-      const cached = uni.getStorageSync('foodfind_weekly')
-      if (cached) this.weeklyData = cached
+      // 家庭模式时，不要覆盖群主的菜谱
+      if (this.familyMode && this.adminId) {
+        // 已经在 onLoad 中加载过了，不需要再次加载
+      } else {
+        const cached = uni.getStorageSync('foodfind_weekly')
+        if (cached) this.weeklyData = cached
+      }
     }
   },
   methods: {
@@ -386,6 +401,14 @@ export default {
       this.selectedDate = new Date(d.date)
     },
     loadWeeklyCache() {
+      // 家庭模式：读取群主的菜谱
+      if (this.familyMode && this.adminId) {
+        const adminWeekly = uni.getStorageSync(`foodfind_weekly_${this.adminId}`)
+        if (adminWeekly) {
+          this.weeklyData = adminWeekly
+          return
+        }
+      }
       const cached = uni.getStorageSync('foodfind_weekly')
       if (cached) this.weeklyData = cached
     },
@@ -462,6 +485,13 @@ export default {
 
         this.weeklyData = data
         uni.setStorageSync('foodfind_weekly', data)
+
+        // 如果是在家庭中且是群主，同时保存到群主专属的菜谱缓存
+        const myId = getCurrentUserId()
+        const group = getFamilyGroup()
+        if (group && group.creatorId === myId) {
+          uni.setStorageSync(`foodfind_weekly_${myId}`, data)
+        }
 
         const app = getApp()
         if (app?.globalData) app.globalData.weeklyMeals = data

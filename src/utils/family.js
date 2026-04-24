@@ -188,7 +188,27 @@ export async function recordFamilyCheckIn(date, userId, mealType) {
 }
 
 export function getFamilyCheckIns() {
-  return uni.getStorageSync('foodfind_family_checkins') || {}
+  const familyCheckins = uni.getStorageSync('foodfind_family_checkins') || {}
+  const personalChecks = uni.getStorageSync('foodfind_personal_checks') || {}
+  const currentUserId = getCurrentUserId()
+  const group = getFamilyGroup()
+  
+  // 如果在家庭中，将我的个人打卡数据合并到家庭打卡中
+  if (group) {
+    // 遍历所有个人打卡日期
+    Object.keys(personalChecks).forEach(date => {
+      if (!familyCheckins[date]) {
+        familyCheckins[date] = {}
+      }
+      // 将我的个人打卡数据同步到家庭打卡中我的 userId 对应的条目中
+      familyCheckins[date][currentUserId] = {
+        ...familyCheckins[date][currentUserId],
+        ...personalChecks[date]
+      }
+    })
+  }
+  
+  return familyCheckins
 }
 
 // 获取家庭打卡记录（调用云函数）
@@ -555,35 +575,33 @@ export function getFamilyCheckInToday() {
   const personalChecks = uni.getStorageSync('foodfind_personal_checks') || {}
   const myChecks = personalChecks[todayStr] || {}
   const group = getFamilyGroup()
+  const currentUserId = getCurrentUserId()
   const result = []
-  result.push({
-    name: '我',
-    isSelf: true,
-    checks: myChecks
-  })
-  if (group && group.members) {
-    group.members.forEach(m => {
-      if (m.userId && m.userId !== getCurrentUserId()) {
-        const memberChecks = familyCheckins[todayStr]?.[m.userId] || {}
-        result.push({
-          name: m.name || 'TA',
-          isSelf: false,
-          checks: memberChecks
-        })
-      }
-    })
+  
+  // 如果不在家庭中，直接返回空数组
+  if (!group || !group.members) {
+    return []
   }
-  const partner = uni.getStorageSync('foodfind_partner')
-  if (partner && partner.nickname) {
-    const existing = result.find(r => r.name === partner.nickname)
-    if (!existing) {
-      const partnerChecks = familyCheckins[todayStr]?.['partner'] || {}
+  
+  // 遍历所有家庭成员
+  group.members.forEach(m => {
+    if (m.userId === currentUserId) {
+      // 我自己 - 使用我的昵称
       result.push({
-        name: partner.nickname,
+        name: m.name || '我',
+        isSelf: true,
+        checks: myChecks
+      })
+    } else {
+      // 其他成员
+      const memberChecks = familyCheckins[todayStr]?.[m.userId] || {}
+      result.push({
+        name: m.name || 'TA',
         isSelf: false,
-        checks: partnerChecks
+        checks: memberChecks
       })
     }
-  }
+  })
+  
   return result
 }

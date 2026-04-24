@@ -521,7 +521,7 @@
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
-import { filterRecipesByHealthTags, filterRecipesByUserPrefs, getFamilyHealthTags, getLocalNotifications, markAllNotificationsRead, getUnreadNotificationCount, notifyCheckIn, getFamilyCheckInToday } from '@/utils/family.js'
+import { filterRecipesByHealthTags, filterRecipesByUserPrefs, getFamilyHealthTags, getLocalNotifications, markAllNotificationsRead, getUnreadNotificationCount, notifyCheckIn, getFamilyCheckInToday, getCurrentUserId, getFamilyGroup } from '@/utils/family.js'
 import { getBirthdayMenuRecommendation, addSpecialDate, getFamilyMemberSpecialToday, getPersonalizedRecipes, getUpcomingSpecialDates, getCurrentSeason, SEASONAL_FOODS } from '@/utils/festival.js'
 import { callFunction, markDirty } from '@/utils/cloud.js'
 
@@ -586,7 +586,9 @@ export default {
       specialDateForm: { name: '', month: 1, day: 1, type: 'birthday' },
       showLoginModal: false,
       familyCheckInList: [],
-      smartReminder: null
+      smartReminder: null,
+      notifSwipeId: null,
+      notifSwipeOffset: 0
     }
   },
   computed: {
@@ -622,11 +624,10 @@ export default {
       return `${d.getMonth()+1}月${d.getDate()}日 ${w}`
     },
     hasOtherFamilyMembers() {
-      // 判断是否存在真正的其他家庭成员（不是自己）
-      // 只有当有非自己的成员时才显示家庭打卡栏
+      // 只要在家庭中就显示打卡栏，不管有没有其他成员
       if (!this.familyCheckInList || this.familyCheckInList.length === 0) return false
-      const otherMembers = this.familyCheckInList.filter(m => !m.isSelf)
-      return otherMembers.length > 0
+      // 只要有家庭成员就显示
+      return true
     },
     mealSections() {
       if (!this.dailyMeals) return []
@@ -734,12 +735,21 @@ export default {
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
     this._nutritionCache = null
-    
+
+    this.loadMode()
+
     const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+    const uc = prefs.userCount
+    if (uc === '1') this.userCount = 1
+    else if (uc === '2') this.userCount = 2
+    else if (uc === '3-4') this.userCount = 4
+    else if (uc === '5+') this.userCount = 5
+    else this.userCount = 2
+
     const mealConfig = prefs.mealConfig || { weekday: ['breakfast', 'lunch', 'dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
     const lastMealConfig = uni.getStorageSync('foodfind_last_meal_config')
     const configChanged = JSON.stringify(mealConfig) !== JSON.stringify(lastMealConfig)
-    
+
     if (configChanged) {
       this.dailyMeals = null
       this.preloadMeals()
@@ -747,11 +757,11 @@ export default {
     } else {
       this.loadMeals()
     }
-    
+
     this.loadTodayCheckIn()
     this.loadNotifications()
     this.checkSmartReminders()
-    
+
     const openSpecial = uni.getStorageSync('foodfind_open_special')
     if (openSpecial === '1') {
       uni.removeStorageSync('foodfind_open_special')
@@ -793,6 +803,8 @@ export default {
       const personalChecks = uni.getStorageSync('foodfind_personal_checks') || {}
       if (personalChecks[todayStr]) {
         this.mealCheckIn = { ...personalChecks[todayStr] }
+      } else {
+        this.mealCheckIn = { breakfast: false, lunch: false, dinner: false }
       }
       this.familyCheckInList = getFamilyCheckInToday()
     },
@@ -806,6 +818,19 @@ export default {
       personalChecks[todayStr][mealKey] = newState
       uni.setStorageSync('foodfind_personal_checks', personalChecks)
       markDirty('personal_checks')
+
+      // 同时保存我的打卡数据到家庭打卡缓存，用我的 userId 作为 key
+      const myId = getCurrentUserId()
+      const group = getFamilyGroup()
+      if (group) {
+        const familyCheckins = uni.getStorageSync('foodfind_family_checkins') || {}
+        if (!familyCheckins[todayStr]) familyCheckins[todayStr] = {}
+        if (!familyCheckins[todayStr][myId]) familyCheckins[todayStr][myId] = { breakfast: false, lunch: false, dinner: false }
+        familyCheckins[todayStr][myId][mealKey] = newState
+        uni.setStorageSync('foodfind_family_checkins', familyCheckins)
+      }
+
+      this.familyCheckInList = getFamilyCheckInToday()
 
       if (newState) {
         notifyCheckIn(mealKey)

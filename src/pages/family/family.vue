@@ -49,10 +49,11 @@
         <text class="jc-desc">输入邀请码加入已有家庭</text>
         
         <view class="join-form">
+          <input class="name-input" v-model="joinUserName" placeholder="输入你的昵称" maxlength="10" />
           <view class="code-input-wrap">
             <input class="code-input" v-model="joinCode" placeholder="输入6位邀请码" maxlength="6" @input="onCodeInput" />
           </view>
-          <view class="join-btn" :class="{ disabled: joinCode.length !== 6 }" @click="joinFamily">
+          <view class="join-btn" :class="{ disabled: joinCode.length !== 6 || !joinUserName.trim() }" @click="joinFamily">
             <text class="jb-text">加入家庭</text>
           </view>
         </view>
@@ -65,7 +66,7 @@
           <text class="fh-name">{{ familyGroup.name }}</text>
           <view class="fh-meta">
             <text class="fh-type">{{ familyTypeData.icon }} {{ familyTypeData.label }}</text>
-            <text class="fh-members">{{ familyGroup.members.length }}/{{ familyTypeData.maxMembers }}人</text>
+            <text class="fh-members">{{ (familyGroup.members || []).length }}/{{ familyTypeData.maxMembers }}人</text>
           </view>
         </view>
         <view class="fh-actions">
@@ -147,6 +148,14 @@
       <view class="section slide-up" style="animation-delay:0.25s;opacity:0">
         <text class="section-title">群组功能</text>
         <view class="func-list">
+          <view class="func-item" @click="goToFamilyMenu">
+            <view class="fi-icon-wrap">🍽️</view>
+            <view class="fi-center">
+              <text class="fi-name">查看菜谱</text>
+              <text class="fi-desc">{{ adminMenuDesc }}</text>
+            </view>
+            <text class="fi-arrow">›</text>
+          </view>
           <view class="func-item" @click="goToFamilyShopping">
             <view class="fi-icon-wrap">🛒</view>
             <view class="fi-center">
@@ -217,6 +226,7 @@ export default {
         userName: ''
       },
       joinCode: '',
+      joinUserName: '',
       showInviteCard: false,
       myHealthTags: [],
       independentMode: false,
@@ -232,6 +242,13 @@ export default {
     familyTypeData() {
       if (!this.familyGroup) return {}
       return FAMILY_TYPES.find(t => t.value === this.familyGroup.type) || {}
+    },
+    adminMenuDesc() {
+      // 获取群主昵称
+      if (!this.familyGroup || !this.familyGroup.members) return '查看群主本周菜谱'
+      const admin = this.familyGroup.members.find(m => m.userId === this.familyGroup.creatorId)
+      const adminName = admin ? admin.name : '群主'
+      return `查看${adminName}本周菜谱`
     }
   },
   onLoad() {
@@ -241,6 +258,7 @@ export default {
   onShow() {
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
+    this.loadFamily()
   },
   methods: {
     loadFamily() {
@@ -287,11 +305,15 @@ export default {
       }
     },
     async joinFamily() {
+      if (!this.joinUserName.trim()) {
+        uni.showToast({ title: '请输入昵称', icon: 'none' })
+        return
+      }
       if (this.joinCode.length !== 6) {
         uni.showToast({ title: '请输入6位邀请码', icon: 'none' })
         return
       }
-      const result = await joinFamilyGroup(this.joinCode, '新成员')
+      const result = await joinFamilyGroup(this.joinCode, this.joinUserName.trim())
       if (result.success) {
         this.hasFamily = true
         this.familyGroup = result.group
@@ -310,9 +332,11 @@ export default {
       }
     },
     async saveMyHealthTags() {
-      // 允许不选择任何健康标签（表示无过敏源、无健康问题等）
       const result = await updateMyHealthTags(this.myHealthTags)
       if (result.success) {
+        const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+        prefs.healthTags = [...this.myHealthTags]
+        uni.setStorageSync('foodfind_detailed_prefs', prefs)
         this.loadFamily()
         uni.showToast({ title: '健康标签已保存', icon: 'success' })
       } else {
@@ -337,6 +361,11 @@ export default {
         }
       })
     },
+    goToFamilyMenu() {
+      // 以群主的菜谱为准，跳转到菜谱页面并传递群主ID
+      const adminId = this.familyGroup ? this.familyGroup.creatorId : ''
+      uni.navigateTo({ url: `/pages/menu/menu?mode=family&adminId=${adminId}` })
+    },
     goToFamilyShopping() {
       uni.navigateTo({ url: '/pages/shoppingList/shoppingList?mode=family' })
     },
@@ -351,9 +380,9 @@ export default {
         title: '确认离开',
         content: '确定要离开这个家庭吗？',
         confirmColor: '#ff4757',
-        success: (res) => {
+        success: async (res) => {
           if (res.confirm) {
-            const result = leaveFamilyGroup()
+            const result = await leaveFamilyGroup()
             if (result.success) {
               this.loadFamily()
               uni.showToast({ title: '已离开家庭', icon: 'success' })
@@ -369,9 +398,9 @@ export default {
         title: '确认解散',
         content: '解散后所有数据将清除，无法恢复！',
         confirmColor: '#ff4757',
-        success: (res) => {
+        success: async (res) => {
           if (res.confirm) {
-            const result = deleteFamilyGroup()
+            const result = await deleteFamilyGroup()
             if (result.success) {
               this.loadFamily()
               uni.showToast({ title: '家庭已解散', icon: 'success' })
@@ -470,6 +499,9 @@ export default {
 .divider-text { font-size: 24rpx; color: #ccc; }
 
 .join-form { display: flex; flex-direction: column; gap: 20rpx; }
+.name-input {
+  background: #f5f6f8; border-radius: 16rpx; padding: 24rpx; font-size: 28rpx; color: #1a1a1a;
+}
 .code-input-wrap {
   background: #f5f6f8;
   border-radius: 16rpx;
