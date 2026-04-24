@@ -114,7 +114,7 @@
         <text class="group-title">我的</text>
         <view class="menu-list">
           <view class="menu-item" @click="openFavorites">
-            <view class="menu-icon-wrap orange"><text class="menu-icon">👍</text></view>
+            <view class="menu-icon-wrap orange"><image class="menu-icon-img" src="/static/image/icons/喜欢.png" mode="aspectFit"></image></view>
             <view class="mi-center">
               <text class="menu-label">我喜欢的</text>
               <text class="menu-desc">{{ favorites.length > 0 ? `已喜欢 ${favorites.length} 道菜` : '标记喜欢的菜品' }}</text>
@@ -123,7 +123,7 @@
           </view>
 
           <view class="menu-item" @click="openMyInfo">
-            <view class="menu-icon-wrap pink"><text class="menu-icon">✦</text></view>
+            <view class="menu-icon-wrap pink"><image class="menu-icon-img" src="/static/image/icons/我的信息.png" mode="aspectFit"></image></view>
             <view class="mi-center">
               <text class="menu-label">我的信息</text>
               <text class="menu-desc">生日、纪念日、身高体重</text>
@@ -131,7 +131,7 @@
             <text class="menu-arrow">›</text>
           </view>
           <view class="menu-item" @click="openPrefModal">
-            <view class="menu-icon-wrap gray"><text class="menu-icon">⚙</text></view>
+            <view class="menu-icon-wrap gray"><image class="menu-icon-img" src="/static/image/icons/设置.png" mode="aspectFit"></image></view>
             <view class="mi-center">
               <text class="menu-label">偏好设置</text>
               <text class="menu-desc">{{ prefSummaryText }}</text>
@@ -140,7 +140,7 @@
           </view>
 
           <view class="menu-item" @click="showAbout">
-            <view class="menu-icon-wrap gray"><text class="menu-icon">ⓘ</text></view>
+            <view class="menu-icon-wrap gray"><image class="menu-icon-img" src="/static/image/icons/关于.png" mode="aspectFit"></image></view>
             <view class="mi-center">
               <text class="menu-label">关于我们</text>
               <text class="menu-desc">关于吃点啥</text>
@@ -409,14 +409,15 @@
             <text class="rms-desc">每日热量变化</text>
           </view>
           <view class="rm-chart-card">
-            <scroll-view scroll-x class="rm-chart-scroll" :class="{ month: reportPeriod === 'month' }">
+            <scroll-view scroll-x class="rm-chart-scroll" :class="{ month: reportPeriod === 'month' }" :scroll-left="nutritionChartScrollLeft" scroll-with-animation>
               <view class="rm-chart-bars" :class="{ month: reportPeriod === 'month' }">
-                <view class="rm-chart-bar" v-for="(day, idx) in weeklyReportData" :key="idx" :style="{ animationDelay: (idx * 0.05) + 's' }">
+                <view class="rm-chart-bar" v-for="(day, idx) in weeklyReportData" :key="'nutri-' + idx" :style="{ animationDelay: (idx * 0.05) + 's' }">
                   <view class="rm-bar nutrient-bar bar-anim" :style="{ height: getNutritionBarHeight(day) + '%' }">
                     <text class="rm-bar-meals" v-if="day.calories > 0">{{ day.calories }}</text>
                   </view>
                   <text class="rm-bar-label">{{ formatDayDate(day.date) }}</text>
                 </view>
+                <view :id="'chart-nutrition-today-anchor'" style="width:1px;height:1px;position:absolute;"></view>
               </view>
             </scroll-view>
           </view>
@@ -619,6 +620,7 @@ export default {
       specialDates: [],
       reportPeriod: 'week',
       chartScrollLeft: 0,
+      nutritionChartScrollLeft: 0,
       reportAchievements: [],
       shareViewCount: 0,
       showAboutModal: false,
@@ -1055,8 +1057,14 @@ export default {
         if (data.length > 0) {
           const todayIdx = data.findIndex(d => d.date === todayStr)
           if (todayIdx >= 0) {
-            // 每个柱子约80rpx，中心偏移
-            this.chartScrollLeft = Math.max(0, todayIdx * 80 - 200)
+            // 根据报告周期调整柱子宽度：周报模式约80rpx，月报模式约60rpx
+            const barWidth = this.reportPeriod === 'month' ? 60 : 80
+            // 屏幕中心偏移量（约为一半屏幕宽度）
+            const centerOffset = this.reportPeriod === 'month' ? 150 : 200
+            // 互动趋势图居中
+            this.chartScrollLeft = Math.max(0, todayIdx * barWidth - centerOffset)
+            // 营养摄入趋势图居中（独立控制）
+            this.nutritionChartScrollLeft = Math.max(0, todayIdx * barWidth - centerOffset)
           }
         }
       })
@@ -1429,6 +1437,7 @@ export default {
   &.gray { background:#f0f1f3; }
 }
 .menu-icon { font-size:32rpx; font-weight:400; letter-spacing:-2rpx; }
+.menu-icon-img { width:44rpx; height:44rpx; }
 .menu-emoji { font-size:34rpx; }
 .mi-center { flex:1; display:flex; flex-direction:column; min-width:0; }
 .menu-label { font-size:28rpx; color:#1a1a1a; font-weight:600; line-height:1.3; }

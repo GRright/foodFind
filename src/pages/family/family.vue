@@ -103,7 +103,7 @@
       </view>
 
       <view class="section slide-up" style="animation-delay:0.15s;opacity:0">
-        <text class="section-title">我的健康标签</text>
+        <text class="section-title">家庭健康标签</text>
         <text class="section-desc">设置标签后，推荐菜品时会考虑家庭成员需求</text>
         
         <view class="tag-categories">
@@ -310,6 +310,7 @@ export default {
       }
     },
     async saveMyHealthTags() {
+      // 允许不选择任何健康标签（表示无过敏源、无健康问题等）
       const result = await updateMyHealthTags(this.myHealthTags)
       if (result.success) {
         this.loadFamily()

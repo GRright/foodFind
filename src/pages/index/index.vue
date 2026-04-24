@@ -67,7 +67,7 @@
           </view>
         </view>
 
-        <view class="family-checkin-bar" v-if="familyCheckInList.length > 1 && familyCheckInList.filter(m => m.isSelf).length < familyCheckInList.length">
+        <view class="family-checkin-bar" v-if="hasOtherFamilyMembers">
           <text class="fcb-title">今日打卡</text>
           <view class="fcb-members">
             <view class="fcb-member" v-for="(m, mi) in familyCheckInList" :key="mi">
@@ -620,6 +620,13 @@ export default {
       const d = new Date()
       const w = ['周日','周一','周二','周三','周四','周五','周六'][d.getDay()]
       return `${d.getMonth()+1}月${d.getDate()}日 ${w}`
+    },
+    hasOtherFamilyMembers() {
+      // 判断是否存在真正的其他家庭成员（不是自己）
+      // 只有当有非自己的成员时才显示家庭打卡栏
+      if (!this.familyCheckInList || this.familyCheckInList.length === 0) return false
+      const otherMembers = this.familyCheckInList.filter(m => !m.isSelf)
+      return otherMembers.length > 0
     },
     mealSections() {
       if (!this.dailyMeals) return []

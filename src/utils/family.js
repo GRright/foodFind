@@ -151,12 +151,13 @@ export async function updateFamilyMember(familyId, updates) {
   }
 }
 
-// 更新我的健康标签
+// 更新我的健康标签（允许为空数组，表示无特殊健康需求）
 export async function updateMyHealthTags(healthTags) {
   const group = getFamilyGroup()
   if (!group) return { success: false, error: '不在任何家庭中' }
-  if (!group._id) return { success: false, error: '家庭信息不完整' }
+  if (!group._id) return { success: false, error: '家庭信息不完整，请重新加入家庭' }
 
+  // healthTags 可以为空数组，表示无过敏源、无健康问题
   return await updateFamilyMember(group._id, { healthTags })
 }
 
