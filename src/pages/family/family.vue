@@ -26,11 +26,6 @@
               </view>
             </view>
           </view>
-
-          <view class="form-row">
-            <text class="fr-label">我的昵称</text>
-            <input class="fr-input" v-model="form.userName" placeholder="大家怎么称呼你" maxlength="12" />
-          </view>
         </view>
 
         <view class="create-btn" @click="createFamily">
@@ -49,11 +44,10 @@
         <text class="jc-desc">输入邀请码加入已有家庭</text>
         
         <view class="join-form">
-          <input class="name-input" v-model="joinUserName" placeholder="输入你的昵称" maxlength="10" />
           <view class="code-input-wrap">
             <input class="code-input" v-model="joinCode" placeholder="输入6位邀请码" maxlength="6" @input="onCodeInput" />
           </view>
-          <view class="join-btn" :class="{ disabled: joinCode.length !== 6 || !joinUserName.trim() }" @click="joinFamily">
+          <view class="join-btn" :class="{ disabled: joinCode.length !== 6 }" @click="joinFamily">
             <text class="jb-text">加入家庭</text>
           </view>
         </view>
@@ -222,11 +216,9 @@ export default {
       currentUserId: '',
       form: {
         name: '',
-        type: 'couple',
-        userName: ''
+        type: 'couple'
       },
       joinCode: '',
-      joinUserName: '',
       showInviteCard: false,
       myHealthTags: [],
       independentMode: false,
@@ -261,7 +253,7 @@ export default {
     this.loadFamily()
   },
   methods: {
-    loadFamily() {
+    async loadFamily() {
       const group = getFamilyGroup()
       if (group) {
         this.hasFamily = true
@@ -273,7 +265,34 @@ export default {
         const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
         this.independentMode = !!prefs.independentMode
       } else {
+        // 本地没有数据，尝试从云端同步
         this.hasFamily = false
+        await this.syncFamilyFromCloud()
+      }
+    },
+    async syncFamilyFromCloud() {
+      try {
+        const { OPENID } = await wx.cloud.callFunction({ name: 'login' }).then(res => res.result)
+        if (!OPENID) return
+        
+        // 查询云端是否有该用户的家庭
+        const res = await wx.cloud.callFunction({
+          name: 'updateFamilyMember',
+          data: { action: 'getMyFamily' }
+        })
+        
+        if (res.result && res.result.success && res.result.familyData) {
+          // 云端有家庭，同步到本地
+          uni.setStorageSync('foodfind_family_group', res.result.familyData)
+          this.hasFamily = true
+          this.familyGroup = res.result.familyData
+          const me = res.result.familyData.members.find(m => m.userId === this.currentUserId)
+          if (me) {
+            this.myHealthTags = [...(me.healthTags || [])]
+          }
+        }
+      } catch (e) {
+        console.warn('同步家庭数据失败:', e.message)
       }
     },
     getHealthTag(tagId) {
@@ -290,11 +309,7 @@ export default {
         uni.showToast({ title: '请输入家庭名称', icon: 'none' })
         return
       }
-      if (!this.form.userName.trim()) {
-        uni.showToast({ title: '请输入你的昵称', icon: 'none' })
-        return
-      }
-      const result = await createFamilyGroup(this.form.name.trim(), this.form.type, this.form.userName.trim())
+      const result = await createFamilyGroup(this.form.name.trim(), this.form.type)
       if (result.success) {
         this.hasFamily = true
         this.familyGroup = result.group
@@ -305,15 +320,11 @@ export default {
       }
     },
     async joinFamily() {
-      if (!this.joinUserName.trim()) {
-        uni.showToast({ title: '请输入昵称', icon: 'none' })
-        return
-      }
       if (this.joinCode.length !== 6) {
         uni.showToast({ title: '请输入6位邀请码', icon: 'none' })
         return
       }
-      const result = await joinFamilyGroup(this.joinCode, this.joinUserName.trim())
+      const result = await joinFamilyGroup(this.joinCode)
       if (result.success) {
         this.hasFamily = true
         this.familyGroup = result.group

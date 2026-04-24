@@ -46,10 +46,6 @@
               <text class="nb-icon">🔔</text>
               <view class="nb-badge" v-if="unreadCount > 0">{{ unreadCount > 9 ? '9+' : unreadCount }}</view>
             </view>
-            <view class="share-btn" :class="{ shared: shareBtnClicked }" @click="onShareClick">
-              <text class="sb-icon">♡</text>
-              <text class="sb-text">{{ shareBtnClicked ? '已分享' : '分享' }}</text>
-            </view>
           </view>
         </view>
 
@@ -355,8 +351,9 @@
       <scroll-view scroll-y class="np-list">
         <view class="notif-item-wrap" v-for="(n, i) in notifList" :key="n.id || i"
           @touchstart="onNotifSwipeStart(n.id, $event)"
+          @touchmove="onNotifSwipeMove(n.id, $event)"
           @touchend="onNotifSwipeEnd(n.id, $event)">
-          <view class="notif-item" :class="{ unread: !n.read, swiping: notifSwipeId === n.id }"
+          <view class="notif-item" :class="{ unread: !n.read }"
             :style="getNotifSwipeStyle(n.id)">
             <view class="ni-icon">{{ n.type === 'checkin' ? '🍽️' : n.type === 'comment' ? '💬' : n.type === 'vote' ? '🗳️' : '🔔' }}</view>
             <view class="ni-content">
@@ -365,7 +362,7 @@
               <text class="ni-time">{{ formatTime(n.createdAt) }}</text>
             </view>
           </view>
-          <view class="ni-delete" v-if="notifSwipeId === n.id" @tap.stop="deleteNotif(n.id)">
+          <view class="ni-delete" v-if="notifSwipeId === n.id && notifSwipeOffset < 0" @tap.stop="deleteNotif(n.id)">
             <text>删除</text>
           </view>
         </view>
@@ -521,7 +518,7 @@
 
 <script>
 import { ALL_RECIPES } from '@/utils/constants.js'
-import { filterRecipesByHealthTags, filterRecipesByUserPrefs, getFamilyHealthTags, getLocalNotifications, markAllNotificationsRead, getUnreadNotificationCount, notifyCheckIn, getFamilyCheckInToday, getCurrentUserId, getFamilyGroup } from '@/utils/family.js'
+import { filterRecipesByHealthTags, filterRecipesByUserPrefs, getFamilyHealthTags, getLocalNotifications, markAllNotificationsRead, getUnreadNotificationCount, notifyCheckIn, getFamilyCheckInToday, getCurrentUserId, getFamilyGroup, getUserNickname, recordFamilyCheckIn } from '@/utils/family.js'
 import { getBirthdayMenuRecommendation, addSpecialDate, getFamilyMemberSpecialToday, getPersonalizedRecipes, getUpcomingSpecialDates, getCurrentSeason, SEASONAL_FOODS } from '@/utils/festival.js'
 import { callFunction, markDirty } from '@/utils/cloud.js'
 
@@ -549,7 +546,6 @@ export default {
       deleteTargetFood: null,
       deleteTargetMealKey: '',
       showGestureGuide: false,
-      shareBtnClicked: false,
       ggStage: 0,
       ggDemoFood: null,
       ggSwipeOffset: 0,
@@ -585,6 +581,8 @@ export default {
       showSpecialModal: false,
       specialDateForm: { name: '', month: 1, day: 1, type: 'birthday' },
       showLoginModal: false,
+      hasFamily: false,
+      familyGroup: null,
       familyCheckInList: [],
       smartReminder: null,
       notifSwipeId: null,
@@ -592,23 +590,28 @@ export default {
     }
   },
   computed: {
+    userNickname() {
+      return getUserNickname()
+    },
     greetingText() {
+      const nickname = this.userNickname
       const h = new Date().getHours()
-      if (h < 6) return '夜深了，早点休息'
-      if (h < 9) return '早上好'
-      if (h < 12) return '中午好'
-      if (h < 14) return '午休时间'
-      if (h < 18) return '下午好'
-      return '晚上好'
+      if (h < 6) return `夜深了，${nickname}早点休息`
+      if (h < 9) return `早上好，${nickname}`
+      if (h < 12) return `中午好，${nickname}`
+      if (h < 14) return `午休时间，${nickname}`
+      if (h < 18) return `下午好，${nickname}`
+      return `晚上好，${nickname}`
     },
     greetingTextNoCook() {
+      const nickname = this.userNickname
       const h = new Date().getHours()
-      if (h < 6) return '夜深了'
-      if (h < 9) return '早安'
-      if (h < 12) return '中午了'
-      if (h < 14) return '下午茶时间'
-      if (h < 18) return '晚餐时间'
-      return '晚上好'
+      if (h < 6) return `夜深了，${nickname}`
+      if (h < 9) return `早安，${nickname}`
+      if (h < 12) return `中午了，${nickname}`
+      if (h < 14) return `下午茶时间，${nickname}`
+      if (h < 18) return `晚餐时间，${nickname}`
+      return `晚上好，${nickname}`
     },
     greetingSubText() {
       const h = new Date().getHours()
@@ -716,6 +719,7 @@ export default {
     this.loadPairId()
     this.loadSpecialBanner()
     this.preloadMeals()
+    this.loadFamily()
     this.$nextTick(() => {
       this.loadTodayCheckIn()
       this.loadStreak()
@@ -731,7 +735,6 @@ export default {
     this.pageReady = true
   },
   onShow() {
-    this.shareBtnClicked = false
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
     this._nutritionCache = null
@@ -758,6 +761,7 @@ export default {
       this.loadMeals()
     }
 
+    this.loadFamily()
     this.loadTodayCheckIn()
     this.loadNotifications()
     this.checkSmartReminders()
@@ -795,6 +799,16 @@ export default {
       const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
       this.noCookMode = !!prefs.noCookMode
     },
+    loadFamily() {
+      const group = getFamilyGroup()
+      if (group) {
+        this.hasFamily = true
+        this.familyGroup = group
+      } else {
+        this.hasFamily = false
+        this.familyGroup = null
+      }
+    },
     recordAppOpen() {
       return
     },
@@ -808,7 +822,7 @@ export default {
       }
       this.familyCheckInList = getFamilyCheckInToday()
     },
-    markMealEaten(mealKey) {
+    async markMealEaten(mealKey) {
       const newState = !this.mealCheckIn[mealKey]
       this.mealCheckIn[mealKey] = newState
 
@@ -819,7 +833,7 @@ export default {
       uni.setStorageSync('foodfind_personal_checks', personalChecks)
       markDirty('personal_checks')
 
-      // 同时保存我的打卡数据到家庭打卡缓存，用我的 userId 作为 key
+      // 同时保存我的打卡数据到家庭打卡缓存和云端
       const myId = getCurrentUserId()
       const group = getFamilyGroup()
       if (group) {
@@ -828,6 +842,11 @@ export default {
         if (!familyCheckins[todayStr][myId]) familyCheckins[todayStr][myId] = { breakfast: false, lunch: false, dinner: false }
         familyCheckins[todayStr][myId][mealKey] = newState
         uni.setStorageSync('foodfind_family_checkins', familyCheckins)
+
+        // 同步到云端
+        if (newState) {
+          await recordFamilyCheckIn(todayStr, myId, mealKey)
+        }
       }
 
       this.familyCheckInList = getFamilyCheckInToday()
@@ -1240,70 +1259,7 @@ export default {
       this.showSpecialModal = false
       this.loadSpecialBanner()
     },
-    onShareClick() {
-      this.shareBtnClicked = true
-      const meals = uni.getStorageSync('foodfind_meals')
-      const app = getApp()
-      const myName = app?.globalData?.userInfo?.nickname || '美食爱好者'
-      const todayStr = this.getTodayStr()
-      
-      const shareData = {
-        meals: meals || {},
-        fromName: myName,
-        date: todayStr,
-        time: new Date().toLocaleString(),
-        viewCount: 0
-      }
-      uni.setStorageSync('foodfind_share_data', shareData)
-      
-      let shareCount = uni.getStorageSync('foodfind_share_count') || 0
-      shareCount++
-      uni.setStorageSync('foodfind_share_count', shareCount)
-      
-      uni.showShareMenu({
-        withShareTicket: true,
-        menus: ['shareAppMessage', 'shareTimeline']
-      })
-    },
-    onShareAppMessage() {
-      const app = getApp()
-      const myName = app?.globalData?.userInfo?.nickname || '美食爱好者'
 
-      if (this.noCookMode) {
-        return { title: `来看看我今天吃了什么~`, path: '/pages/friend-menu/friend-menu?from=' + encodeURIComponent(myName), imageUrl: '' }
-      }
-
-      const cal = this.totalCalories
-      const meals = uni.getStorageSync('foodfind_meals')
-
-      uni.setStorageSync('foodfind_share_data', {
-        meals: meals,
-        fromName: myName,
-        time: new Date().toLocaleString(),
-        viewCount: 0
-      })
-
-      return { 
-        title: `${myName} 今天吃这些~ (${cal}kcal)`, 
-        path: '/pages/friend-menu/friend-menu?from=' + encodeURIComponent(myName),
-        imageUrl: '' 
-      }
-    },
-    onShareTimeline() {
-      const app = getApp()
-      const myName = app?.globalData?.userInfo?.nickname || '美食爱好者'
-      const cal = this.totalCalories
-      
-      let shareCount = uni.getStorageSync('foodfind_share_count') || 0
-      shareCount++
-      uni.setStorageSync('foodfind_share_count', shareCount)
-      
-      return {
-        title: `${myName}的今日菜单 (${cal}kcal) - 吃点啥`,
-        query: 'from=' + encodeURIComponent(myName),
-        imageUrl: ''
-      }
-    },
     loadMore() {},
     loadPairId() {
       const partner = uni.getStorageSync('foodfind_partner')
@@ -1334,36 +1290,69 @@ export default {
       this._notifTouchStartX = e.touches[0].clientX
       this._notifTouchStartY = e.touches[0].clientY
     },
+    onNotifSwipeMove(id, e) {
+      if (this.notifSwipeId !== id) return
+      const touch = e.touches[0]
+      const dx = touch.clientX - this._notifTouchStartX
+      const dy = touch.clientY - this._notifTouchStartY
+      
+      // 只处理水平滑动，且必须是左滑
+      if (Math.abs(dx) > Math.abs(dy) && dx < 0) {
+        // 左滑时，最多偏移 -140rpx（删除按钮宽度）
+        const offset = Math.max(-140, dx)
+        this.notifSwipeOffset = offset
+      }
+    },
     onNotifSwipeEnd(id, e) {
       if (!this.notifSwipeId) return
       const touch = e.changedTouches[0]
       const dx = touch.clientX - this._notifTouchStartX
       const dy = touch.clientY - this._notifTouchStartY
-      // 只处理水平滑动，滑动超过60px则打开删除按钮
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 60) {
+      
+      // 只处理水平滑动
+      if (Math.abs(dx) > Math.abs(dy)) {
         if (dx < 0) {
-          this.notifSwipeOffset = -160
+          // 左滑：如果滑动距离超过 80rpx，直接删除
+          if (Math.abs(dx) > 80) {
+            this.deleteNotif(id)
+          } else {
+            // 滑动距离不够，复位
+            this.notifSwipeId = null
+            this.notifSwipeOffset = 0
+          }
         } else {
+          // 右滑，复位
           this.notifSwipeId = null
           this.notifSwipeOffset = 0
         }
       } else {
+        // 垂直滑动，复位
         this.notifSwipeId = null
         this.notifSwipeOffset = 0
       }
     },
     deleteNotif(id) {
+      // 先从本地列表中移除，确保UI立即更新
+      const index = this.notifList.findIndex(n => n.id === id)
+      if (index > -1) {
+        this.notifList.splice(index, 1)
+      }
+      
+      // 同步更新本地存储
       const list = getLocalNotifications()
       const newList = list.filter(n => n.id !== id)
       uni.setStorageSync('foodfind_notifications', newList)
+      
+      // 重置滑动状态
       this.notifSwipeId = null
       this.notifSwipeOffset = 0
-      this.loadNotifications()
-      uni.showToast({ title: '已删除', icon: 'success', duration: 1000 })
+      
+      // 更新未读数
+      this.unreadCount = this.notifList.filter(n => !n.read).length
     },
     getNotifSwipeStyle(id) {
       if (this.notifSwipeId !== id) return ''
-      return `transform: translateX(${this.notifSwipeOffset}px); transition: transform ${this.notifSwipeOffset < -160 ? '0' : '0.25'}s ease;`
+      return `transform: translateX(${this.notifSwipeOffset}px);`
     },
     openComment(item) {
       this.currentFeedItem = item
@@ -1472,7 +1461,7 @@ export default {
         { id: 'streak_7', name: '坚持不懈', desc: '连续打卡7天', icon: '🔥', condition: () => this.streakDays >= 7 },
         { id: 'streak_14', name: '美食达人', desc: '连续打卡14天', icon: '⭐', condition: () => this.streakDays >= 14 },
         { id: 'streak_30', name: '食神', desc: '连续打卡30天', icon: '👑', condition: () => this.streakDays >= 30 },
-        { id: 'share_5', name: '分享使者', desc: '分享5次美食', icon: '📤', condition: () => (uni.getStorageSync('foodfind_share_count') || 0) >= 5 },
+        { id: 'favorite_10', name: '美食收藏家', desc: '收藏10道美食', icon: '❤️', condition: () => (uni.getStorageSync('foodfind_favorites') || []).length >= 10 },
         { id: 'comment_10', name: '评论达人', desc: '评论10次', icon: '💬', condition: () => (uni.getStorageSync('foodfind_comment_count') || 0) >= 10 },
         { id: 'vote_3', name: '选择困难', desc: '发起3次投票', icon: '🗳️', condition: () => (uni.getStorageSync('foodfind_vote_count') || 0) >= 3 }
       ]
@@ -1660,23 +1649,7 @@ export default {
 .greeting { font-size:44rpx; font-weight:800; color:#1a1a1a; letter-spacing:-1rpx; line-height:1.2; }
 .greeting-sub { font-size:24rpx; color:#999; font-weight:400; margin-top:6rpx; display:block; }
 
-.share-btn {
-  display:flex; align-items:center; gap:6rpx;
-  padding:12rpx 24rpx;
-  border:2rpx solid #1a1a1a;
-  background:#fff;
-  border-radius:40rpx; transition:all .3s ease;
-  &:active { transform:scale(.95); }
-  &.shared {
-    background:linear-gradient(135deg,#ff6b8a,#ff8e9e);
-    border-color:transparent;
-    box-shadow:0 4rpx 16rpx rgba(255,107,138,.3);
-    .sb-icon { color:#fff; }
-    .sb-text { color:#fff; }
-  }
-}
-.sb-icon { font-size:22rpx; color:#1a1a1a; }
-.sb-text { font-size:23rpx; color:#1a1a1a; font-weight:600; }
+
 
 .mode-tag {
   display:flex; align-items:center; gap:6rpx;
@@ -2165,12 +2138,11 @@ export default {
 .notif-item {
   display:flex; align-items:flex-start; gap:16rpx;
   padding:20rpx; background:#f8f9fa; border-radius:16rpx;
-  position:relative; z-index:2; transition:transform .25s ease;
+  position:relative; z-index:2;
   &.unread { background:#e8f7ef; }
-  &.swiping { transition:none; }
 }
 .ni-delete {
-  position:absolute; right:0; top:0; bottom:0; width:160rpx;
+  position:absolute; right:0; top:0; bottom:0; width:120rpx;
   background:#ff4757; display:flex; align-items:center; justify-content:center;
   border-radius:0 16rpx 16rpx 0; z-index:1;
   & text { font-size:26rpx; color:#fff; font-weight:600; }

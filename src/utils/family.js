@@ -35,19 +35,43 @@ export const HEALTH_TAGS = [
 
 export const HEALTH_TAG_CATEGORIES = ['人群', '健康', '过敏', '饮食']
 
-// 当前用户 ID 管理
+// 当前用户 ID 管理（使用微信 OpenID，确保前后端一致）
 export function getCurrentUserId() {
-  let userId = uni.getStorageSync('foodfind_user_id')
-  if (!userId) {
-    userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
-    uni.setStorageSync('foodfind_user_id', userId)
+  // 优先使用微信登录的 OpenID
+  const wxContext = uni.getStorageSync('foodfind_wx_context')
+  if (wxContext && wxContext.openid) {
+    return wxContext.openid
   }
+  
+  // 兼容旧数据：如果已有自定义 ID，继续使用
+  let userId = uni.getStorageSync('foodfind_user_id')
+  if (userId) {
+    return userId
+  }
+  
+  // 生成临时 ID（未登录状态）
+  userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+  uni.setStorageSync('foodfind_user_id', userId)
   return userId
 }
 
+// 设置微信 OpenID（登录后调用）
+export function setWxOpenId(openid) {
+  if (openid) {
+    uni.setStorageSync('foodfind_wx_context', { openid })
+  }
+}
+
+// 获取用户昵称
+export function getUserNickname() {
+  const userInfo = uni.getStorageSync('foodfind_user_info') || {}
+  return userInfo.nickname || '美食爱好者'
+}
+
 // 家庭群组 CRUD 操作（调用云函数）
-export async function createFamilyGroup(name, type, userName) {
+export async function createFamilyGroup(name, type) {
   try {
+    const userName = getUserNickname()
     const res = await wx.cloud.callFunction({
       name: 'createFamilyGroup',
       data: { name, type, userName }
@@ -65,8 +89,9 @@ export async function createFamilyGroup(name, type, userName) {
   }
 }
 
-export async function joinFamilyGroup(inviteCode, userName) {
+export async function joinFamilyGroup(inviteCode) {
   try {
+    const userName = getUserNickname()
     const res = await wx.cloud.callFunction({
       name: 'joinFamilyGroup',
       data: { inviteCode, userName }
@@ -87,20 +112,43 @@ export async function leaveFamilyGroup() {
   if (!group) return { success: false, error: '不在任何家庭中' }
 
   const currentUserId = getCurrentUserId()
-  if (group.creatorId === currentUserId) {
-    return { success: false, error: '群主不能离开，请先转让或解散' }
-  }
+  const isAdmin = group.creatorId === currentUserId
+  const otherMembers = group.members.filter(m => m.userId !== currentUserId)
 
   try {
-    await wx.cloud.callFunction({
-      name: 'updateFamilyMember',
-      data: { familyId: group._id, action: 'remove', userId: currentUserId }
-    })
+    if (isAdmin && otherMembers.length > 0) {
+      // 群主离开且有其他成员：转让群主给第一个成员，然后移除自己
+      const newAdmin = otherMembers[0]
+      await wx.cloud.callFunction({
+        name: 'updateFamilyMember',
+        data: { 
+          familyId: group._id, 
+          action: 'transferAndLeave', 
+          newAdminId: newAdmin.userId 
+        }
+      })
+    } else if (isAdmin && otherMembers.length === 0) {
+      // 群主离开且无其他成员：直接解散家庭
+      await wx.cloud.callFunction({
+        name: 'updateFamilyMember',
+        data: { familyId: group._id, action: 'disband' }
+      })
+    } else {
+      // 普通成员离开：直接移除自己
+      await wx.cloud.callFunction({
+        name: 'updateFamilyMember',
+        data: { familyId: group._id, action: 'remove', userId: currentUserId }
+      })
+    }
   } catch (e) {
-    console.warn('离开家庭云函数调用失败，仍清除本地:', e.message)
+    console.warn('离开家庭云函数调用失败:', e.message)
+    // 即使云函数失败，也要清除本地数据，让用户可以重新创建
   }
 
+  // 清除本地数据
   uni.removeStorageSync('foodfind_family_group')
+  uni.removeStorageSync('foodfind_family_checkins')
+  uni.removeStorageSync('foodfind_family_shopping')
   return { success: true }
 }
 
@@ -119,9 +167,11 @@ export async function deleteFamilyGroup() {
       data: { familyId: group._id, action: 'disband' }
     })
   } catch (e) {
-    console.warn('解散家庭云函数调用失败，仍清除本地:', e.message)
+    console.warn('解散家庭云函数调用失败:', e.message)
+    // 即使云函数失败，也要清除本地数据，让用户可以重新创建
   }
 
+  // 清除本地数据
   uni.removeStorageSync('foodfind_family_group')
   uni.removeStorageSync('foodfind_family_checkins')
   uni.removeStorageSync('foodfind_family_shopping')
@@ -149,6 +199,41 @@ export async function updateFamilyMember(familyId, updates) {
   } catch (err) {
     return { success: false, error: err.message }
   }
+}
+
+// 更新我的昵称
+export async function updateMyNickname(nickname) {
+  const group = getFamilyGroup()
+  if (!group) return { success: false, error: '不在任何家庭中' }
+
+  const currentUserId = getCurrentUserId()
+  let updated = false
+  const finalNickname = nickname || getUserNickname()
+
+  if (group.members) {
+    group.members.forEach(m => {
+      if (m.userId === currentUserId) {
+        m.name = finalNickname
+        updated = true
+      }
+    })
+  }
+
+  if (updated) {
+    // 先保存到本地缓存
+    uni.setStorageSync('foodfind_family_group', group)
+    
+    // 同步到云端
+    try {
+      const res = await updateFamilyMember(group._id, { name: finalNickname })
+      return res
+    } catch (e) {
+      // 云端同步失败，但本地已经更新
+      console.warn('云端同步昵称失败:', e)
+      return { success: true, warning: '云端同步失败，但本地已更新' }
+    }
+  }
+  return { success: false, error: '未在家庭成员中找到自己' }
 }
 
 // 更新我的健康标签（允许为空数组，表示无特殊健康需求）
@@ -539,8 +624,7 @@ export function getUnreadNotificationCount() {
 }
 
 export function notifyShoppingChange(action, itemName) {
-  const app = getApp()
-  const myName = app?.globalData?.userInfo?.nickname || '我'
+  const myName = getUserNickname()
   addLocalNotification({
     type: 'shopping',
     fromName: myName,
@@ -549,8 +633,7 @@ export function notifyShoppingChange(action, itemName) {
 }
 
 export function notifyCheckIn(mealType) {
-  const app = getApp()
-  const myName = app?.globalData?.userInfo?.nickname || '我'
+  const myName = getUserNickname()
   const mealName = mealType === 'breakfast' ? '早餐' : mealType === 'lunch' ? '午餐' : '晚餐'
   addLocalNotification({
     type: 'checkin',
@@ -560,8 +643,7 @@ export function notifyCheckIn(mealType) {
 }
 
 export function notifyRecipeLike(recipeName) {
-  const app = getApp()
-  const myName = app?.globalData?.userInfo?.nickname || '我'
+  const myName = getUserNickname()
   addLocalNotification({
     type: 'like',
     fromName: myName,
@@ -578,19 +660,59 @@ export function getFamilyCheckInToday() {
   const currentUserId = getCurrentUserId()
   const result = []
   
+  // 获取用户设置的昵称
+  const myNickname = getUserNickname()
+  
   // 如果不在家庭中，直接返回空数组
   if (!group || !group.members) {
     return []
   }
   
+  // 确保 checks 对象总是包含完整字段
+  const ensureChecks = (checks) => {
+    return {
+      breakfast: checks?.breakfast || false,
+      lunch: checks?.lunch || false,
+      dinner: checks?.dinner || false
+    }
+  }
+  
+  // 检查当前用户是否在家庭成员中（兼容旧数据）
+  let foundSelf = false
+  let selfMember = null
+  
+  // 首先尝试精确匹配
+  selfMember = group.members.find(m => m.userId === currentUserId)
+  
+  // 如果没找到，尝试通过其他方式识别（如角色为 admin 且只有一个 admin）
+  if (!selfMember) {
+    const admins = group.members.filter(m => m.role === 'admin')
+    if (admins.length === 1) {
+      selfMember = admins[0]
+    }
+  }
+  
   // 遍历所有家庭成员
   group.members.forEach(m => {
-    if (m.userId === currentUserId) {
-      // 我自己 - 使用我的昵称
+    const isSelf = (m.userId === currentUserId) || (selfMember && m.userId === selfMember.userId)
+    
+    if (isSelf) {
+      foundSelf = true
+      // 我自己 - 优先使用用户设置的昵称
+      const checksFromFamily = familyCheckins[todayStr]?.[m.userId] || {}
+      // 合并：个人打卡和家庭缓存中的数据
+      // 同时检查以 currentUserId 为 key 的数据（兼容新 ID 格式）
+      const checksFromNewId = familyCheckins[todayStr]?.[currentUserId] || {}
+      const finalChecks = {
+        ...myChecks,
+        ...checksFromFamily,
+        ...checksFromNewId
+      }
+      
       result.push({
-        name: m.name || '我',
+        name: myNickname || m.name || '我',
         isSelf: true,
-        checks: myChecks
+        checks: ensureChecks(finalChecks)
       })
     } else {
       // 其他成员
@@ -598,10 +720,19 @@ export function getFamilyCheckInToday() {
       result.push({
         name: m.name || 'TA',
         isSelf: false,
-        checks: memberChecks
+        checks: ensureChecks(memberChecks)
       })
     }
   })
+  
+  // 如果还是没找到自己，但有个人打卡数据，添加一个自己的条目
+  if (!foundSelf && (myChecks.breakfast || myChecks.lunch || myChecks.dinner)) {
+    result.unshift({
+      name: myNickname || '我',
+      isSelf: true,
+      checks: ensureChecks(myChecks)
+    })
+  }
   
   return result
 }

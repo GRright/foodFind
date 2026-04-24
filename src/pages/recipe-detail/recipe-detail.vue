@@ -169,9 +169,20 @@ export default {
         if (type === 'like') {
           dislikes = dislikes.filter(d => String(d.id) !== String(this.recipeId))
           uni.setStorageSync('foodfind_dislikes', dislikes)
-          if (!favorites.some(f => String(f.id) === String(this.recipeId))) {
+          const isNewFavorite = !favorites.some(f => String(f.id) === String(this.recipeId))
+          if (isNewFavorite) {
             favorites.unshift(this.recipe)
             uni.setStorageSync('foodfind_favorites', favorites)
+            
+            // 检查是否解锁新成就
+            if (favorites.length >= 10) {
+              const unlocked = uni.getStorageSync('foodfind_achievements') || []
+              if (!unlocked.includes('favorite_10')) {
+                unlocked.push('favorite_10')
+                uni.setStorageSync('foodfind_achievements', unlocked)
+                uni.showToast({ title: '🏆 解锁新成就！', icon: 'none', duration: 2000 })
+              }
+            }
           }
           notifyRecipeLike(this.recipe.name)
           uni.showToast({ title: '已标记为喜欢', icon: 'success' })
