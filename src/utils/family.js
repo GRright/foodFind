@@ -155,8 +155,8 @@ export async function updateFamilyMember(familyId, updates) {
 export async function updateMyHealthTags(healthTags) {
   const group = getFamilyGroup()
   if (!group) return { success: false, error: '不在任何家庭中' }
+  if (!group._id) return { success: false, error: '家庭信息不完整' }
 
-  const currentUserId = getCurrentUserId()
   return await updateFamilyMember(group._id, { healthTags })
 }
 

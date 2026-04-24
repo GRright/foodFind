@@ -67,7 +67,7 @@
           </view>
         </view>
 
-        <view class="family-checkin-bar" v-if="familyCheckInList.length > 1">
+        <view class="family-checkin-bar" v-if="familyCheckInList.length > 1 && familyCheckInList.filter(m => m.isSelf).length < familyCheckInList.length">
           <text class="fcb-title">今日打卡</text>
           <view class="fcb-members">
             <view class="fcb-member" v-for="(m, mi) in familyCheckInList" :key="mi">
@@ -353,12 +353,20 @@
         <view class="np-close" @click="showNotifPanel = false"><text>✕</text></view>
       </view>
       <scroll-view scroll-y class="np-list">
-        <view class="notif-item" v-for="(n, i) in notifList" :key="i" :class="{ unread: !n.read }">
-          <view class="ni-icon">{{ n.type === 'checkin' ? '🍽️' : n.type === 'comment' ? '💬' : n.type === 'vote' ? '🗳️' : '🔔' }}</view>
-          <view class="ni-content">
-            <text class="ni-from">{{ n.fromName }}</text>
-            <text class="ni-text">{{ n.content }}</text>
-            <text class="ni-time">{{ formatTime(n.createdAt) }}</text>
+        <view class="notif-item-wrap" v-for="(n, i) in notifList" :key="n.id || i"
+          @touchstart="onNotifSwipeStart(n.id, $event)"
+          @touchend="onNotifSwipeEnd(n.id, $event)">
+          <view class="notif-item" :class="{ unread: !n.read, swiping: notifSwipeId === n.id }"
+            :style="getNotifSwipeStyle(n.id)">
+            <view class="ni-icon">{{ n.type === 'checkin' ? '🍽️' : n.type === 'comment' ? '💬' : n.type === 'vote' ? '🗳️' : '🔔' }}</view>
+            <view class="ni-content">
+              <text class="ni-from">{{ n.fromName }}</text>
+              <text class="ni-text">{{ n.content }}</text>
+              <text class="ni-time">{{ formatTime(n.createdAt) }}</text>
+            </view>
+          </view>
+          <view class="ni-delete" v-if="notifSwipeId === n.id" @tap.stop="deleteNotif(n.id)">
+            <text>删除</text>
           </view>
         </view>
         <view class="empty-notif" v-if="notifList.length === 0">
@@ -1278,10 +1286,52 @@ export default {
     showNotifications() {
       this.loadNotifications()
       this.showNotifPanel = true
+      this.notifSwipeId = null
+      this.notifSwipeOffset = 0
       this.$nextTick(() => {
         markAllNotificationsRead()
         this.unreadCount = 0
       })
+    },
+    onNotifSwipeStart(id, e) {
+      if (this.notifSwipeId && this.notifSwipeId !== id) {
+        this.notifSwipeId = null
+        this.notifSwipeOffset = 0
+      }
+      this.notifSwipeId = id
+      this._notifTouchStartX = e.touches[0].clientX
+      this._notifTouchStartY = e.touches[0].clientY
+    },
+    onNotifSwipeEnd(id, e) {
+      if (!this.notifSwipeId) return
+      const touch = e.changedTouches[0]
+      const dx = touch.clientX - this._notifTouchStartX
+      const dy = touch.clientY - this._notifTouchStartY
+      // 只处理水平滑动，滑动超过60px则打开删除按钮
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 60) {
+        if (dx < 0) {
+          this.notifSwipeOffset = -160
+        } else {
+          this.notifSwipeId = null
+          this.notifSwipeOffset = 0
+        }
+      } else {
+        this.notifSwipeId = null
+        this.notifSwipeOffset = 0
+      }
+    },
+    deleteNotif(id) {
+      const list = getLocalNotifications()
+      const newList = list.filter(n => n.id !== id)
+      uni.setStorageSync('foodfind_notifications', newList)
+      this.notifSwipeId = null
+      this.notifSwipeOffset = 0
+      this.loadNotifications()
+      uni.showToast({ title: '已删除', icon: 'success', duration: 1000 })
+    },
+    getNotifSwipeStyle(id) {
+      if (this.notifSwipeId !== id) return ''
+      return `transform: translateX(${this.notifSwipeOffset}px); transition: transform ${this.notifSwipeOffset < -160 ? '0' : '0.25'}s ease;`
     },
     openComment(item) {
       this.currentFeedItem = item
@@ -1477,11 +1527,20 @@ export default {
         return
       }
 
-      if (h >= 6 && h < 9 && !todayChecks.breakfast) {
+      const now = new Date()
+      const isWeekend = now.getDay() === 0 || now.getDay() === 6
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      const mealConfig = prefs.mealConfig || { weekday: ['breakfast', 'lunch', 'dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
+      const activeMeals = isWeekend ? mealConfig.weekend : mealConfig.weekday
+      const hasBreakfast = activeMeals.includes('breakfast')
+      const hasLunch = activeMeals.includes('lunch')
+      const hasDinner = activeMeals.includes('dinner')
+
+      if (h >= 6 && h < 9 && hasBreakfast && !todayChecks.breakfast) {
         this.smartReminder = { icon: '☀️', title: '早餐时间到！', desc: '别忘了打卡早餐~', action: 'checkin', mealKey: 'breakfast' }
-      } else if (h >= 11 && h < 13 && !todayChecks.lunch) {
+      } else if (h >= 11 && h < 13 && hasLunch && !todayChecks.lunch) {
         this.smartReminder = { icon: '🌞', title: '午餐时间到！', desc: '午饭吃了没？记得打卡~', action: 'checkin', mealKey: 'lunch' }
-      } else if (h >= 17 && h < 19 && !todayChecks.dinner) {
+      } else if (h >= 17 && h < 19 && hasDinner && !todayChecks.dinner) {
         this.smartReminder = { icon: '🌙', title: '晚餐时间到！', desc: '晚饭安排了吗？记得打卡~', action: 'checkin', mealKey: 'dinner' }
       } else {
         const upcoming = getUpcomingSpecialDates(3)
@@ -2067,12 +2126,23 @@ export default {
   width:56rpx; height:56rpx; display:flex; align-items:center; justify-content:center;
   text { font-size:28rpx; color:#999; }
 }
-.np-list { flex:1; padding:16rpx; }
+.np-list { flex:1; padding:16rpx; overflow:hidden; }
+.notif-item-wrap {
+  position:relative; overflow:hidden; border-radius:16rpx; margin-bottom:12rpx;
+}
 .notif-item {
   display:flex; align-items:flex-start; gap:16rpx;
   padding:20rpx; background:#f8f9fa; border-radius:16rpx;
-  margin-bottom:12rpx; transition:all .2s ease;
+  position:relative; z-index:2; transition:transform .25s ease;
   &.unread { background:#e8f7ef; }
+  &.swiping { transition:none; }
+}
+.ni-delete {
+  position:absolute; right:0; top:0; bottom:0; width:160rpx;
+  background:#ff4757; display:flex; align-items:center; justify-content:center;
+  border-radius:0 16rpx 16rpx 0; z-index:1;
+  & text { font-size:26rpx; color:#fff; font-weight:600; }
+  &:active { background:#e8414f; }
 }
 .ni-icon { font-size:36rpx; flex-shrink:0; margin-top:4rpx; }
 .ni-content { flex:1; display:flex; flex-direction:column; gap:4rpx; }
@@ -2278,9 +2348,9 @@ export default {
 
 .special-banner {
   display:flex; align-items:center; justify-content:space-between;
-  margin:0 28rpx 16rpx; padding:20rpx 24rpx;
+  margin-bottom:20rpx; padding:20rpx 24rpx;
   background:linear-gradient(135deg,#fff5f5,#fff0f6);
-  border-radius:20rpx; border:2rpx solid #ffe0e8;
+  border-radius:24rpx; border:2rpx solid #ffe0e8;
   &:active { transform:scale(.98); }
 }
 .sp-banner-left { display:flex; align-items:center; gap:16rpx; flex:1; }
@@ -2297,9 +2367,9 @@ export default {
 
 .smart-reminder {
   display:flex; align-items:center; gap:16rpx;
-  margin:0 28rpx 16rpx; padding:20rpx 24rpx;
+  margin-bottom:20rpx; padding:20rpx 24rpx;
   background:linear-gradient(135deg,#f0f7ff,#e8f4fd);
-  border-radius:20rpx; border:2rpx solid #c8e0f4;
+  border-radius:24rpx; border:2rpx solid #c8e0f4;
   transition:all .25s ease;
   &:active { transform:scale(.98); }
 }

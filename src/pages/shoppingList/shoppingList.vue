@@ -239,7 +239,7 @@ const CATEGORY_MAP = {
 const CATEGORY_KEYWORDS = {
   vegetable: ['菜', '豆', '茄', '瓜', '菇', '笋', '藕', '椒', '蒜', '葱', '姜', '花', '叶', '生菜', '萝卜', '番茄', '西兰', '四季'],
   meat: ['肉', '鸡', '鸭', '鱼', '虾', '蛋', '排', '里脊', '牛肉', '猪肉', '鸡胸', '鸡翅', '鸭', '鲈', '皮蛋'],
-  seasoning: ['油', '盐', '酱', '醋', '糖', '料酒', '蚝油', '淀粉', '花椒', '八角', '桂皮', '豆瓣', '豉', '芝麻', '辣椒', '泡椒', '甜面', '豆鼓', '冰糖'],
+  seasoning: ['油', '盐', '酱', '醋', '糖', '料酒', '蚝油', '淀粉', '花椒', '八角', '桂皮', '豆瓣', '豉', '芝麻', '辣椒', '泡椒', '甜面', '豆鼓', '冰糖', '生抽', '老抽', '葱', '姜', '蒜'],
   staple: ['米', '面', '粉', '饼', '油条', '馒头', '粮', '麦', '豆', '黄豆']
 }
 
@@ -260,7 +260,7 @@ export default {
       newItemAmount: '',
       config: {
         mode: 'today',
-        customDays: 3
+        customDays: 1
       },
       mealConfig: {
         weekday: ['dinner'],
@@ -404,7 +404,7 @@ export default {
     togglePredefinedMode() {
       this.isPredefinedMode = !this.isPredefinedMode
       this.config.mode = this.isPredefinedMode ? 'today' : 'custom'
-      this.config.customDays = 3
+      this.config.customDays = 1
       this.saveConfig()
       this.loadShoppingList()
       setTimeout(() => { this.autoGenerateIfEmpty() }, 100)
@@ -546,14 +546,23 @@ export default {
     },
     mergeAmount(amount1, amount2) {
       if (!amount1 || !amount2) return amount1 || amount2
-      const num1 = parseFloat(amount1)
-      const num2 = parseFloat(amount2)
+      const cleanAmount = (amt) => amt.toString().replace(/\s*·\s*可选\s*$/, '')
+      const amount1Str = cleanAmount(amount1)
+      const amount2Str = cleanAmount(amount2)
+      if (amount1Str === '适量' || amount2Str === '适量') return '适量'
+      if (amount1Str === '少许' || amount2Str === '少许') {
+        if (amount1Str === amount2Str) return amount1Str
+        return '少许'
+      }
+      if (amount1Str === amount2Str) return amount1Str
+      const num1 = parseFloat(amount1Str)
+      const num2 = parseFloat(amount2Str)
       if (!isNaN(num1) && !isNaN(num2)) {
-        const unit1 = amount1.replace(/[\d.]/g, '')
-        const unit2 = amount2.replace(/[\d.]/g, '')
+        const unit1 = amount1Str.replace(/[\d.]/g, '')
+        const unit2 = amount2Str.replace(/[\d.]/g, '')
         if (unit1 === unit2) return (num1 + num2) + unit1
       }
-      return amount1 + ' + ' + amount2
+      return amount1Str + ' + ' + amount2Str
     },
     clearCompleted() {
       uni.showModal({

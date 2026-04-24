@@ -81,9 +81,9 @@
     <view class="action-bar pop-in" style="animation-delay:0.15s" v-if="!isLoading">
       <view class="gen-btn" @click="generateWeekPlan">
         <text class="gen-icon">✦</text>
-        <text class="gen-text">生成本周菜谱</text>
+        <text class="gen-text">{{ genBtnText }}</text>
       </view>
-      <text class="gen-hint" v-if="weeklyData && weeklyData[selectedDateStr]">已生成 · {{ weekNutriSummary }}</text>
+      <text class="gen-hint" v-if="weeklyData && weeklyData[selectedDateStr]">{{ genHintPrefix }} · {{ weekNutriSummary }}</text>
     </view>
 
     <scroll-view scroll-y class="meal-scroll" :style="{ height: scrollHeight }" v-if="!isLoading">
@@ -127,7 +127,7 @@
       <view v-else class="empty-state scale-in">
         <text class="empty-icon">📅</text>
         <text class="empty-title">该日暂无菜谱</text>
-        <text class="empty-hint">点击上方「生成本周菜谱」一键规划</text>
+        <text class="empty-hint">{{ emptyHintText }}</text>
       </view>
 
       <view class="bottom-spacer"></view>
@@ -175,6 +175,25 @@ export default {
       thisMonday.setDate(now.getDate() + diff)
       thisMonday.setHours(0,0,0,0)
       return this.currentMonday.getTime() === thisMonday.getTime()
+    },
+    weekHasData() {
+      if (!this.currentMonday || !this.weeklyData) return false
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(this.currentMonday)
+        d.setDate(d.getDate() + i)
+        const ds = this.dateToStr(d)
+        if (this.weeklyData[ds]) return true
+      }
+      return false
+    },
+    genBtnText() {
+      return this.weekHasData ? '刷新本周菜谱' : '生成本周菜谱'
+    },
+    genHintPrefix() {
+      return this.weekHasData ? '已刷新' : '已生成'
+    },
+    emptyHintText() {
+      return this.weekHasData ? '点击上方「刷新本周菜谱」重新规划' : '点击上方「生成本周菜谱」一键规划'
     },
     weekDays() {
       if (!this.currentMonday) return []

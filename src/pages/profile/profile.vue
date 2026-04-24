@@ -389,7 +389,7 @@
             <text class="rms-title">🤝 互动趋势</text>
           </view>
           <view class="rm-chart-card">
-            <scroll-view scroll-x class="rm-chart-scroll" :class="{ month: reportPeriod === 'month' }">
+            <scroll-view scroll-x class="rm-chart-scroll" :class="{ month: reportPeriod === 'month' }" :scroll-left="chartScrollLeft" scroll-with-animation>
               <view class="rm-chart-bars" :class="{ month: reportPeriod === 'month' }">
                 <view class="rm-chart-bar" v-for="(day, idx) in weeklyReportData" :key="idx" :style="{ animationDelay: (idx * 0.05) + 's' }">
                   <view class="rm-bar bar-anim" :style="{ height: Math.max(10, (day.mealCount / 3) * 100) + '%' }">
@@ -397,6 +397,7 @@
                   </view>
                   <text class="rm-bar-label">{{ formatDayDate(day.date) }}</text>
                 </view>
+                <view :id="'chart-today-anchor'" style="width:1px;height:1px;position:absolute;"></view>
               </view>
             </scroll-view>
           </view>
@@ -617,6 +618,7 @@ export default {
       myInfo: { height: '', weight: '', allergies: '', dietary: '' },
       specialDates: [],
       reportPeriod: 'week',
+      chartScrollLeft: 0,
       reportAchievements: [],
       shareViewCount: 0,
       showAboutModal: false,
@@ -970,17 +972,41 @@ export default {
     },
     loadReportAchievements() {
       const streak = uni.getStorageSync('foodfind_streak') || { days: 0, lastDate: '' }
-      const shareCount = uni.getStorageSync('foodfind_share_count') || 0
+      // 计算当前实际连续打卡天数 - 根据打卡记录计算
       const checks = uni.getStorageSync('foodfind_personal_checks') || {}
-      const totalCheckDays = Object.keys(checks).length
+      const actualStreak = this.calcActualStreak(checks)
+      const shareCount = uni.getStorageSync('foodfind_share_count') || 0
+      const totalCheckDays = Object.keys(checks).filter(d => checks[d] && (checks[d].breakfast || checks[d].lunch || checks[d].dinner)).length
+      const finalStreak = Math.max(streak.days, actualStreak)
       this.reportAchievements = [
-        { icon: '🌱', name: '初出茅庐', desc: '连续打卡3天即可解锁', unlocked: streak.days >= 3 },
-        { icon: '🔥', name: '坚持不懈', desc: '连续打卡7天即可解锁', unlocked: streak.days >= 7 },
-        { icon: '⭐', name: '美食达人', desc: '连续打卡14天即可解锁', unlocked: streak.days >= 14 },
-        { icon: '👑', name: '食神', desc: '连续打卡30天即可解锁', unlocked: streak.days >= 30 },
+        { icon: '🌱', name: '初出茅庐', desc: '连续打卡3天即可解锁', unlocked: finalStreak >= 3 },
+        { icon: '🔥', name: '坚持不懈', desc: '连续打卡7天即可解锁', unlocked: finalStreak >= 7 },
+        { icon: '⭐', name: '美食达人', desc: '连续打卡14天即可解锁', unlocked: finalStreak >= 14 },
+        { icon: '👑', name: '食神', desc: '连续打卡30天即可解锁', unlocked: finalStreak >= 30 },
         { icon: '📊', name: '记录者', desc: '累计打卡5天即可解锁', unlocked: totalCheckDays >= 5 },
         { icon: '📤', name: '分享使者', desc: '分享菜谱5次即可解锁', unlocked: shareCount >= 5 }
       ]
+    },
+    calcActualStreak(checks) {
+      let streak = 0
+      let d = new Date()
+      // 如果今天没打卡，从昨天开始算
+      const todayStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+      const todayChecks = checks[todayStr]
+      if (!todayChecks || (!todayChecks.breakfast && !todayChecks.lunch && !todayChecks.dinner)) {
+        d.setDate(d.getDate() - 1)
+      }
+      while (true) {
+        const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+        const dayChecks = checks[ds]
+        if (dayChecks && (dayChecks.breakfast || dayChecks.lunch || dayChecks.dinner)) {
+          streak++
+          d.setDate(d.getDate() - 1)
+        } else {
+          break
+        }
+      }
+      return streak
     },
     onAchievementClick(a) {
       this.selectedAchievement = a
@@ -994,6 +1020,9 @@ export default {
       const allRecipes = [...ALL_RECIPES.breakfast, ...ALL_RECIPES.lunch, ...ALL_RECIPES.dinner]
       const days = this.reportPeriod === 'month' ? 30 : 7
       const data = []
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const todayStr = today.toISOString().split('T')[0]
       for (let i = days - 1; i >= 0; i--) {
         const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0]
         const dayChecks = checks[d]
@@ -1021,6 +1050,16 @@ export default {
         data.push({ date: d, sparkLevel, mealCount, calories: Math.round(calories), allOpened: sparkLevel > 0, allShared: false })
       }
       this.weeklyReportData = data
+      // 让图表以今天为中心 - 通过scroll-left定位
+      this.$nextTick(() => {
+        if (data.length > 0) {
+          const todayIdx = data.findIndex(d => d.date === todayStr)
+          if (todayIdx >= 0) {
+            // 每个柱子约80rpx，中心偏移
+            this.chartScrollLeft = Math.max(0, todayIdx * 80 - 200)
+          }
+        }
+      })
     },
     formatDayDate(dateStr) {
       if (!dateStr) return ''
