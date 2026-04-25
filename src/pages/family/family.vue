@@ -189,6 +189,56 @@
         </view>
       </view>
     </template>
+
+    <!-- 群主菜谱查看弹窗 -->
+    <view class="admin-menu-modal" v-if="showAdminMenuModal" @click="closeAdminMenuModal">
+      <view class="amm-container" @click.stop>
+        <view class="amm-header">
+          <text class="amm-title">{{ isAdmin ? '我的今日菜谱' : adminMenuDesc }}</text>
+          <view class="amm-close" @click="closeAdminMenuModal">
+            <text class="amm-close-icon">✕</text>
+          </view>
+        </view>
+        
+        <view class="amm-loading" v-if="adminMenuLoading">
+          <text class="amm-loading-text">加载中...</text>
+        </view>
+        
+        <view class="amm-content" v-else-if="adminTodayMeals">
+          <view class="amm-meal-section" v-for="meal in mealSections" :key="meal.key">
+            <view class="ams-header">
+              <text class="ams-icon">{{ meal.icon }}</text>
+              <text class="ams-title">{{ meal.title }}</text>
+            </view>
+            <view class="ams-list" v-if="adminTodayMeals[meal.key] && adminTodayMeals[meal.key].length > 0">
+              <view class="ams-item" v-for="(food, idx) in adminTodayMeals[meal.key]" :key="idx">
+                <image class="ams-img" :src="food.image || '/static/icons/placeholder.png'" mode="aspectFill" />
+                <view class="ams-info">
+                  <text class="ams-name">{{ food.name }}</text>
+                  <text class="ams-desc">{{ food.desc || '美味佳肴' }}</text>
+                </view>
+              </view>
+            </view>
+            <view class="ams-empty" v-else>
+              <text class="ams-empty-text">暂无菜品</text>
+            </view>
+          </view>
+        </view>
+        
+        <view class="amm-empty-state" v-else>
+          <text class="aes-icon">🍽️</text>
+          <text class="aes-text">今日暂无菜谱数据</text>
+          <text class="aes-hint">群主还未设置今日菜谱</text>
+        </view>
+        
+        <view class="amm-footer" v-if="!isAdmin && !independentMode">
+          <text class="amm-hint-text">💡 您当前处于共享菜谱模式，首页显示的就是群主的菜谱</text>
+        </view>
+        <view class="amm-footer" v-else-if="!isAdmin && independentMode">
+          <text class="amm-hint-text">💡 您当前处于独立菜谱模式，可参考群主菜谱进行烹饪</text>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -206,6 +256,7 @@ import {
   updateMyHealthTags,
   getHealthTagById
 } from '@/utils/family'
+import { markDirty } from '@/utils/cloud'
 
 export default {
   data() {
@@ -224,7 +275,10 @@ export default {
       independentMode: false,
       familyTypes: FAMILY_TYPES,
       healthTags: HEALTH_TAGS,
-      healthTagCategories: HEALTH_TAG_CATEGORIES
+      healthTagCategories: HEALTH_TAG_CATEGORIES,
+      showAdminMenuModal: false,
+      adminTodayMeals: null,
+      adminMenuLoading: false
     }
   },
   computed: {
@@ -236,11 +290,20 @@ export default {
       return FAMILY_TYPES.find(t => t.value === this.familyGroup.type) || {}
     },
     adminMenuDesc() {
-      // 获取群主昵称
-      if (!this.familyGroup || !this.familyGroup.members) return '查看群主本周菜谱'
+      if (!this.familyGroup || !this.familyGroup.members) return '查看群主今日菜谱'
       const admin = this.familyGroup.members.find(m => m.userId === this.familyGroup.creatorId)
       const adminName = admin ? admin.name : '群主'
-      return `查看${adminName}本周菜谱`
+      if (this.isAdmin) {
+        return `查看我的今日菜谱`
+      }
+      return `查看${adminName}今日菜谱`
+    },
+    mealSections() {
+      return [
+        { key: 'breakfast', title: '早餐', icon: '☀️' },
+        { key: 'lunch', title: '午餐', icon: '🌞' },
+        { key: 'dinner', title: '晚餐', icon: '🌙' }
+      ]
     }
   },
   onLoad() {
@@ -264,25 +327,21 @@ export default {
         }
         const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
         this.independentMode = !!prefs.independentMode
+        
+        this.syncFamilyFromCloud()
       } else {
-        // 本地没有数据，尝试从云端同步
         this.hasFamily = false
         await this.syncFamilyFromCloud()
       }
     },
     async syncFamilyFromCloud() {
       try {
-        const { OPENID } = await wx.cloud.callFunction({ name: 'login' }).then(res => res.result)
-        if (!OPENID) return
-        
-        // 查询云端是否有该用户的家庭
         const res = await wx.cloud.callFunction({
           name: 'updateFamilyMember',
           data: { action: 'getMyFamily' }
         })
         
         if (res.result && res.result.success && res.result.familyData) {
-          // 云端有家庭，同步到本地
           uni.setStorageSync('foodfind_family_group', res.result.familyData)
           this.hasFamily = true
           this.familyGroup = res.result.familyData
@@ -290,6 +349,12 @@ export default {
           if (me) {
             this.myHealthTags = [...(me.healthTags || [])]
           }
+          const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+          this.independentMode = !!prefs.independentMode
+        } else if (res.result && !res.result.success) {
+          uni.removeStorageSync('foodfind_family_group')
+          this.hasFamily = false
+          this.familyGroup = null
         }
       } catch (e) {
         console.warn('同步家庭数据失败:', e.message)
@@ -329,6 +394,10 @@ export default {
         this.hasFamily = true
         this.familyGroup = result.group
         this.loadFamily()
+        
+        uni.removeStorageSync('foodfind_meals')
+        uni.removeStorageSync('foodfind_meals_date')
+        
         uni.showToast({ title: '加入成功！', icon: 'success' })
       } else {
         uni.showToast({ title: result.error || '加入失败', icon: 'none' })
@@ -359,6 +428,13 @@ export default {
       const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
       prefs.independentMode = val
       uni.setStorageSync('foodfind_detailed_prefs', prefs)
+      markDirty('user_prefs')
+      
+      if (!val) {
+        uni.removeStorageSync('foodfind_meals')
+        uni.removeStorageSync('foodfind_meals_date')
+      }
+      
       uni.showToast({ title: val ? '已切换为独立菜谱' : '已切换为共享菜谱', icon: 'success' })
     },
     showInviteCode() {
@@ -372,10 +448,92 @@ export default {
         }
       })
     },
-    goToFamilyMenu() {
-      // 以群主的菜谱为准，跳转到菜谱页面并传递群主ID
+    async goToFamilyMenu() {
+      this.showAdminMenuModal = true
+      this.adminMenuLoading = true
+      this.adminTodayMeals = null
+      await this.loadAdminTodayMeals()
+      this.adminMenuLoading = false
+    },
+    async loadAdminTodayMeals() {
       const adminId = this.familyGroup ? this.familyGroup.creatorId : ''
-      uni.navigateTo({ url: `/pages/menu/menu?mode=family&adminId=${adminId}` })
+      const todayStr = new Date().toISOString().split('T')[0]
+      
+      if (this.isAdmin) {
+        // 群主查看自己的菜谱
+        const myMeals = uni.getStorageSync('foodfind_meals') || null
+        if (myMeals) {
+          this.adminTodayMeals = myMeals
+          return
+        }
+        // 尝试从周数据中获取
+        const weeklyCache = uni.getStorageSync('foodfind_weekly') || {}
+        if (weeklyCache[todayStr]) {
+          this.adminTodayMeals = weeklyCache[todayStr]
+          return
+        }
+      } else {
+        // 非群主成员查看群主的菜谱
+        // 1. 先尝试从本地缓存获取群主的菜谱（共享模式下可能已同步）
+        if (!this.independentMode) {
+          // 共享模式：本地存储的就是群主的菜谱
+          const sharedMeals = uni.getStorageSync('foodfind_meals') || null
+          if (sharedMeals) {
+            this.adminTodayMeals = sharedMeals
+            return
+          }
+        }
+        
+        // 2. 尝试从群主周数据缓存中获取
+        const adminWeeklyKey = `foodfind_weekly_${adminId}`
+        const adminWeekly = uni.getStorageSync(adminWeeklyKey) || {}
+        if (adminWeekly[todayStr]) {
+          this.adminTodayMeals = adminWeekly[todayStr]
+          return
+        }
+        
+        // 3. 尝试从云端获取群主的菜谱
+        try {
+          const res = await wx.cloud.callFunction({
+            name: 'batchSync',
+            data: {
+              collection: 'daily_meals',
+              data: {},
+              action: 'get',
+              targetOpenid: adminId
+            }
+          })
+          const result = res.result || res
+          if (result.code === 0 && result.data && result.data.meals) {
+            const mealsData = result.data.meals
+            if (result.data.date === todayStr) {
+              this.adminTodayMeals = mealsData
+              const adminWeeklyKey = `foodfind_weekly_${adminId}`
+              const adminWeekly = uni.getStorageSync(adminWeeklyKey) || {}
+              adminWeekly[todayStr] = mealsData
+              uni.setStorageSync(adminWeeklyKey, adminWeekly)
+              return
+            }
+            if (mealsData[todayStr]) {
+              this.adminTodayMeals = mealsData[todayStr]
+              const adminWeeklyKey = `foodfind_weekly_${adminId}`
+              const adminWeekly = uni.getStorageSync(adminWeeklyKey) || {}
+              adminWeekly[todayStr] = mealsData[todayStr]
+              uni.setStorageSync(adminWeeklyKey, adminWeekly)
+              return
+            }
+          }
+        } catch (e) {
+          console.warn('获取群主菜谱失败:', e.message)
+        }
+      }
+      
+      // 默认返回空结构
+      this.adminTodayMeals = { breakfast: [], lunch: [], dinner: [] }
+    },
+    closeAdminMenuModal() {
+      this.showAdminMenuModal = false
+      this.adminTodayMeals = null
     },
     goToFamilyShopping() {
       uni.navigateTo({ url: '/pages/shoppingList/shoppingList?mode=family' })
@@ -708,4 +866,108 @@ export default {
   &.delete { background: #fff0f0; }
 }
 .db-text { font-size: 26rpx; font-weight: 600; color: #ff4757; }
+
+/* 群主菜谱弹窗 */
+.admin-menu-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: ammFadeIn .25s ease forwards;
+}
+@keyframes ammFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.amm-container {
+  width: 100%;
+  max-height: 85vh;
+  background: #fff;
+  border-radius: 32rpx 32rpx 0 0;
+  overflow: hidden;
+  animation: ammSlideUp .3s ease forwards;
+}
+@keyframes ammSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.amm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 32rpx 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.amm-title { font-size: 32rpx; font-weight: 700; color: #1a1a1a; }
+.amm-close {
+  width: 56rpx; height: 56rpx;
+  display: flex; align-items: center; justify-content: center;
+  background: #f5f6f8; border-radius: 50%;
+  &:active { opacity: .7; }
+}
+.amm-close-icon { font-size: 28rpx; color: #666; }
+.amm-loading {
+  padding: 80rpx 32rpx;
+  text-align: center;
+}
+.amm-loading-text { font-size: 28rpx; color: #999; }
+.amm-content {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0 32rpx 24rpx;
+}
+.amm-meal-section {
+  margin-bottom: 28rpx;
+  &:last-child { margin-bottom: 0; }
+}
+.ams-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+  padding-bottom: 12rpx;
+  border-bottom: 2rpx solid #f5f6f8;
+}
+.ams-icon { font-size: 32rpx; }
+.ams-title { font-size: 28rpx; font-weight: 700; color: #1a1a1a; }
+.ams-list { display: flex; flex-direction: column; gap: 16rpx; }
+.ams-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 16rpx;
+  background: #fafafa;
+  border-radius: 16rpx;
+}
+.ams-img {
+  width: 100rpx; height: 100rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+  background: #eee;
+}
+.ams-info { flex: 1; }
+.ams-name { font-size: 26rpx; font-weight: 600; color: #1a1a1a; display: block; line-height: 1.4; }
+.ams-desc { font-size: 22rpx; color: #999; margin-top: 4rpx; display: block; line-height: 1.3; }
+.ams-empty {
+  padding: 24rpx;
+  text-align: center;
+  background: #fafafa;
+  border-radius: 12rpx;
+}
+.ams-empty-text { font-size: 24rpx; color: #bbb; }
+.amm-empty-state {
+  padding: 60rpx 32rpx;
+  text-align: center;
+}
+.aes-icon { font-size: 80rpx; margin-bottom: 16rpx; display: block; }
+.aes-text { font-size: 30rpx; font-weight: 600; color: #666; display: block; margin-bottom: 10rpx; }
+.aes-hint { font-size: 24rpx; color: #bbb; }
+.amm-footer {
+  padding: 20rpx 32rpx 28rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+.amm-hint-text { font-size: 23rpx; color: #07c160; line-height: 1.5; }
 </style>

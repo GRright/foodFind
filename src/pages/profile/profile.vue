@@ -90,7 +90,7 @@
           </template>
           <template v-else>
             <view class="menu-item" @click="goToFamily">
-              <view class="menu-icon-wrap green"><text class="menu-icon">▣</text></view>
+              <view class="menu-icon-wrap green"><image class="menu-icon-img" :src="iconFamily" mode="aspectFit"/></view>
               <view class="mi-center">
                 <text class="menu-label">家庭群组</text>
                 <text class="menu-desc">{{ familySummary }}</text>
@@ -99,7 +99,7 @@
             </view>
 
             <view class="menu-item report-card" @click="openReport">
-              <view class="menu-icon-wrap green"><text class="menu-icon">◈</text></view>
+              <view class="menu-icon-wrap green"><image class="menu-icon-img" :src="iconReport" mode="aspectFit"/></view>
               <view class="mi-center">
                 <text class="menu-label">本周饮食报告</text>
                 <text class="menu-desc">查看我的营养数据</text>
@@ -114,7 +114,7 @@
         <text class="group-title">我的</text>
         <view class="menu-list">
           <view class="menu-item" @click="openFavorites">
-            <view class="menu-icon-wrap orange"><text class="menu-icon">👍</text></view>
+            <view class="menu-icon-wrap orange"><image class="menu-icon-img" :src="iconLike" mode="aspectFit"/></view>
             <view class="mi-center">
               <text class="menu-label">我喜欢的</text>
               <text class="menu-desc">{{ favorites.length > 0 ? `已喜欢 ${favorites.length} 道菜` : '标记喜欢的菜品' }}</text>
@@ -123,7 +123,7 @@
           </view>
 
           <view class="menu-item" @click="openMyInfo">
-            <view class="menu-icon-wrap pink"><text class="menu-icon">✦</text></view>
+            <view class="menu-icon-wrap pink"><image class="menu-icon-img" :src="iconMyInfo" mode="aspectFit"/></view>
             <view class="mi-center">
               <text class="menu-label">我的信息</text>
               <text class="menu-desc">生日、纪念日、身高体重</text>
@@ -131,7 +131,7 @@
             <text class="menu-arrow">›</text>
           </view>
           <view class="menu-item" @click="openPrefModal">
-            <view class="menu-icon-wrap gray"><text class="menu-icon">⚙</text></view>
+            <view class="menu-icon-wrap gray"><image class="menu-icon-img" :src="iconSettings" mode="aspectFit"/></view>
             <view class="mi-center">
               <text class="menu-label">偏好设置</text>
               <text class="menu-desc">{{ prefSummaryText }}</text>
@@ -140,7 +140,7 @@
           </view>
 
           <view class="menu-item" @click="showAbout">
-            <view class="menu-icon-wrap gray"><text class="menu-icon">ⓘ</text></view>
+            <view class="menu-icon-wrap gray"><image class="menu-icon-img" :src="iconAbout" mode="aspectFit"/></view>
             <view class="mi-center">
               <text class="menu-label">关于我们</text>
               <text class="menu-desc">关于吃点啥</text>
@@ -529,6 +529,12 @@
         <view class="spm-close" @click="showMyInfoModal = false"><text>✕</text></view>
       </view>
       <scroll-view scroll-y class="spm-body" :style="{ height: 'calc(75vh - 180rpx)' }">
+        <!-- 昵称设置 -->
+        <view class="spm-section-title">👤 我的昵称</view>
+        <view class="spm-row">
+          <text class="spm-label">昵称</text>
+          <input class="spm-input" v-model="myInfo.nickname" placeholder="美食爱好者" maxlength="20" />
+        </view>
         <!-- 生日和纪念日 -->
         <view class="spm-section-title">🎂 生日与纪念日</view>
         <view class="spm-special-list" v-for="(d, i) in specialDates" :key="i">
@@ -616,7 +622,7 @@ export default {
       showMyInfoModal: false,
       showAddDateForm: false,
       specialDateForm: { name: '', month: 1, day: 1, type: 'birthday' },
-      myInfo: { height: '', weight: '', allergies: '', dietary: '' },
+      myInfo: { nickname: '', height: '', weight: '', allergies: '', dietary: '' },
       specialDates: [],
       reportPeriod: 'week',
       chartScrollLeft: 0,
@@ -688,6 +694,12 @@ export default {
     }
   },
   computed: {
+    iconFamily() { return '/static/image/icons/家庭群组.png' },
+    iconReport() { return '/static/image/icons/报告.png' },
+    iconLike() { return '/static/image/icons/喜欢.png' },
+    iconMyInfo() { return '/static/image/icons/我的信息.png' },
+    iconSettings() { return '/static/image/icons/设置.png' },
+    iconAbout() { return '/static/image/icons/关于.png' },
     relationLabel() {
       const map = { couple: '💕 情侣', family: '👨‍👩‍👧 家人', friend: '🤝 朋友' }
       return map[this.partnerInfo.relationType] || '💕 伙伴'
@@ -845,6 +857,7 @@ export default {
   },
   onShow() {
     this.loadUserInfo()
+    this.loadFamilyData()
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
     const shareData = uni.getStorageSync('foodfind_share_data')
@@ -977,7 +990,7 @@ export default {
       // 计算当前实际连续打卡天数 - 根据打卡记录计算
       const checks = uni.getStorageSync('foodfind_personal_checks') || {}
       const actualStreak = this.calcActualStreak(checks)
-      const shareCount = uni.getStorageSync('foodfind_share_count') || 0
+      const favoriteCount = (uni.getStorageSync('foodfind_favorites') || []).length
       const totalCheckDays = Object.keys(checks).filter(d => checks[d] && (checks[d].breakfast || checks[d].lunch || checks[d].dinner)).length
       const finalStreak = Math.max(streak.days, actualStreak)
       this.reportAchievements = [
@@ -986,7 +999,7 @@ export default {
         { icon: '⭐', name: '美食达人', desc: '连续打卡14天即可解锁', unlocked: finalStreak >= 14 },
         { icon: '👑', name: '食神', desc: '连续打卡30天即可解锁', unlocked: finalStreak >= 30 },
         { icon: '📊', name: '记录者', desc: '累计打卡5天即可解锁', unlocked: totalCheckDays >= 5 },
-        { icon: '📤', name: '分享使者', desc: '分享菜谱5次即可解锁', unlocked: shareCount >= 5 }
+        { icon: '❤️', name: '美食收藏家', desc: '收藏10道美食即可解锁', unlocked: favoriteCount >= 10 }
       ]
     },
     calcActualStreak(checks) {
@@ -1248,6 +1261,10 @@ export default {
     loadMyInfo() {
       const saved = uni.getStorageSync('foodfind_my_info')
       if (saved) this.myInfo = { ...this.myInfo, ...saved }
+      // 从 userInfo 同步昵称到 myInfo
+      if (this.userInfo.nickname && this.userInfo.nickname !== '美食爱好者') {
+        this.myInfo.nickname = this.userInfo.nickname
+      }
     },
     removeSpecialDate(i) {
       uni.showModal({
@@ -1288,8 +1305,23 @@ export default {
       this.specialDateForm = { name: '', month: 1, day: 1, type: 'birthday' }
       uni.showToast({ title: '已保存', icon: 'success' })
     },
-    saveMyInfo() {
+    async saveMyInfo() {
       uni.setStorageSync('foodfind_my_info', this.myInfo)
+      // 同步更新 userInfo 中的昵称
+      const nickname = this.myInfo.nickname.trim() || '美食爱好者'
+      this.userInfo.nickname = nickname
+      const savedUserInfo = uni.getStorageSync('foodfind_user_info') || {}
+      savedUserInfo.nickname = nickname
+      uni.setStorageSync('foodfind_user_info', savedUserInfo)
+      // 同步更新到 app.globalData
+      const app = getApp()
+      if (app?.globalData) {
+        app.globalData.userInfo = { ...app.globalData.userInfo, nickname }
+      }
+      // 如果在家庭群组中，更新成员昵称到本地和云端
+      const { updateMyNickname } = require('@/utils/family.js')
+      await updateMyNickname(nickname)
+      
       markDirty('my_info')
       uni.showToast({ title: '已保存 ✓', icon: 'success' })
       this.showMyInfoModal = false
@@ -1437,7 +1469,7 @@ export default {
   &.gray { background:#f0f1f3; }
 }
 .menu-icon { font-size:32rpx; font-weight:400; letter-spacing:-2rpx; }
-.menu-icon-img { width:44rpx; height:44rpx; }
+.menu-icon-img { width:40rpx; height:40rpx; }
 .menu-emoji { font-size:34rpx; }
 .mi-center { flex:1; display:flex; flex-direction:column; min-width:0; }
 .menu-label { font-size:28rpx; color:#1a1a1a; font-weight:600; line-height:1.3; }

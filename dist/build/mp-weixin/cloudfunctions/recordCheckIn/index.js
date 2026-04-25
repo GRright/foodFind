@@ -7,10 +7,10 @@ const _ = db.command
 
 exports.main = async (event, context) => {
   const { OPENID } = cloud.getWXContext()
-  const { familyId, date, mealType } = event
+  const { familyId, date, mealType, state } = event
+  const checkState = state !== undefined ? state : true
 
   try {
-    // 验证是否是家庭成员
     const family = await db.collection('families').doc(familyId).get()
     if (!family.data) {
       return { success: false, error: '家庭不存在' }
@@ -21,7 +21,6 @@ exports.main = async (event, context) => {
       return { success: false, error: '不是家庭成员' }
     }
 
-    // 检查是否已有打卡记录
     const existingCheckIn = await db.collection('checkins').where({
       familyId,
       date,
@@ -29,25 +28,23 @@ exports.main = async (event, context) => {
     }).get()
 
     if (existingCheckIn.data.length > 0) {
-      // 更新已有记录
       const checkInId = existingCheckIn.data[0]._id
       await db.collection('checkins').doc(checkInId).update({
         data: {
-          [mealType]: true,
+          [mealType]: checkState,
           updatedAt: new Date()
         }
       })
     } else {
-      // 创建新记录
       await db.collection('checkins').add({
         data: {
           familyId,
           userId: OPENID,
           userName: getMemberName(family.data, OPENID),
           date,
-          breakfast: mealType === 'breakfast',
-          lunch: mealType === 'lunch',
-          dinner: mealType === 'dinner',
+          breakfast: mealType === 'breakfast' ? checkState : false,
+          lunch: mealType === 'lunch' ? checkState : false,
+          dinner: mealType === 'dinner' ? checkState : false,
           createdAt: new Date(),
           updatedAt: new Date()
         }

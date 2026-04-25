@@ -1,7 +1,33 @@
 # 吃点啥 - 项目进度文档
 
-> 最后更新：2026-04-23
-> 版本：v2.7.0
+> 最后更新：2026-04-24
+> 版本：v2.8.0
+
+---
+
+### v2.8.0 - 昵称统一与数据一致性 (2026-04-24)
+
+#### 👤 昵称统一管理
+- **单一事实来源**：统一使用 `foodfind_user_info.nickname` 作为用户唯一昵称
+- **我的信息弹窗新增昵称输入**：用户可自定义昵称，默认为"美食爱好者"
+- **移除创建/加入家庭时的昵称输入**：创建/加入家庭时，直接从 `foodfind_user_info` 读取用户昵称
+- **family.js 新增 getUserNickname()**：统一的获取用户昵称工具函数
+- **所有显示昵称的地方统一更新**：首页问候语、通知、家庭成员列表、打卡看板等
+
+#### ☁️ 昵称云端同步
+- **updateMyNickname() 异步更新**：保存用户昵称时，同步更新到家庭群组并调用云函数上传云端
+- **recordFamilyCheckIn 调用**：首页打卡时自动调用云函数同步到云端，家庭成员可见
+- **容错机制**：即使云端同步失败，本地数据不受影响
+
+#### 📊 打卡数据一致性
+- **getFamilyCheckIns() 自动合并**：家庭打卡数据自动合并个人打卡数据（以 userId 为 key）
+- **首页打卡自动同步**：markMealEaten 更新时同时更新 `foodfind_personal_checks` 和 `foodfind_family_checkins`
+- **家庭报告统一数据来源**：使用 getFamilyCheckIns 获取完整数据，确保个人数据在所有地方一致
+
+#### 🔄 数据同步流程
+- **昵称更新流程**：profile 保存 → 更新本地 `foodfind_user_info` → 更新家庭缓存 → 调用 updateFamilyMember 云函数
+- **打卡同步流程**：首页打卡 → 更新本地个人数据 → 更新家庭缓存 → 调用 recordFamilyCheckIn 云函数
+- **统一读取流程**：所有地方优先从 `foodfind_user_info` 读取用户信息，使用 getUserNickname() 工具函数
 
 ---
 

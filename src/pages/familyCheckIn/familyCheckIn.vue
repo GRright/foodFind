@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import { getFamilyGroup, getCurrentUserId, getFamilyCheckIns, HEALTH_TAGS } from '@/utils/family.js'
+import { getFamilyGroup, getCurrentUserId, getFamilyCheckIns, fetchFamilyCheckIns, HEALTH_TAGS } from '@/utils/family.js'
 
 export default {
   data() {
@@ -159,13 +159,24 @@ export default {
     this.todayStr = new Date().toISOString().split('T')[0]
     this.checkIns = getFamilyCheckIns()
     this.initWeekDays()
+    this.syncFromCloud()
   },
   onShow() {
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
     this.checkIns = getFamilyCheckIns()
+    this.syncFromCloud()
   },
   methods: {
+    async syncFromCloud() {
+      if (!this.familyGroup) return
+      const endDate = this.todayStr
+      const startDate = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0]
+      const result = await fetchFamilyCheckIns(startDate, endDate)
+      if (result.success) {
+        this.checkIns = getFamilyCheckIns()
+      }
+    },
     goToFamily() {
       uni.navigateTo({ url: '/pages/family/family' })
     },

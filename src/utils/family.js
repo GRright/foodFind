@@ -149,6 +149,19 @@ export async function leaveFamilyGroup() {
   uni.removeStorageSync('foodfind_family_group')
   uni.removeStorageSync('foodfind_family_checkins')
   uni.removeStorageSync('foodfind_family_shopping')
+  
+  // 清除群主菜谱缓存
+  if (group.creatorId) {
+    uni.removeStorageSync(`foodfind_weekly_${group.creatorId}`)
+  }
+  
+  // 如果是共享模式，清除菜谱数据以便重新加载
+  const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+  if (!prefs.independentMode) {
+    uni.removeStorageSync('foodfind_meals')
+    uni.removeStorageSync('foodfind_meals_date')
+  }
+  
   return { success: true }
 }
 
@@ -247,14 +260,14 @@ export async function updateMyHealthTags(healthTags) {
 }
 
 // 打卡相关
-export async function recordFamilyCheckIn(date, userId, mealType) {
+export async function recordFamilyCheckIn(date, userId, mealType, state) {
   const group = getFamilyGroup()
   if (!group) return { success: false, error: '不在任何家庭中' }
 
   try {
     await wx.cloud.callFunction({
       name: 'recordCheckIn',
-      data: { familyId: group._id, date, mealType }
+      data: { familyId: group._id, date, mealType, state: state !== undefined ? state : true }
     })
 
     // 更新本地缓存
@@ -263,7 +276,7 @@ export async function recordFamilyCheckIn(date, userId, mealType) {
     if (!checkins[date][userId]) {
       checkins[date][userId] = { breakfast: false, lunch: false, dinner: false }
     }
-    checkins[date][userId][mealType] = true
+    checkins[date][userId][mealType] = state !== undefined ? state : true
     uni.setStorageSync('foodfind_family_checkins', checkins)
 
     return { success: true }
@@ -625,21 +638,33 @@ export function getUnreadNotificationCount() {
 
 export function notifyShoppingChange(action, itemName) {
   const myName = getUserNickname()
+  const content = action === 'add' ? `添加了「${itemName}」到购物清单` : action === 'buy' ? `购买了「${itemName}」` : `从购物清单移除了「${itemName}」`
   addLocalNotification({
     type: 'shopping',
     fromName: myName,
-    content: action === 'add' ? `添加了「${itemName}」到购物清单` : action === 'buy' ? `购买了「${itemName}」` : `从购物清单移除了「${itemName}」`
+    content
   })
+  
+  const group = getFamilyGroup()
+  if (group) {
+    sendFamilyNotification('shopping', content).catch(() => {})
+  }
 }
 
 export function notifyCheckIn(mealType) {
   const myName = getUserNickname()
   const mealName = mealType === 'breakfast' ? '早餐' : mealType === 'lunch' ? '午餐' : '晚餐'
+  const content = `完成了${mealName}打卡 🎉`
   addLocalNotification({
     type: 'checkin',
     fromName: myName,
-    content: `完成了${mealName}打卡 🎉`
+    content
   })
+  
+  const group = getFamilyGroup()
+  if (group) {
+    sendFamilyNotification('checkin', content).catch(() => {})
+  }
 }
 
 export function notifyRecipeLike(recipeName) {

@@ -126,7 +126,7 @@
 </template>
 
 <script>
-import { getFamilyGroup, getCurrentUserId, getFamilyCheckIns, getFamilyHealthTags, HEALTH_TAGS } from '@/utils/family.js'
+import { getFamilyGroup, getCurrentUserId, getFamilyCheckIns, fetchFamilyCheckIns, getFamilyHealthTags, HEALTH_TAGS } from '@/utils/family.js'
 
 export default {
   data() {
@@ -213,14 +213,27 @@ export default {
     this.initWeekData()
     this.calcWeeklyNutrition()
     this.familyHealthTags = getFamilyHealthTags().map(id => HEALTH_TAGS.find(t => t.id === id)).filter(Boolean)
+    this.syncFromCloud()
   },
   onShow() {
     this.pageEnter = true
     setTimeout(() => { this.pageEnter = false }, 300)
     this.checkIns = getFamilyCheckIns()
     this.initWeekData()
+    this.syncFromCloud()
   },
   methods: {
+    async syncFromCloud() {
+      if (!this.familyGroup) return
+      const today = new Date().toISOString().split('T')[0]
+      const startDate = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0]
+      const result = await fetchFamilyCheckIns(startDate, today)
+      if (result.success) {
+        this.checkIns = getFamilyCheckIns()
+        this.initWeekData()
+        this.calcWeeklyNutrition()
+      }
+    },
     initWeekData() {
       const days = []
       const dayNames = ['日', '一', '二', '三', '四', '五', '六']

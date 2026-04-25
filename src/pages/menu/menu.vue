@@ -139,6 +139,7 @@
 import { ALL_RECIPES } from '@/utils/constants.js'
 import { filterRecipesByHealthTags, getFamilyHealthTags, getCurrentUserId, getFamilyGroup } from '@/utils/family.js'
 import { getPersonalizedRecipes } from '@/utils/festival.js'
+import { callFunction } from '@/utils/cloud.js'
 
 export default {
   data() {
@@ -467,6 +468,17 @@ export default {
       return { breakfast, lunch, dinner }
     },
     generateWeekPlan() {
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      const group = getFamilyGroup()
+      const myId = getCurrentUserId()
+      const isSharedMode = !prefs.independentMode
+      const isAdmin = group && group.creatorId === myId
+      
+      if (group && isSharedMode && !isAdmin) {
+        uni.showToast({ title: '共享模式下由群主生成菜谱', icon: 'none' })
+        return
+      }
+      
       uni.showLoading({ title: '智能生成中...' })
       setTimeout(() => {
         const data = {}
@@ -486,11 +498,20 @@ export default {
         this.weeklyData = data
         uni.setStorageSync('foodfind_weekly', data)
 
-        // 如果是在家庭中且是群主，同时保存到群主专属的菜谱缓存
         const myId = getCurrentUserId()
         const group = getFamilyGroup()
         if (group && group.creatorId === myId) {
           uni.setStorageSync(`foodfind_weekly_${myId}`, data)
+          
+          try {
+            callFunction('batchSync', {
+              collection: 'daily_meals',
+              data: { meals: data, date: 'weekly' },
+              action: 'set'
+            })
+          } catch (e) {
+            console.warn('同步周菜谱到云端失败:', e.message)
+          }
         }
 
         const app = getApp()

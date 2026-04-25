@@ -129,7 +129,8 @@ export default {
     async acceptInvite() {
       uni.showLoading({ title: '接受中...' })
       try {
-        const myName = uni.getStorageSync('foodfind_detailed_prefs')?.nickname || '美食爱好者'
+        const userInfo = uni.getStorageSync('foodfind_user_info') || {}
+        const myName = userInfo.nickname || '美食爱好者'
         const res = await callFunction('acceptPairInvite', {
           pairId: this.pairId,
           accepterName: myName,

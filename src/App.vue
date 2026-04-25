@@ -1,5 +1,6 @@
 <script>
 import { initCloud, getOpenId, batchSyncOnHide, syncOnStartup } from '@/utils/cloud.js'
+import { setWxOpenId } from '@/utils/family.js'
 
 export default {
   onLaunch() {
@@ -41,7 +42,6 @@ export default {
               if (openid) {
                 this.globalData.openid = openid
                 // 存储 OpenID 到本地，确保家庭群组功能使用正确的用户 ID
-                const { setWxOpenId } = require('./utils/family.js')
                 setWxOpenId(openid)
               }
               const cached = uni.getStorageSync('foodfind_user_info')

@@ -804,9 +804,25 @@ export default {
       if (group) {
         this.hasFamily = true
         this.familyGroup = group
+        this.syncFamilyFromCloud()
       } else {
         this.hasFamily = false
         this.familyGroup = null
+      }
+    },
+    async syncFamilyFromCloud() {
+      try {
+        const res = await wx.cloud.callFunction({
+          name: 'updateFamilyMember',
+          data: { action: 'getMyFamily' }
+        })
+        if (res.result && res.result.success && res.result.familyData) {
+          uni.setStorageSync('foodfind_family_group', res.result.familyData)
+          this.familyGroup = res.result.familyData
+          this.hasFamily = true
+        }
+      } catch (e) {
+        console.warn('同步家庭数据失败:', e.message)
       }
     },
     recordAppOpen() {
@@ -844,9 +860,7 @@ export default {
         uni.setStorageSync('foodfind_family_checkins', familyCheckins)
 
         // 同步到云端
-        if (newState) {
-          await recordFamilyCheckIn(todayStr, myId, mealKey)
-        }
+        await recordFamilyCheckIn(todayStr, myId, mealKey, newState)
       }
 
       this.familyCheckInList = getFamilyCheckInToday()
@@ -1086,6 +1100,34 @@ export default {
     },
 
     preloadMeals() {
+      const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
+      const group = getFamilyGroup()
+      const currentUserId = getCurrentUserId()
+      const isSharedMode = !prefs.independentMode
+      const isAdmin = group && group.creatorId === currentUserId
+      
+      // 共享菜谱模式下，非群主成员优先使用群主的菜谱
+      if (group && isSharedMode && !isAdmin) {
+        const adminId = group.creatorId
+        const adminWeeklyKey = `foodfind_weekly_${adminId}`
+        const adminWeekly = uni.getStorageSync(adminWeeklyKey)
+        const todayStr = this.getTodayStr()
+        
+        // 先尝试从群主的周数据获取
+        if (adminWeekly && adminWeekly[todayStr]) {
+          this.dailyMeals = adminWeekly[todayStr]
+          uni.setStorageSync('foodfind_meals', this.dailyMeals)
+          uni.setStorageSync('foodfind_meals_date', todayStr)
+          const app = getApp()
+          if (app?.globalData) app.globalData.dailyMeals = this.dailyMeals
+          return
+        }
+        
+        // 尝试从云端获取群主的菜谱
+        this.loadAdminMealsFromCloud()
+        // 同时先用本地缓存显示
+      }
+      
       const cached = uni.getStorageSync('foodfind_meals')
       const cachedDate = uni.getStorageSync('foodfind_meals_date')
       if (cached && cachedDate && cachedDate === this.getTodayStr()) {
@@ -1104,6 +1146,36 @@ export default {
         return
       }
       this.generateDailyMeals()
+    },
+    async loadAdminMealsFromCloud() {
+      const group = getFamilyGroup()
+      if (!group) return
+      const adminId = group.creatorId
+      const todayStr = this.getTodayStr()
+      
+      try {
+        const res = await wx.cloud.callFunction({
+          name: 'batchSync',
+          data: {
+            collection: 'daily_meals',
+            data: {},
+            action: 'get',
+            targetOpenid: adminId
+          }
+        })
+        const result = res.result || res
+        if (result.code === 0 && result.data && result.data.meals && result.data.date === todayStr) {
+          this.dailyMeals = result.data.meals
+          uni.setStorageSync('foodfind_meals', this.dailyMeals)
+          uni.setStorageSync('foodfind_meals_date', todayStr)
+          const adminWeeklyKey = `foodfind_weekly_${adminId}`
+          const adminWeekly = uni.getStorageSync(adminWeeklyKey) || {}
+          adminWeekly[todayStr] = this.dailyMeals
+          uni.setStorageSync(adminWeeklyKey, adminWeekly)
+        }
+      } catch (e) {
+        console.warn('获取群主菜谱失败:', e.message)
+      }
     },
     loadMeals() {
       this._nutritionCache = null
@@ -1172,6 +1244,25 @@ export default {
       weeklyCache[todayStr] = dailyMeals
       uni.setStorageSync('foodfind_weekly', weeklyCache)
       if (app?.globalData) app.globalData.weeklyMeals = weeklyCache
+      
+      this.syncMealsToCloud(dailyMeals, todayStr)
+    },
+    syncMealsToCloud(meals, date) {
+      const group = getFamilyGroup()
+      if (!group) return
+      const currentUserId = getCurrentUserId()
+      const isAdmin = group.creatorId === currentUserId
+      if (!isAdmin) return
+      
+      try {
+        callFunction('batchSync', {
+          collection: 'daily_meals',
+          data: { meals, date },
+          action: 'set'
+        })
+      } catch (e) {
+        console.warn('同步菜谱到云端失败:', e.message)
+      }
     },
     refreshMeal(mealKey) {
       if (this.isRefreshing) return
@@ -1192,6 +1283,7 @@ export default {
         const wc = uni.getStorageSync('foodfind_weekly') || {}
         wc[this.getTodayStr()] = this.dailyMeals
         uni.setStorageSync('foodfind_weekly', wc)
+        this.syncMealsToCloud(this.dailyMeals, this.getTodayStr())
         this.isRefreshing = ''
         uni.showToast({ title: `已更换${mealKey==='breakfast'?'早餐':mealKey==='lunch'?'午餐':'晚餐'}`, icon: 'none' })
       }, 400)

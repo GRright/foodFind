@@ -37,7 +37,21 @@ exports.main = async (event) => {
     }
 
     if (existingFamily.data.length > 0) {
-      return { success: false, error: '您已经属于一个家庭群组' }
+      // 如果用户是群主且是唯一的成员，自动解散旧家庭
+      const oldFamily = existingFamily.data[0]
+      const isOnlyMember = oldFamily.members.length === 1 && oldFamily.members[0].userId === OPENID
+      const isAdmin = oldFamily.creatorId === OPENID
+      
+      if (isAdmin && isOnlyMember) {
+        // 自动解散旧家庭
+        try {
+          await db.collection('families').doc(oldFamily._id).remove()
+        } catch (e) {
+          console.warn('自动解散旧家庭失败:', e.message)
+        }
+      } else {
+        return { success: false, error: '您已经属于一个家庭群组' }
+      }
     }
 
     // 生成 6 位邀请码（排除易混淆字符）

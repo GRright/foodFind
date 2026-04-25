@@ -31,7 +31,22 @@ exports.main = async (event) => {
     }
 
     if (action === 'get') {
-      const r = await db.collection(collection).where({ openid }).orderBy('syncedAt', 'desc').limit(1).get()
+      let query = db.collection(collection).where({ openid })
+      
+      if (event.targetOpenid && ALLOWED_COLLECTIONS.includes(collection)) {
+        const family = await db.collection('families').where({
+          members: _.elemMatch({ userId: openid })
+        }).get()
+        
+        if (family.data.length > 0) {
+          const isFamilyMember = family.data[0].members.some(m => m.userId === event.targetOpenid)
+          if (isFamilyMember) {
+            query = db.collection(collection).where({ openid: event.targetOpenid })
+          }
+        }
+      }
+      
+      const r = await query.orderBy('syncedAt', 'desc').limit(1).get()
       if (r.data.length > 0) {
         return { code: 0, data: r.data[0] }
       }
