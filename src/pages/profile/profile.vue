@@ -235,7 +235,7 @@
     </view>
 
     <view class="version-info">
-      <text class="version-text">吃点啥 v2.9.0 · 家庭数据同步完善版</text>
+      <text class="version-text">吃点啥 v2.9.0 · 智慧版</text>
       <text class="share-stats" v-if="shareViewCount > 0">📊 菜谱已被查看 {{ shareViewCount }} 次</text>
     </view>
 
@@ -247,7 +247,7 @@
       </view>
       <scroll-view scroll-y class="am-body">
         <view class="am-info">
-          <text class="am-version">v2.9.0 · 家庭数据同步完善版</text>
+          <text class="am-version">v2.9.0 · 智慧版</text>
           <text class="am-desc">为情侣/家人打造的共同决策「今天吃什么」的微信小程序</text>
           <text class="am-features">智能推荐 · 个性偏好 · 季节时令 · 家庭共享</text>
         </view>
