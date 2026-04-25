@@ -586,7 +586,10 @@ export default {
       familyCheckInList: [],
       smartReminder: null,
       notifSwipeId: null,
-      notifSwipeOffset: 0
+      notifSwipeOffset: 0,
+      _notifTouchStartX: 0,
+      _notifTouchStartY: 0,
+      _notifAnimating: false
     }
   },
   computed: {
@@ -743,10 +746,10 @@ export default {
 
     const prefs = uni.getStorageSync('foodfind_detailed_prefs') || {}
     const uc = prefs.userCount
-    if (uc === '1') this.userCount = 1
-    else if (uc === '2') this.userCount = 2
-    else if (uc === '3-4') this.userCount = 4
-    else if (uc === '5+') this.userCount = 5
+    if (uc === '1' || uc === 1) this.userCount = 1
+    else if (uc === '2' || uc === 2) this.userCount = 2
+    else if (uc === '3-4' || uc === 3 || uc === 4) this.userCount = 4
+    else if (uc === '5+' || uc === 5 || (typeof uc === 'number' && uc >= 5)) this.userCount = 5
     else this.userCount = 2
 
     const mealConfig = prefs.mealConfig || { weekday: ['breakfast', 'lunch', 'dinner'], weekend: ['breakfast', 'lunch', 'dinner'] }
@@ -1381,9 +1384,10 @@ export default {
       this.notifSwipeId = id
       this._notifTouchStartX = e.touches[0].clientX
       this._notifTouchStartY = e.touches[0].clientY
+      this._notifAnimating = false
     },
     onNotifSwipeMove(id, e) {
-      if (this.notifSwipeId !== id) return
+      if (this.notifSwipeId !== id || this._notifAnimating) return
       const touch = e.touches[0]
       const dx = touch.clientX - this._notifTouchStartX
       const dy = touch.clientY - this._notifTouchStartY
@@ -1396,7 +1400,7 @@ export default {
       }
     },
     onNotifSwipeEnd(id, e) {
-      if (!this.notifSwipeId) return
+      if (!this.notifSwipeId || this._notifAnimating) return
       const touch = e.changedTouches[0]
       const dx = touch.clientX - this._notifTouchStartX
       const dy = touch.clientY - this._notifTouchStartY
@@ -1404,23 +1408,41 @@ export default {
       // 只处理水平滑动
       if (Math.abs(dx) > Math.abs(dy)) {
         if (dx < 0) {
-          // 左滑：如果滑动距离超过 80rpx，直接删除
+          // 左滑：如果滑动距离超过 80rpx，执行删除动画
           if (Math.abs(dx) > 80) {
-            this.deleteNotif(id)
+            this._notifAnimating = true
+            // 先添加滑出动画
+            this.notifSwipeOffset = -300
+            setTimeout(() => {
+              this.deleteNotif(id)
+              this._notifAnimating = false
+            }, 200)
           } else {
-            // 滑动距离不够，复位
-            this.notifSwipeId = null
+            // 滑动距离不够，平滑复位
+            this._notifAnimating = true
             this.notifSwipeOffset = 0
+            setTimeout(() => {
+              this.notifSwipeId = null
+              this._notifAnimating = false
+            }, 200)
           }
         } else {
-          // 右滑，复位
-          this.notifSwipeId = null
+          // 右滑，平滑复位
+          this._notifAnimating = true
           this.notifSwipeOffset = 0
+          setTimeout(() => {
+            this.notifSwipeId = null
+            this._notifAnimating = false
+          }, 200)
         }
       } else {
-        // 垂直滑动，复位
-        this.notifSwipeId = null
+        // 垂直滑动，平滑复位
+        this._notifAnimating = true
         this.notifSwipeOffset = 0
+        setTimeout(() => {
+          this.notifSwipeId = null
+          this._notifAnimating = false
+        }, 200)
       }
     },
     deleteNotif(id) {
@@ -1444,7 +1466,8 @@ export default {
     },
     getNotifSwipeStyle(id) {
       if (this.notifSwipeId !== id) return ''
-      return `transform: translateX(${this.notifSwipeOffset}px);`
+      const transition = this._notifAnimating ? 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)' : 'none'
+      return `transform: translateX(${this.notifSwipeOffset}px); transition: ${transition};`
     },
     openComment(item) {
       this.currentFeedItem = item
@@ -2231,6 +2254,8 @@ export default {
   display:flex; align-items:flex-start; gap:16rpx;
   padding:20rpx; background:#f8f9fa; border-radius:16rpx;
   position:relative; z-index:2;
+  will-change: transform;
+  backface-visibility: hidden;
   &.unread { background:#e8f7ef; }
 }
 .ni-delete {

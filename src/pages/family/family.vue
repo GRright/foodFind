@@ -212,7 +212,9 @@
             </view>
             <view class="ams-list" v-if="adminTodayMeals[meal.key] && adminTodayMeals[meal.key].length > 0">
               <view class="ams-item" v-for="(food, idx) in adminTodayMeals[meal.key]" :key="idx">
-                <image class="ams-img" :src="food.image || '/static/icons/placeholder.png'" mode="aspectFill" />
+                <view class="ams-emoji-wrap">
+                  <text class="ams-emoji">{{ food.image || '🍽️' }}</text>
+                </view>
                 <view class="ams-info">
                   <text class="ams-name">{{ food.name }}</text>
                   <text class="ams-desc">{{ food.desc || '美味佳肴' }}</text>
@@ -942,12 +944,14 @@ export default {
   background: #fafafa;
   border-radius: 16rpx;
 }
-.ams-img {
+.ams-emoji-wrap {
   width: 100rpx; height: 100rpx;
   border-radius: 12rpx;
   flex-shrink: 0;
-  background: #eee;
+  background: #f5f6f8;
+  display: flex; align-items: center; justify-content: center;
 }
+.ams-emoji { font-size: 48rpx; }
 .ams-info { flex: 1; }
 .ams-name { font-size: 26rpx; font-weight: 600; color: #1a1a1a; display: block; line-height: 1.4; }
 .ams-desc { font-size: 22rpx; color: #999; margin-top: 4rpx; display: block; line-height: 1.3; }

@@ -2,7 +2,7 @@
   <view class="page" :class="{ 'page-enter': pageEnter }">
     <view class="header fade-in">
       <text class="header-title">家庭周报</text>
-      <text class="header-sub">{{ dateRange }} · {{ viewMode === 'all' ? '全家营养总览' : selectedMember?.name + '的饮食记录' }}</text>
+      <text class="header-sub">{{ dateRange }} · {{ viewMode === 'all' ? '全家营养总览' : viewMode === 'self' ? '我的饮食记录' : (selectedMember?.name || '成员') + '的饮食记录' }}</text>
       
       <view class="view-mode-selector">
         <view class="vms-item" :class="{ active: viewMode === 'all' }" @click="setViewMode('all')">
@@ -13,22 +13,13 @@
           <text class="vms-icon">👤</text>
           <text class="vms-label">只看我</text>
         </view>
-        <view class="vms-dropdown" v-if="showMemberDropdown">
-          <view class="vms-item" :class="{ active: viewMode === 'member' && selectedMember }" @click="toggleMemberSelect">
+        <picker mode="selector" :range="memberNames" :value="memberIndex" @change="onMemberPickerChange" v-if="showMemberDropdown">
+          <view class="vms-item" :class="{ active: viewMode === 'member' && selectedMember }">
             <text class="vms-icon">👥</text>
-            <text class="vms-label">看某人</text>
+            <text class="vms-label">{{ selectedMember ? selectedMember.name : '看某人' }}</text>
             <text class="vms-arrow">›</text>
           </view>
-          <view class="vms-member-list" v-if="isMemberSelectOpen">
-            <view class="vms-member-item" v-for="member in familyGroup?.members || []" :key="member.userId" @click="selectMember(member)">
-              <view class="vmi-avatar">
-                <text class="vmi-char">{{ member.name.charAt(0) }}</text>
-              </view>
-              <text class="vmi-name">{{ member.name }}</text>
-              <view class="vmi-check" v-if="selectedMember?.userId === member.userId">✓</view>
-            </view>
-          </view>
-        </view>
+        </picker>
       </view>
     </view>
 
@@ -143,8 +134,7 @@ export default {
       familyHealthTags: [],
       viewMode: 'all',
       selectedMember: null,
-      showMemberDropdown: true,
-      isMemberSelectOpen: false
+      showMemberDropdown: true
     }
   },
   computed: {
@@ -152,6 +142,14 @@ export default {
       const end = new Date()
       const start = new Date(end.getTime() - 6 * 86400000)
       return `${start.getMonth() + 1}月${start.getDate()}日 - ${end.getMonth() + 1}月${end.getDate()}日`
+    },
+    memberNames() {
+      return (this.familyGroup?.members || []).map(m => m.name)
+    },
+    memberIndex() {
+      if (!this.selectedMember) return 0
+      const idx = (this.familyGroup?.members || []).findIndex(m => m.userId === this.selectedMember.userId)
+      return idx >= 0 ? idx : 0
     },
     familyCheckInDays() {
       let days = 0
@@ -306,19 +304,18 @@ export default {
       if (mode === 'self') {
         this.selectedMember = null
       }
-      this.isMemberSelectOpen = false
       this.initWeekData()
       this.calcWeeklyNutrition()
     },
-    toggleMemberSelect() {
-      this.isMemberSelectOpen = !this.isMemberSelectOpen
-    },
-    selectMember(member) {
-      this.selectedMember = member
-      this.viewMode = 'member'
-      this.isMemberSelectOpen = false
-      this.initWeekData()
-      this.calcWeeklyNutrition()
+    onMemberPickerChange(e) {
+      const idx = e.detail.value
+      const members = this.familyGroup?.members || []
+      if (members[idx]) {
+        this.selectedMember = members[idx]
+        this.viewMode = 'member'
+        this.initWeekData()
+        this.calcWeeklyNutrition()
+      }
     }
   }
 }
@@ -331,7 +328,7 @@ export default {
   padding: 0 28rpx;
 }
 
-.header { padding: 56rpx 0 24rpx; }
+.header { padding: 56rpx 0 24rpx; overflow: visible; }
 .header-title { display: block; font-size: 44rpx; font-weight: 800; color: #1a1a1a; margin-bottom: 8rpx; }
 .header-sub { display: block; font-size: 24rpx; color: #999; margin-bottom: 24rpx; }
 
@@ -352,28 +349,6 @@ export default {
 .vms-icon { font-size: 24rpx; }
 .vms-label { font-size: 22rpx; font-weight: 600; color: #666; }
 .vms-arrow { font-size: 20rpx; color: #ccc; margin-left: 4rpx; }
-
-.vms-dropdown { position: relative; }
-.vms-member-list {
-  position: absolute; top: 100%; right: 0;
-  background: #fff; border-radius: 16rpx;
-  box-shadow: 0 4rpx 24rpx rgba(0,0,0,.12);
-  padding: 12rpx; min-width: 280rpx; z-index: 100;
-  margin-top: 8rpx;
-}
-.vms-member-item {
-  display: flex; align-items: center; gap: 12rpx;
-  padding: 12rpx 16rpx; border-radius: 12rpx;
-  transition: background .2s ease;
-  &:active { background: #f5f6f8; }
-}
-.vmi-avatar {
-  width: 48rpx; height: 48rpx; background: #e8f7ef; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.vmi-char { font-size: 20rpx; font-weight: 700; color: #07c160; }
-.vmi-name { flex: 1; font-size: 24rpx; color: #1a1a1a; font-weight: 500; }
-.vmi-check { font-size: 24rpx; color: #07c160; font-weight: 700; }
 
 .list-scroll { padding-bottom: 48rpx; }
 

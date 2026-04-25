@@ -49,8 +49,12 @@ export function getCurrentUserId() {
     return userId
   }
   
-  // 生成临时 ID（未登录状态）
-  userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+  // 生成唯一 ID（未登录状态）
+  const timestamp = Date.now()
+  const randomStr = Math.random().toString(36).substr(2, 9)
+  const deviceInfo = uni.getSystemInfoSync() || {}
+  const platform = deviceInfo.platform || 'unknown'
+  userId = `user_${platform}_${timestamp}_${randomStr}`
   uni.setStorageSync('foodfind_user_id', userId)
   return userId
 }

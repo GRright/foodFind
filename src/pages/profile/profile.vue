@@ -183,7 +183,7 @@
           <view class="pm-row">
             <text class="pm-q">用餐人数</text>
             <view class="pm-tags">
-              <view class="pm-tag" :class="{ active: String(prefs.userCount) === opt.value }" v-for="opt in userCountOptions" :key="opt.value" @click="prefs.userCount = Number(opt.value)">{{ opt.label }}</view>
+              <view class="pm-tag" :class="{ active: String(prefs.userCount) === opt.value }" v-for="opt in userCountOptions" :key="opt.value" @click="prefs.userCount = opt.value">{{ opt.label }}</view>
             </view>
           </view>
           <view class="pm-row">
@@ -533,7 +533,7 @@
         <view class="spm-section-title">👤 我的昵称</view>
         <view class="spm-row">
           <text class="spm-label">昵称</text>
-          <input class="spm-input" v-model="myInfo.nickname" placeholder="美食爱好者" maxlength="20" />
+          <input class="spm-input" v-model="myInfo.nickname" placeholder="最多6个字" maxlength="6" />
         </view>
         <!-- 生日和纪念日 -->
         <view class="spm-section-title">🎂 生日与纪念日</view>
@@ -906,7 +906,48 @@ export default {
     },
     loadPrefs() {
       const cached = uni.getStorageSync('foodfind_detailed_prefs')
-      if (cached) { this.prefs = { ...this.prefs, ...cached } }
+      if (cached) { 
+        this.prefs = { ...this.prefs, ...cached }
+        // 如果用户已经自定义了用餐人数，以用户的设置为准
+        if (cached.userCount !== undefined) {
+          return
+        }
+      }
+      
+      // 智能初始化用餐人数
+      const { getFamilyGroup, FAMILY_TYPES } = require('@/utils/family.js')
+      const familyGroup = getFamilyGroup()
+      
+      if (!familyGroup) {
+        // 没有家庭群组，使用默认值
+        return
+      }
+      
+      const familyPrefs = uni.getStorageSync('foodfind_family_prefs') || {}
+      if (familyPrefs.independentMode) {
+        // 独立菜谱模式，设置为1人
+        this.prefs.userCount = 1
+        return
+      }
+      
+      const familyType = familyGroup.type || 'family'
+      const memberCount = (familyGroup.members || []).length
+      
+      if (familyType === 'couple') {
+        // 情侣/夫妻，默认2人
+        this.prefs.userCount = 2
+      } else if (familyType === 'family' || familyType === 'roommates') {
+        // 家庭或室友，根据成员数量设置
+        if (memberCount <= 1) {
+          this.prefs.userCount = 1
+        } else if (memberCount === 2) {
+          this.prefs.userCount = 2
+        } else if (memberCount <= 4) {
+          this.prefs.userCount = '3-4'
+        } else {
+          this.prefs.userCount = '5+'
+        }
+      }
     },
     loadMyWeeklyMeals() {
       const meals = []
@@ -1306,21 +1347,26 @@ export default {
       uni.showToast({ title: '已保存', icon: 'success' })
     },
     async saveMyInfo() {
+      const nickname = this.myInfo.nickname.trim()
+      if (nickname.length > 6) {
+        uni.showToast({ title: '昵称最多6个字', icon: 'none' })
+        return
+      }
+      const finalNickname = nickname || '美食爱好者'
       uni.setStorageSync('foodfind_my_info', this.myInfo)
       // 同步更新 userInfo 中的昵称
-      const nickname = this.myInfo.nickname.trim() || '美食爱好者'
-      this.userInfo.nickname = nickname
+      this.userInfo.nickname = finalNickname
       const savedUserInfo = uni.getStorageSync('foodfind_user_info') || {}
-      savedUserInfo.nickname = nickname
+      savedUserInfo.nickname = finalNickname
       uni.setStorageSync('foodfind_user_info', savedUserInfo)
       // 同步更新到 app.globalData
       const app = getApp()
       if (app?.globalData) {
-        app.globalData.userInfo = { ...app.globalData.userInfo, nickname }
+        app.globalData.userInfo = { ...app.globalData.userInfo, nickname: finalNickname }
       }
       // 如果在家庭群组中，更新成员昵称到本地和云端
       const { updateMyNickname } = require('@/utils/family.js')
-      await updateMyNickname(nickname)
+      await updateMyNickname(finalNickname)
       
       markDirty('my_info')
       uni.showToast({ title: '已保存 ✓', icon: 'success' })
