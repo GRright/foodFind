@@ -30,9 +30,9 @@
               </view>
               <view class="mc-info">
                 <text class="mc-name">{{ member.name }}</text>
-                <text class="mc-tags" v-if="member.healthTags?.length > 0">
-                  <text class="mc-tag" v-for="tag in member.healthTags.slice(0, 2)" :key="tag">{{ getHealthTag(tag).icon }}</text>
-                </text>
+                <view class="mc-tags" v-if="member.healthTags?.length > 0">
+                  <text class="mc-tag" v-for="tag in member.healthTags.slice(0, 3)" :key="tag">{{ getHealthTag(tag).name }}</text>
+                </view>
               </view>
               <view class="mc-status" :class="{ good: getMemberTodayCheckIn(member.userId).allChecked }">
                 <text class="mc-status-text">{{ getMemberTodayCheckIn(member.userId).allChecked ? '✓ 完成' : '○ 未完成' }}</text>
@@ -274,8 +274,8 @@ export default {
 .mc-char { font-size: 24rpx; font-weight: 700; color: #07c160; }
 .mc-info { flex: 1; }
 .mc-name { font-size: 24rpx; font-weight: 600; color: #1a1a1a; display: block; }
-.mc-tags { display: flex; gap: 4rpx; margin-top: 4rpx; }
-.mc-tag { font-size: 18rpx; }
+.mc-tags { display: flex; gap: 6rpx; margin-top: 6rpx; flex-wrap: wrap; }
+.mc-tag { font-size: 18rpx; padding: 2rpx 8rpx; background: #fff3e0; color: #e65100; border-radius: 6rpx; line-height: 1.4; }
 .mc-status {
   padding: 6rpx 16rpx; border-radius: 20rpx; background: #f0f0f0;
   &.good { background: #e8f7ef; }
