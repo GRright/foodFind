@@ -1040,7 +1040,7 @@ export default {
         { icon: '⭐', name: '美食达人', desc: '连续打卡14天即可解锁', unlocked: finalStreak >= 14 },
         { icon: '👑', name: '食神', desc: '连续打卡30天即可解锁', unlocked: finalStreak >= 30 },
         { icon: '📊', name: '记录者', desc: '累计打卡5天即可解锁', unlocked: totalCheckDays >= 5 },
-        { icon: '❤️', name: '美食收藏家', desc: '收藏10道美食即可解锁', unlocked: favoriteCount >= 10 }
+        { icon: '❤️', name: '美食收藏家', desc: '喜欢10道美食即可解锁', unlocked: favoriteCount >= 10 }
       ]
     },
     calcActualStreak(checks) {
