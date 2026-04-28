@@ -1,6 +1,6 @@
 <script>
-import { initCloud, getOpenId, batchSyncOnHide, syncOnStartup } from '@/utils/cloud.js'
-import { setWxOpenId } from '@/utils/family.js'
+import { initCloud, getOpenId, batchSyncOnHide, syncOnStartup } from './utils/cloud.js'
+import { setWxOpenId } from './utils/family.js'
 
 export default {
   onLaunch() {

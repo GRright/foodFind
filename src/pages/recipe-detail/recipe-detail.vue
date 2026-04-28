@@ -1,7 +1,10 @@
 <template>
   <view class="page">
     <view class="recipe-hero">
-      <text class="hero-emoji scale-in">{{ recipe.image || '🍽️' }}</text>
+      <image class="hero-bg" :src="recipe.image" mode="aspectFill" v-if="recipe.image && recipe.image.startsWith('/')"></image>
+      <view class="hero-frosted" v-if="recipe.image && recipe.image.startsWith('/')"></view>
+      <image class="hero-dish scale-in" :src="recipe.image" mode="aspectFill" v-if="recipe.image && recipe.image.startsWith('/')"></image>
+      <text class="hero-emoji scale-in" v-else>🍽️</text>
       <view class="hero-overlay">
         <text class="hero-title">{{ recipe.name }}</text>
         <view class="hero-tags">
@@ -109,8 +112,8 @@
 </template>
 
 <script>
-import { ALL_RECIPES } from '@/utils/constants.js'
-import { notifyRecipeLike } from '@/utils/family.js'
+import { ALL_RECIPES } from '../../utils/constants.js'
+import { notifyRecipeLike } from '../../utils/family.js'
 
 export default {
   data() {
@@ -227,13 +230,31 @@ export default {
 .recipe-hero {
   height: 420rpx; background: #07c160;
   display: flex; align-items: center; justify-content: center; position: relative;
-  overflow: visible;
+  overflow: hidden;
 }
-.hero-emoji { font-size: 140rpx; }
+.hero-bg {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  filter: blur(30px); transform: scale(1.2);
+  z-index: 0;
+}
+.hero-frosted {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(7, 193, 96, 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 1;
+}
+.hero-dish {
+  width: 280rpx; height: 280rpx; border-radius: 50%;
+  border: 6rpx solid rgba(255,255,255,0.6);
+  box-shadow: 0 8rpx 32rpx rgba(0,0,0,0.2);
+  z-index: 2;
+}
+.hero-emoji { font-size: 140rpx; z-index: 2; }
 .hero-overlay {
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 32rpx; background: rgba(0,0,0,.2);
   padding-top: calc(48rpx + env(safe-area-inset-top));
+  z-index: 3;
 }
 .hero-title {
   font-size: 40rpx; font-weight: 800; color: #fff; display: block;

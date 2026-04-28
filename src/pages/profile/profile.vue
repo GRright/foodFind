@@ -590,10 +590,10 @@
 </template>
 
 <script>
-import { ALL_RECIPES } from '@/utils/constants.js'
-import { HEALTH_TAGS, HEALTH_TAG_CATEGORIES, getFamilyGroup, getCurrentUserId } from '@/utils/family.js'
-import { addSpecialDate } from '@/utils/festival.js'
-import { callFunction, markDirty } from '@/utils/cloud.js'
+import { ALL_RECIPES } from '../../utils/constants.js'
+import { HEALTH_TAGS, HEALTH_TAG_CATEGORIES, getFamilyGroup, getCurrentUserId } from '../../utils/family.js'
+import { addSpecialDate } from '../../utils/festival.js'
+import { callFunction, markDirty } from '../../utils/cloud.js'
 
 export default {
   data() {

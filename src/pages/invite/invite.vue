@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { callFunction } from '@/utils/cloud.js'
+import { callFunction } from '../../utils/cloud.js'
 
 export default {
   data() {

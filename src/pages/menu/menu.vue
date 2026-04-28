@@ -116,7 +116,10 @@
               :style="{ animationDelay: (180 + mi*60 + fi*50) + 'ms' }"
               style="animation: popIn .4s cubic-bezier(.175,.885,.32,1.275) forwards; opacity: 0;"
             >
-              <view class="fc-icon-wrap"><text class="fc-icon">{{ food.image || '🍽️' }}</text></view>
+              <view class="fc-icon-wrap">
+                <image class="fc-image" :src="food.image" mode="aspectFill" @error="food.imageLoadError = true" v-if="food.image && food.image.startsWith('/') && !food.imageLoadError"></image>
+                <text class="fc-icon" v-else>️</text>
+              </view>
               <text class="fc-name">{{ food.name }}</text>
               <text class="fc-kcal">{{ food.nutrition.calories * effectiveUserCount }} kcal</text>
             </view>
@@ -136,10 +139,11 @@
 </template>
 
 <script>
-import { ALL_RECIPES } from '@/utils/constants.js'
-import { filterRecipesByHealthTags, getFamilyHealthTags, getCurrentUserId, getFamilyGroup } from '@/utils/family.js'
-import { getPersonalizedRecipes } from '@/utils/festival.js'
-import { callFunction } from '@/utils/cloud.js'
+import { ALL_RECIPES, filterByUserSuitability } from '../../utils/constants.js'
+import { filterRecipesByHealthTags, getFamilyHealthTags, getCurrentUserId, getFamilyGroup } from '../../utils/family.js'
+import { getPersonalizedRecipes } from '../../utils/festival.js'
+import { callFunction } from '../../utils/cloud.js'
+import { checkAndIncrement, getRemainingCount } from '../../utils/generation-limit.js'
 
 export default {
   data() {
@@ -453,6 +457,10 @@ export default {
       availableLunch = filterRecipesByHealthTags(availableLunch, allHealthTags)
       availableDinner = filterRecipesByHealthTags(availableDinner, allHealthTags)
 
+      availableBreakfast = filterByUserSuitability(availableBreakfast, allHealthTags)
+      availableLunch = filterByUserSuitability(availableLunch, allHealthTags)
+      availableDinner = filterByUserSuitability(availableDinner, allHealthTags)
+
       availableBreakfast = getPersonalizedRecipes(availableBreakfast)
       availableLunch = getPersonalizedRecipes(availableLunch)
       availableDinner = getPersonalizedRecipes(availableDinner)
@@ -478,6 +486,8 @@ export default {
         uni.showToast({ title: '共享模式下由群主生成菜谱', icon: 'none' })
         return
       }
+      
+      if (!checkAndIncrement()) return
       
       uni.showLoading({ title: '智能生成中...' })
       setTimeout(() => {
@@ -525,7 +535,7 @@ export default {
         }
 
         uni.hideLoading()
-        uni.showToast({ title: '本周菜谱已生成', icon: 'success' })
+        uni.showToast({ title: `本周菜谱已生成（今日剩余${getRemainingCount()}次）`, icon: 'success' })
       }, 800)
     },
     viewRecipe(r) {
@@ -724,8 +734,10 @@ export default {
   display:flex; align-items:center; justify-content:center;
   margin-bottom:8rpx; box-shadow:0 1rpx 6rpx rgba(0,0,0,.06);
   transition: transform .25s ease;
+  overflow: hidden;
 }
 .food-card:active .fc-icon-wrap { transform: scale(0.9); }
+.fc-image { width:100%; height:100%; border-radius:18rpx; }
 .fc-icon { font-size:32rpx; }
 .fc-name {
   font-size:20rpx; font-weight:500; color:#333;

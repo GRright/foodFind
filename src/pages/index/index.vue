@@ -161,7 +161,10 @@
               style="animation: popIn .4s cubic-bezier(.175,.885,.32,1.275) forwards; opacity: 0;"
             >
               <view class="fc-inner" :class="{ 'flip-out': flippingCardId === food.id, 'flip-in': newCardId === food.id }">
-                <view class="fc-icon-wrap"><text class="fc-icon">{{ food.image || '🍽️' }}</text></view>
+                <view class="fc-icon-wrap">
+                  <image class="fc-img" :src="food.image" mode="aspectFill" @error="food._imgErr = true" v-if="food.image && food.image.startsWith('/') && !food._imgErr"></image>
+                  <text class="fc-icon" v-else>{{ (!food.image || food.image.startsWith('/')) ? '🍽️' : food.image }}</text>
+                </view>
                 <text class="fc-name">{{ food.name }}</text>
               </view>
 
@@ -243,7 +246,10 @@
                   <text class="ggsh-text">{{ ggHintText }}</text>
                 </view>
                 <view class="ggdc-inner">
-                  <view class="ggdc-icon-wrap"><text class="ggdc-icon">{{ ggDemoFood?.image || '🍽️' }}</text></view>
+                  <view class="ggdc-icon-wrap">
+                    <image class="ggdc-img" :src="ggDemoFood.image" mode="aspectFill" @error="ggDemoFood._imgErr = true" v-if="ggDemoFood && ggDemoFood.image && ggDemoFood.image.startsWith('/') && !ggDemoFood._imgErr"></image>
+                    <text class="ggdc-icon" v-else>{{ (ggDemoFood && ggDemoFood.image && !ggDemoFood.image.startsWith('/')) ? ggDemoFood.image : '🍽️' }}</text>
+                  </view>
                   <text class="ggdc-name">{{ ggDemoFood?.name || '示例菜品' }}</text>
                 </view>
                 <view class="ggdc-sparkle-layer" v-if="ggShowSparkle">
@@ -517,10 +523,11 @@
 </template>
 
 <script>
-import { ALL_RECIPES } from '@/utils/constants.js'
-import { filterRecipesByHealthTags, filterRecipesByUserPrefs, getFamilyHealthTags, getLocalNotifications, markAllNotificationsRead, getUnreadNotificationCount, notifyCheckIn, getFamilyCheckInToday, getCurrentUserId, getFamilyGroup, getUserNickname, recordFamilyCheckIn } from '@/utils/family.js'
-import { getBirthdayMenuRecommendation, addSpecialDate, getFamilyMemberSpecialToday, getPersonalizedRecipes, getUpcomingSpecialDates, getCurrentSeason, SEASONAL_FOODS } from '@/utils/festival.js'
-import { callFunction, markDirty } from '@/utils/cloud.js'
+import { ALL_RECIPES } from '../../utils/constants.js'
+import { filterRecipesByHealthTags, filterRecipesByUserPrefs, getFamilyHealthTags, getLocalNotifications, markAllNotificationsRead, getUnreadNotificationCount, notifyCheckIn, getFamilyCheckInToday, getCurrentUserId, getFamilyGroup, getUserNickname, recordFamilyCheckIn } from '../../utils/family.js'
+import { getBirthdayMenuRecommendation, addSpecialDate, getFamilyMemberSpecialToday, getPersonalizedRecipes, getUpcomingSpecialDates, getCurrentSeason, SEASONAL_FOODS } from '../../utils/festival.js'
+import { callFunction, markDirty } from '../../utils/cloud.js'
+import { checkAndIncrement, getRemainingCount } from '../../utils/generation-limit.js'
 
 export default {
   data() {
@@ -1269,6 +1276,7 @@ export default {
     },
     refreshMeal(mealKey) {
       if (this.isRefreshing) return
+      if (!checkAndIncrement()) return
       this.isRefreshing = mealKey
       setTimeout(() => {
         const currentRecipes = this.dailyMeals[mealKey] || []
@@ -1288,11 +1296,12 @@ export default {
         uni.setStorageSync('foodfind_weekly', wc)
         this.syncMealsToCloud(this.dailyMeals, this.getTodayStr())
         this.isRefreshing = ''
-        uni.showToast({ title: `已更换${mealKey==='breakfast'?'早餐':mealKey==='lunch'?'午餐':'晚餐'}`, icon: 'none' })
+        uni.showToast({ title: `已更换${mealKey==='breakfast'?'早餐':mealKey==='lunch'?'午餐':'晚餐'}（今日剩余${getRemainingCount()}次）`, icon: 'none' })
       }, 400)
     },
     regenerateAll() {
-      uni.showToast({ title: '已重新生成', icon: 'success' })
+      if (!checkAndIncrement()) return
+      uni.showToast({ title: `已重新生成（今日剩余${getRemainingCount()}次）`, icon: 'success' })
       setTimeout(() => { this.generateDailyMeals() }, 300)
     },
     goToDetail(recipe) { uni.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` }) },
@@ -1882,8 +1891,10 @@ export default {
   width:64rpx; height:64rpx; background:#fff; border-radius:18rpx;
   display:flex; align-items:center; justify-content:center;
   margin-bottom:8rpx; box-shadow:0 1rpx 6rpx rgba(0,0,0,.06);
+  overflow: hidden;
 }
 .swiping .fc-icon-wrap, .flipping .fc-icon-wrap { opacity: 0.5; }
+.fc-img { width:100%; height:100%; border-radius:18rpx; }
 .fc-icon { font-size:32rpx; }
 .fc-name {
   font-size:20rpx; font-weight:500; color:#333;
@@ -2115,7 +2126,9 @@ export default {
 .ggdc-icon-wrap {
   width:96rpx; height:96rpx; background:#f5f6fa; border-radius:22rpx;
   display:flex; align-items:center; justify-content:center;
+  overflow: hidden;
 }
+.ggdc-img { width:100%; height:100%; border-radius:22rpx; }
 .ggdc-icon { font-size:48rpx; }
 .ggdc-name { font-size:24rpx; font-weight:600; color:#333; text-align:center; }
 

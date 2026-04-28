@@ -29,7 +29,10 @@
             </view>
             <view class="food-row">
               <view class="food-card" v-for="(food, fi) in meal.recipes" :key="fi" @click="viewRecipe(food)">
-                <view class="fc-icon-wrap"><text class="fc-icon">{{ food.image || '🍽️' }}</text></view>
+                <view class="fc-icon-wrap">
+                  <image class="fc-img" :src="food.image" mode="aspectFill" @error="food._imgErr = true" v-if="food.image && food.image.startsWith('/') && !food._imgErr"></image>
+                  <text class="fc-icon" v-else>{{ (!food.image || food.image.startsWith('/')) ? '🍽️' : food.image }}</text>
+                </view>
                 <text class="fc-name">{{ food.name }}</text>
                 <text class="fc-kcal">{{ food.nutrition?.calories || 0 }} kcal</text>
               </view>
@@ -253,7 +256,9 @@ export default {
   justify-content: center;
   margin-bottom: 8rpx;
   box-shadow: 0 1rpx 6rpx rgba(0,0,0,.06);
+  overflow: hidden;
 }
+.fc-img { width:100%; height:100%; border-radius:18rpx; }
 .fc-icon { font-size: 32rpx; }
 .fc-name { font-size: 20rpx; font-weight: 500; color: #333; text-align: center; line-height: 1.3; }
 .fc-kcal { font-size: 18rpx; color: #999; font-weight: 600; margin-top: 6rpx; }

@@ -213,7 +213,8 @@
             <view class="ams-list" v-if="adminTodayMeals[meal.key] && adminTodayMeals[meal.key].length > 0">
               <view class="ams-item" v-for="(food, idx) in adminTodayMeals[meal.key]" :key="idx">
                 <view class="ams-emoji-wrap">
-                  <text class="ams-emoji">{{ food.image || '🍽️' }}</text>
+                  <image class="ams-img" :src="food.image" mode="aspectFill" @error="food._imgErr = true" v-if="food.image && food.image.startsWith('/') && !food._imgErr"></image>
+                  <text class="ams-emoji" v-else>{{ (!food.image || food.image.startsWith('/')) ? '🍽️' : food.image }}</text>
                 </view>
                 <view class="ams-info">
                   <text class="ams-name">{{ food.name }}</text>
@@ -257,8 +258,8 @@ import {
   getCurrentUserId,
   updateMyHealthTags,
   getHealthTagById
-} from '@/utils/family'
-import { markDirty } from '@/utils/cloud'
+} from '../../utils/family.js'
+import { markDirty } from '../../utils/cloud'
 
 export default {
   data() {
@@ -950,7 +951,9 @@ export default {
   flex-shrink: 0;
   background: #f5f6f8;
   display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
 }
+.ams-img { width:100%; height:100%; border-radius:12rpx; }
 .ams-emoji { font-size: 48rpx; }
 .ams-info { flex: 1; }
 .ams-name { font-size: 26rpx; font-weight: 600; color: #1a1a1a; display: block; line-height: 1.4; }

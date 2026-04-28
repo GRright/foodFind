@@ -117,7 +117,7 @@
 </template>
 
 <script>
-import { getFamilyGroup, getCurrentUserId, getFamilyCheckIns, fetchFamilyCheckIns, getFamilyHealthTags, HEALTH_TAGS } from '@/utils/family.js'
+import { getFamilyGroup, getCurrentUserId, getFamilyCheckIns, fetchFamilyCheckIns, getFamilyHealthTags, HEALTH_TAGS } from '../../utils/family.js'
 
 export default {
   data() {

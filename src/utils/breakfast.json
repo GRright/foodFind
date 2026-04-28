@@ -1,0 +1,6795 @@
+[
+  {
+    "id": "zc001",
+    "name": "白粥",
+    "alias": ["大米粥", "白米粥"],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 35,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["粥", "经典", "养胃"],
+    "suitable_for": ["老人", "肠胃不适者"],
+    "avoid_for": ["糖尿病人适量"],
+    "nutrition": {
+      "calories": 80,
+      "protein": 1.5,
+      "fat": 0.3,
+      "carbs": 17,
+      "dietary_fiber": 0.3,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "大米", "amount": "100g", "note": "洗净" },
+      { "name": "清水", "amount": "1500ml", "note": "约12倍水" }
+    ],
+    "steps": [
+      "大米淘洗1-2遍，沥干水分。",
+      "锅中加入1500ml清水，大火烧开。",
+      "水开后下入大米，用勺子搅拌防止粘底。",
+      "再次煮沸后转小火，盖上锅盖留一条缝隙，煮30分钟。",
+      "期间搅拌2-3次，防止粘锅。",
+      "煮至米粒开花、粥体浓稠即可关火。"
+    ],
+    "remark": "大米与水的比例约为1:12-15，喜欢稀粥可多加些水。小火慢熬是粥浓稠的关键。"
+  },
+  {
+    "id": "zc002",
+    "name": "小米粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 30,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["小米", "粥", "养胃"],
+    "suitable_for": ["老人", "肠胃不适者"],
+    "avoid_for": ["糖尿病人适量"],
+    "nutrition": {
+      "calories": 90,
+      "protein": 2.5,
+      "fat": 0.8,
+      "carbs": 18,
+      "dietary_fiber": 0.6,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "小米", "amount": "100g", "note": "淘洗1遍" },
+      { "name": "清水", "amount": "1200ml", "note": "" }
+    ],
+    "steps": [
+      "小米用清水轻轻淘洗1遍（不要过度搓洗，以免营养流失）。",
+      "锅中加入1200ml清水，大火烧开。",
+      "水开后下入小米，用勺子搅拌防止粘底。",
+      "再次煮沸后转小火，盖上锅盖煮25分钟。",
+      "煮至小米开花、粥体浓稠即可关火。",
+      "关火后焖5分钟，表面会有一层米油，非常有营养。"
+    ],
+    "remark": "小米粥不要加碱，会破坏B族维生素。煮好后焖一会儿会自然形成米油。"
+  },
+  {
+    "id": "zc003",
+    "name": "南瓜粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 25,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["南瓜", "粥", "甜味"],
+    "suitable_for": ["儿童", "一般人群"],
+    "avoid_for": ["糖尿病人适量"],
+    "nutrition": {
+      "calories": 70,
+      "protein": 1.5,
+      "fat": 0.3,
+      "carbs": 16,
+      "dietary_fiber": 1,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "南瓜", "amount": "150g", "note": "去皮切小块" },
+      { "name": "大米", "amount": "60g", "note": "洗净" },
+      { "name": "清水", "amount": "1000ml", "note": "" }
+    ],
+    "steps": [
+      "南瓜去皮去瓤，切成2cm见方的小块。",
+      "大米淘洗干净。",
+      "锅中加入1000ml清水，放入大米和南瓜块。",
+      "大火烧开后转小火，煮20-25分钟，期间搅拌几次。",
+      "煮至米粒开花、南瓜软烂、粥体浓稠即可。",
+      "喜欢甜的可以加少许冰糖。"
+    ],
+    "remark": "南瓜本身有甜味，不需要加太多糖。南瓜煮烂后会自然融入粥中，色泽金黄。"
+  },
+  {
+    "id": "zc004",
+    "name": "八宝粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 90,
+    "difficulty": "中等",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["八宝", "粥", "腊八"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人适量"],
+    "nutrition": {
+      "calories": 120,
+      "protein": 4,
+      "fat": 1,
+      "carbs": 25,
+      "dietary_fiber": 2.5,
+      "sodium": 10
+    },
+    "ingredients": [
+      { "name": "糯米", "amount": "30g", "note": "洗净" },
+      { "name": "大米", "amount": "30g", "note": "洗净" },
+      { "name": "红豆", "amount": "20g", "note": "提前泡4小时" },
+      { "name": "绿豆", "amount": "20g", "note": "提前泡4小时" },
+      { "name": "花生", "amount": "20g", "note": "提前泡4小时" },
+      { "name": "红枣", "amount": "8颗", "note": "去核" },
+      { "name": "桂圆", "amount": "8颗", "note": "去壳" },
+      { "name": "莲子", "amount": "15g", "note": "提前泡2小时去芯" },
+      { "name": "冰糖", "amount": "30g", "note": "可选" },
+      { "name": "清水", "amount": "1500ml", "note": "" }
+    ],
+    "steps": [
+      "红豆、绿豆、花生提前浸泡4小时；莲子提前浸泡2小时。",
+      "将所有材料（除冰糖外）放入锅中，加入1500ml清水。",
+      "大火烧开后转小火，盖上锅盖煮60-80分钟，期间搅拌几次防止粘底。",
+      "煮至豆子软烂、米粒开花、粥体浓稠。",
+      "加入冰糖，煮5分钟至融化即可。"
+    ],
+    "remark": "八宝粥的材料可以根据自己喜好调整，喜欢软烂口感可以多煮一会儿。高压锅可缩短时间至30分钟。"
+  },
+  {
+    "id": "zc005",
+    "name": "黑米粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 60,
+    "difficulty": "中等",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["黑米", "粥", "滋补"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["消化功能弱者少食"],
+    "nutrition": {
+      "calories": 110,
+      "protein": 3.5,
+      "fat": 1,
+      "carbs": 22,
+      "dietary_fiber": 2,
+      "sodium": 8
+    },
+    "ingredients": [
+      { "name": "黑米", "amount": "100g", "note": "提前泡4小时" },
+      { "name": "糯米", "amount": "30g", "note": "提前泡2小时" },
+      { "name": "冰糖", "amount": "20g", "note": "可选" },
+      { "name": "清水", "amount": "1200ml", "note": "" }
+    ],
+    "steps": [
+      "黑米和糯米分别用清水浸泡4小时和2小时，泡好后沥干。",
+      "锅中加入1200ml清水，放入泡好的黑米和糯米。",
+      "大火烧开后转小火，盖上锅盖煮50-60分钟，期间搅拌几次。",
+      "煮至米粒软烂、粥体浓稠。",
+      "加入冰糖，煮5分钟至融化即可。"
+    ],
+    "remark": "黑米不易煮烂，一定要提前浸泡。加少量糯米可以让粥更浓稠。"
+  },
+  {
+    "id": "zc006",
+    "name": "绿豆粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 50,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["绿豆", "粥", "消暑"],
+    "suitable_for": ["夏季", "一般人群"],
+    "avoid_for": ["脾胃虚寒者少食"],
+    "nutrition": {
+      "calories": 85,
+      "protein": 3,
+      "fat": 0.5,
+      "carbs": 17,
+      "dietary_fiber": 2,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "绿豆", "amount": "100g", "note": "提前泡2小时" },
+      { "name": "大米", "amount": "50g", "note": "洗净" },
+      { "name": "冰糖", "amount": "20g", "note": "可选" },
+      { "name": "清水", "amount": "1200ml", "note": "" }
+    ],
+    "steps": [
+      "绿豆提前用清水浸泡2小时。大米淘洗干净。",
+      "锅中加入1200ml清水，放入绿豆和大米。",
+      "大火烧开后转小火，煮40-50分钟，期间搅拌几次。",
+      "煮至绿豆开花、米粒软烂、粥体浓稠。",
+      "加入冰糖，煮5分钟至融化即可。"
+    ],
+    "remark": "绿豆粥清热解暑，夏季可放凉后食用。脾胃虚寒者建议加几片生姜同煮。"
+  },
+  {
+    "id": "zc007",
+    "name": "红豆粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 60,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["红豆", "粥", "补血"],
+    "suitable_for": ["女性", "一般人群"],
+    "avoid_for": ["糖尿病人适量"],
+    "nutrition": {
+      "calories": 100,
+      "protein": 3.5,
+      "fat": 0.5,
+      "carbs": 20,
+      "dietary_fiber": 2.5,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "红豆", "amount": "100g", "note": "提前泡4小时" },
+      { "name": "大米", "amount": "50g", "note": "洗净" },
+      { "name": "冰糖", "amount": "20g", "note": "可选" },
+      { "name": "清水", "amount": "1200ml", "note": "" }
+    ],
+    "steps": [
+      "红豆提前用清水浸泡4小时。大米淘洗干净。",
+      "锅中加入1200ml清水，放入红豆和大米。",
+      "大火烧开后转小火，煮50-60分钟，期间搅拌几次。",
+      "煮至红豆软烂、米粒开花、粥体浓稠。",
+      "加入冰糖，煮5分钟至融化即可。"
+    ],
+    "remark": "红豆不容易煮烂，建议提前浸泡4小时以上，或用高压锅煮制。"
+  },
+  {
+    "id": "zc008",
+    "name": "燕麦粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["燕麦", "粥", "健康"],
+    "suitable_for": ["健身人群", "三高人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 90,
+      "protein": 3.5,
+      "fat": 1.5,
+      "carbs": 16,
+      "dietary_fiber": 2.5,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "即食燕麦片", "amount": "50g", "note": "" },
+      { "name": "清水或牛奶", "amount": "400ml", "note": "" }
+    ],
+    "steps": [
+      "锅中加入400ml清水（或牛奶），大火烧开。",
+      "水开后倒入即食燕麦片，转小火。",
+      "煮3-5分钟，期间不断搅拌防止粘底。",
+      "煮至燕麦片软化、粥体浓稠即可关火。",
+      "可根据喜好加入蜂蜜、水果、坚果等。"
+    ],
+    "remark": "即食燕麦片很快熟，不需要长时间煮。用牛奶煮更香浓。如果使用生燕麦片，需要煮15-20分钟。"
+  },
+  {
+    "id": "zc009",
+    "name": "皮蛋瘦肉粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 40,
+    "difficulty": "中等",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["皮蛋", "瘦肉", "粥", "广式"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["儿童少食皮蛋"],
+    "nutrition": {
+      "calories": 160,
+      "protein": 10,
+      "fat": 6,
+      "carbs": 18,
+      "dietary_fiber": 0.5,
+      "sodium": 450
+    },
+    "ingredients": [
+      { "name": "大米", "amount": "100g", "note": "洗净" },
+      { "name": "皮蛋", "amount": "2个", "note": "去壳切丁" },
+      { "name": "瘦肉", "amount": "80g", "note": "切丝" },
+      { "name": "生姜", "amount": "5g", "note": "切丝" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" },
+      { "name": "盐", "amount": "3g", "note": "" },
+      { "name": "白胡椒粉", "amount": "1g", "note": "" },
+      { "name": "料酒", "amount": "3ml", "note": "" },
+      { "name": "食用油", "amount": "3ml", "note": "" },
+      { "name": "清水", "amount": "1200ml", "note": "" }
+    ],
+    "steps": [
+      "大米淘洗干净，加少许食用油拌匀腌制10分钟（让粥更顺滑）。",
+      "瘦肉切细丝，加料酒、1g盐抓匀腌制10分钟。",
+      "皮蛋去壳切小丁，姜切丝。",
+      "锅中加入1200ml清水烧开，放入大米，大火煮沸后转小火煮30分钟。",
+      "放入姜丝、瘦肉丝煮5分钟至肉丝变色。",
+      "放入皮蛋丁，继续煮5分钟。",
+      "加入盐和白胡椒粉调味，撒上葱花即可。"
+    ],
+    "remark": "里脊肉最嫩，适合做这道粥。皮蛋不要煮太久，否则会散。喜欢更浓稠可以多煮一会儿。"
+  },
+  {
+    "id": "zc010",
+    "name": "青菜瘦肉粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 35,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["青菜", "瘦肉", "粥"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 120,
+      "protein": 8,
+      "fat": 3,
+      "carbs": 16,
+      "dietary_fiber": 0.8,
+      "sodium": 380
+    },
+    "ingredients": [
+      { "name": "大米", "amount": "80g", "note": "洗净" },
+      { "name": "瘦肉", "amount": "60g", "note": "切丝" },
+      { "name": "小白菜", "amount": "100g", "note": "切碎" },
+      { "name": "生姜", "amount": "3g", "note": "切丝" },
+      { "name": "盐", "amount": "3g", "note": "" },
+      { "name": "料酒", "amount": "3ml", "note": "" },
+      { "name": "食用油", "amount": "2ml", "note": "" },
+      { "name": "清水", "amount": "1000ml", "note": "" }
+    ],
+    "steps": [
+      "大米淘洗干净。瘦肉切丝，加料酒和1g盐腌制5分钟。",
+      "锅中加入1000ml清水烧开，放入大米，大火煮沸后转小火煮25分钟。",
+      "放入姜丝和肉丝，煮5分钟至肉丝变色。",
+      "放入切碎的小白菜，煮2分钟。",
+      "加入盐调味即可。"
+    ],
+    "remark": "青菜不要煮太久，保持翠绿和脆嫩。青菜粥清淡营养。"
+  },
+  {
+    "id": "zc011",
+    "name": "香菇鸡肉粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 35,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["香菇", "鸡肉", "粥"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 135,
+      "protein": 9,
+      "fat": 3.5,
+      "carbs": 17,
+      "dietary_fiber": 0.8,
+      "sodium": 360
+    },
+    "ingredients": [
+      { "name": "大米", "amount": "80g", "note": "洗净" },
+      { "name": "鸡胸肉", "amount": "60g", "note": "切丁" },
+      { "name": "鲜香菇", "amount": "3朵", "note": "切片" },
+      { "name": "生姜", "amount": "3g", "note": "切丝" },
+      { "name": "盐", "amount": "3g", "note": "" },
+      { "name": "料酒", "amount": "3ml", "note": "" },
+      { "name": "白胡椒粉", "amount": "1g", "note": "" },
+      { "name": "食用油", "amount": "2ml", "note": "" },
+      { "name": "清水", "amount": "1000ml", "note": "" }
+    ],
+    "steps": [
+      "大米淘洗干净。鸡胸肉切小丁，加料酒和1g盐腌制5分钟。",
+      "香菇洗净切片。",
+      "锅中加入1000ml清水烧开，放入大米，大火煮沸后转小火煮25分钟。",
+      "放入姜丝、鸡肉丁和香菇片，煮8分钟至鸡肉熟透、香菇出味。",
+      "加入盐和白胡椒粉调味即可。"
+    ],
+    "remark": "鸡胸肉切丁后易熟，不要煮太久否则会柴。香菇可选用干香菇，更香。"
+  },
+  {
+    "id": "zc012",
+    "name": "山药粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 25,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["山药", "粥", "健脾"],
+    "suitable_for": ["老人", "肠胃不佳者"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 85,
+      "protein": 2,
+      "fat": 0.3,
+      "carbs": 18,
+      "dietary_fiber": 1,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "大米", "amount": "80g", "note": "洗净" },
+      { "name": "铁棍山药", "amount": "100g", "note": "去皮切块" },
+      { "name": "清水", "amount": "1000ml", "note": "" }
+    ],
+    "steps": [
+      "大米淘洗干净。山药戴手套去皮，切成滚刀块。",
+      "锅中加入1000ml清水烧开，放入大米和山药块。",
+      "大火烧开后转小火煮20-25分钟，期间搅拌几次。",
+      "煮至米粒开花、山药软烂、粥体浓稠即可。",
+      "喜欢甜的可以加少许冰糖。"
+    ],
+    "remark": "山药去皮时建议戴手套，避免皮肤过敏。山药粥健脾养胃，适合肠胃不适时食用。"
+  },
+  {
+    "id": "zc013",
+    "name": "红枣粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 30,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["红枣", "粥", "补血"],
+    "suitable_for": ["女性", "一般人群"],
+    "avoid_for": ["糖尿病人适量"],
+    "nutrition": {
+      "calories": 95,
+      "protein": 1.5,
+      "fat": 0.3,
+      "carbs": 22,
+      "dietary_fiber": 1.2,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "大米", "amount": "80g", "note": "洗净" },
+      { "name": "红枣", "amount": "10颗", "note": "去核" },
+      { "name": "冰糖", "amount": "15g", "note": "可选" },
+      { "name": "清水", "amount": "1000ml", "note": "" }
+    ],
+    "steps": [
+      "大米淘洗干净。红枣洗净去核。",
+      "锅中加入1000ml清水烧开，放入大米和红枣。",
+      "大火烧开后转小火煮25-30分钟，期间搅拌几次。",
+      "煮至米粒开花、粥体浓稠，红枣的甜味融入粥中。",
+      "喜欢更甜的可加入冰糖煮至融化。"
+    ],
+    "remark": "红枣自带甜味，不需要加太多糖。红枣粥补血养颜。"
+  },
+  {
+    "id": "zc014",
+    "name": "莲子粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 40,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["莲子", "粥", "安神"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["便秘者少食"],
+    "nutrition": {
+      "calories": 90,
+      "protein": 2.5,
+      "fat": 0.5,
+      "carbs": 19,
+      "dietary_fiber": 1,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "大米", "amount": "80g", "note": "洗净" },
+      { "name": "干莲子", "amount": "30g", "note": "提前泡2小时去芯" },
+      { "name": "冰糖", "amount": "15g", "note": "可选" },
+      { "name": "清水", "amount": "1000ml", "note": "" }
+    ],
+    "steps": [
+      "莲子提前用清水浸泡2小时，去除莲心（否则会苦）。",
+      "大米淘洗干净。",
+      "锅中加入1000ml清水烧开，放入大米和莲子。",
+      "大火烧开后转小火煮35-40分钟，期间搅拌几次。",
+      "煮至莲子软糯、米粒开花、粥体浓稠。",
+      "加入冰糖煮至融化即可。"
+    ],
+    "remark": "莲心很苦，一定要去除。莲子粥有安神功效，适合睡前食用。"
+  },
+  {
+    "id": "zc015",
+    "name": "核桃粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 30,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["核桃", "粥", "补脑"],
+    "suitable_for": ["学生", "脑力劳动者"],
+    "avoid_for": ["腹泻者少食"],
+    "nutrition": {
+      "calories": 150,
+      "protein": 4,
+      "fat": 7,
+      "carbs": 19,
+      "dietary_fiber": 1.2,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "大米", "amount": "80g", "note": "洗净" },
+      { "name": "核桃仁", "amount": "30g", "note": "掰碎" },
+      { "name": "冰糖", "amount": "15g", "note": "可选" },
+      { "name": "清水", "amount": "1000ml", "note": "" }
+    ],
+    "steps": [
+      "大米淘洗干净。核桃仁掰成小碎块。",
+      "锅中加入1000ml清水烧开，放入大米。",
+      "大火烧开后转小火煮25分钟。",
+      "加入核桃碎，继续煮5分钟。",
+      "加入冰糖煮至融化即可。"
+    ],
+    "remark": "核桃不要煮太久，保持香脆口感。核桃粥补脑益智。"
+  },
+  {
+    "id": "zc016",
+    "name": "花生粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 35,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["花生", "粥"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["花生过敏者"],
+    "nutrition": {
+      "calories": 120,
+      "protein": 4.5,
+      "fat": 5,
+      "carbs": 16,
+      "dietary_fiber": 1.2,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "大米", "amount": "80g", "note": "洗净" },
+      { "name": "花生米", "amount": "40g", "note": "提前泡2小时" },
+      { "name": "盐", "amount": "2g", "note": "可选，咸粥" },
+      { "name": "清水", "amount": "1000ml", "note": "" }
+    ],
+    "steps": [
+      "花生米提前浸泡2小时。大米淘洗干净。",
+      "锅中加入1000ml清水烧开，放入大米和花生米。",
+      "大火烧开后转小火煮30-35分钟，期间搅拌几次。",
+      "煮至花生软烂、米粒开花、粥体浓稠。",
+      "可加盐做成咸粥，或加糖做成甜粥。"
+    ],
+    "remark": "花生粥香甜可口，用红皮花生更有营养。"
+  },
+  {
+    "id": "zc017",
+    "name": "豆浆",
+    "alias": ["原味豆浆"],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 25,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["豆浆", "豆制品", "健康"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["痛风急性期患者"],
+    "nutrition": {
+      "calories": 65,
+      "protein": 4.5,
+      "fat": 2.5,
+      "carbs": 5,
+      "dietary_fiber": 0.5,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "干黄豆", "amount": "80g", "note": "提前泡8小时" },
+      { "name": "清水", "amount": "1000ml", "note": "打豆浆用" },
+      { "name": "白糖", "amount": "15g", "note": "可选" }
+    ],
+    "steps": [
+      "黄豆提前一晚用清水浸泡（夏天放冰箱）。泡好的黄豆体积膨胀2-3倍。",
+      "将泡好的黄豆放入豆浆机或破壁机，加入1000ml清水。",
+      "启动豆浆程序（约20分钟），机器会自动完成熬煮。",
+      "如果使用普通搅拌机，打好后倒入锅中，大火烧开转小火煮8分钟（必须煮沸去除生豆味）。",
+      "用滤网或纱布过滤豆渣。",
+      "根据喜好加入白糖调味。"
+    ],
+    "remark": "豆浆必须彻底煮沸才能饮用，否则会引起食物中毒。豆渣不要扔，可以做豆渣饼。"
+  },
+  {
+    "id": "zc018",
+    "name": "甜豆浆",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 25,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["甜豆浆", "豆制品"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 85,
+      "protein": 4.5,
+      "fat": 2.5,
+      "carbs": 10,
+      "dietary_fiber": 0.5,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "干黄豆", "amount": "80g", "note": "提前泡8小时" },
+      { "name": "清水", "amount": "1000ml", "note": "" },
+      { "name": "白糖", "amount": "20g", "note": "" }
+    ],
+    "steps": [
+      "黄豆提前一晚泡发。",
+      "将泡好的黄豆放入豆浆机，加入1000ml清水，启动豆浆程序。",
+      "打好的豆浆用滤网过滤豆渣。",
+      "加入白糖搅拌均匀至融化即可。"
+    ],
+    "remark": "甜豆浆是最经典的早餐饮品，趁热喝或放凉喝都不错。"
+  },
+  {
+    "id": "zc019",
+    "name": "咸豆浆",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 25,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["咸豆浆", "豆制品", "江南"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 100,
+      "protein": 5,
+      "fat": 4,
+      "carbs": 8,
+      "dietary_fiber": 0.5,
+      "sodium": 450
+    },
+    "ingredients": [
+      { "name": "干黄豆", "amount": "80g", "note": "提前泡8小时" },
+      { "name": "清水", "amount": "1000ml", "note": "" },
+      { "name": "虾皮", "amount": "5g", "note": "" },
+      { "name": "紫菜", "amount": "2g", "note": "撕碎" },
+      { "name": "榨菜末", "amount": "10g", "note": "" },
+      { "name": "葱花", "amount": "5g", "note": "" },
+      { "name": "生抽", "amount": "5ml", "note": "" },
+      { "name": "陈醋", "amount": "3ml", "note": "" },
+      { "name": "辣椒油", "amount": "3ml", "note": "可选" }
+    ],
+    "steps": [
+      "黄豆泡发后打成豆浆并煮沸过滤。",
+      "碗中放入虾皮、紫菜、榨菜末、葱花、生抽、陈醋、辣椒油。",
+      "将滚烫的豆浆冲入碗中。",
+      "豆浆会自然凝结成絮状（因为醋的作用）。",
+      "搅拌均匀即可食用。"
+    ],
+    "remark": "咸豆浆是江浙沪地区的特色吃法，豆浆遇到醋会自然凝结，口感独特。"
+  },
+  {
+    "id": "zc020",
+    "name": "黑豆豆浆",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 25,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["黑豆", "豆浆"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["痛风急性期患者"],
+    "nutrition": {
+      "calories": 70,
+      "protein": 5,
+      "fat": 2.5,
+      "carbs": 6,
+      "dietary_fiber": 1,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "干黑豆", "amount": "80g", "note": "提前泡8小时" },
+      { "name": "清水", "amount": "1000ml", "note": "" },
+      { "name": "白糖", "amount": "15g", "note": "可选" }
+    ],
+    "steps": [
+      "黑豆提前一晚用清水浸泡。",
+      "将泡好的黑豆放入豆浆机，加入1000ml清水。",
+      "启动豆浆程序（约20分钟）。",
+      "打好后用滤网过滤豆渣。",
+      "加入白糖调味即可。"
+    ],
+    "remark": "黑豆豆浆比黄豆豆浆颜色深，营养更丰富。"
+  },
+  {
+    "id": "zc021",
+    "name": "红豆豆浆",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 25,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["红豆", "豆浆"],
+    "suitable_for": ["女性"],
+    "avoid_for": ["糖尿病人适量"],
+    "nutrition": {
+      "calories": 75,
+      "protein": 4,
+      "fat": 1.5,
+      "carbs": 12,
+      "dietary_fiber": 1.5,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "干红豆", "amount": "80g", "note": "提前泡8小时" },
+      { "name": "清水", "amount": "1000ml", "note": "" },
+      { "name": "白糖", "amount": "15g", "note": "可选" }
+    ],
+    "steps": [
+      "红豆提前一晚用清水浸泡。",
+      "将泡好的红豆放入豆浆机，加入1000ml清水。",
+      "启动豆浆程序（红豆较硬，可能需要更长时间）。",
+      "打好后用滤网过滤豆渣。",
+      "加入白糖调味即可。"
+    ],
+    "remark": "红豆豆浆有淡淡的豆香和甜味，补血养颜。"
+  },
+  {
+    "id": "zc022",
+    "name": "核桃豆浆",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 25,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["核桃", "豆浆", "补脑"],
+    "suitable_for": ["学生", "脑力劳动者"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 110,
+      "protein": 5,
+      "fat": 5,
+      "carbs": 10,
+      "dietary_fiber": 1,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "干黄豆", "amount": "60g", "note": "提前泡8小时" },
+      { "name": "核桃仁", "amount": "30g", "note": "" },
+      { "name": "清水", "amount": "1000ml", "note": "" },
+      { "name": "白糖", "amount": "15g", "note": "可选" }
+    ],
+    "steps": [
+      "黄豆提前一晚泡发。",
+      "将泡好的黄豆和核桃仁放入豆浆机，加入1000ml清水。",
+      "启动豆浆程序。",
+      "打好后用滤网过滤。",
+      "加入白糖调味即可。"
+    ],
+    "remark": "核桃豆浆补脑益智，核桃的油脂让豆浆更香浓。"
+  },
+  {
+    "id": "zc023",
+    "name": "油条",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "中等",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["油条", "经典早餐", "油炸"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 270,
+      "protein": 5,
+      "fat": 17,
+      "carbs": 25,
+      "dietary_fiber": 0.5,
+      "sodium": 350
+    },
+    "ingredients": [
+      { "name": "速冻油条坯", "amount": "2根", "note": "超市购买" },
+      { "name": "食用油", "amount": "500ml", "note": "实际消耗约30ml" }
+    ],
+    "steps": [
+      "速冻油条坯从冰箱取出，室温解冻10分钟（或按照包装说明）。",
+      "锅中倒入足量食用油，中火烧至180℃左右（筷子插入冒密集小泡）。",
+      "将油条坯轻轻拉长一些，放入油锅中。",
+      "用筷子不断翻动油条，使其受热均匀。",
+      "炸至油条表面金黄、体积膨胀（约1-2分钟），捞出沥油即可。"
+    ],
+    "remark": "使用速冻油条坯是最方便的方法。如果自己做和面比较复杂，家庭不建议尝试。"
+  },
+  {
+    "id": "zc024",
+    "name": "无矾油条",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 20,
+    "difficulty": "中等",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["无矾", "油条", "健康"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 260,
+      "protein": 5,
+      "fat": 16,
+      "carbs": 25,
+      "dietary_fiber": 0.5,
+      "sodium": 300
+    },
+    "ingredients": [
+      { "name": "速冻无矾油条坯", "amount": "2根", "note": "超市购买" },
+      { "name": "食用油", "amount": "500ml", "note": "实际消耗约30ml" }
+    ],
+    "steps": [
+      "速冻无矾油条坯从冰箱取出，室温解冻10分钟。",
+      "锅中倒入足量食用油，中火烧至180℃（筷子插入冒密集小泡）。",
+      "将油条坯轻轻拉长，放入油锅中。",
+      "用筷子不断翻动，炸至金黄膨胀（约1-2分钟）。",
+      "捞出沥油即可。"
+    ],
+    "remark": "无矾油条使用无铝膨松剂，比传统油条更健康。超市有售速冻成品。"
+  },
+  {
+    "id": "zc025",
+    "name": "糖糕",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["糖糕", "甜点", "油炸"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食", "高血脂者慎食"],
+    "nutrition": {
+      "calories": 280,
+      "protein": 3,
+      "fat": 15,
+      "carbs": 32,
+      "dietary_fiber": 0.5,
+      "sodium": 80
+    },
+    "ingredients": [
+      { "name": "速冻糖糕", "amount": "4个", "note": "超市购买" },
+      { "name": "食用油", "amount": "500ml", "note": "实际消耗约40ml" }
+    ],
+    "steps": [
+      "速冻糖糕从冰箱取出，室温解冻5-10分钟（无需完全解冻）。",
+      "锅中倒入足量食用油，中火烧至160-170℃（筷子插入周围缓慢冒泡）。",
+      "将糖糕逐个放入油锅中，注意不要一次放太多。",
+      "炸至表面金黄、糖糕浮起（约2-3分钟），用筷子翻动使其均匀受热。",
+      "捞出沥油，稍微晾凉即可食用（小心内部糖馅烫嘴）。"
+    ],
+    "remark": "糖糕一定要用中小火慢炸，火太大会外焦里生。刚出锅的糖糕内馅温度极高，小心烫伤。"
+  },
+  {
+    "id": "zc026",
+    "name": "油饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["油饼", "油炸", "面食"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 250,
+      "protein": 4,
+      "fat": 14,
+      "carbs": 28,
+      "dietary_fiber": 0.5,
+      "sodium": 300
+    },
+    "ingredients": [
+      { "name": "速冻油饼坯", "amount": "2个", "note": "超市购买" },
+      { "name": "食用油", "amount": "500ml", "note": "实际消耗约40ml" }
+    ],
+    "steps": [
+      "速冻油饼坯从冰箱取出，室温解冻10分钟。",
+      "锅中倒入足量食用油，中火烧至170-180℃。",
+      "将油饼坯轻轻压扁拉大，放入油锅中。",
+      "用筷子不断翻动，炸至两面金黄（约2分钟）。",
+      "捞出沥油即可。"
+    ],
+    "remark": "油饼比油条更容易炸，注意两面都要炸透。超市速冻品很方便。"
+  },
+  {
+    "id": "zc027",
+    "name": "菜盒",
+    "alias": ["韭菜盒子"],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["菜盒", "韭菜盒子", "煎制"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["胃热重者少食"],
+    "nutrition": {
+      "calories": 180,
+      "protein": 5,
+      "fat": 8,
+      "carbs": 22,
+      "dietary_fiber": 1,
+      "sodium": 350
+    },
+    "ingredients": [
+      {
+        "name": "速冻菜盒",
+        "amount": "2个",
+        "note": "超市购买，常见韭菜鸡蛋馅"
+      },
+      { "name": "食用油", "amount": "20ml", "note": "煎制用" }
+    ],
+    "steps": [
+      "速冻菜盒从冰箱取出，无需解冻。",
+      "平底锅倒入食用油，中火烧热。",
+      "放入菜盒，转中小火慢煎。",
+      "煎约2-3分钟至底面金黄，翻面。",
+      "另一面也煎2-3分钟至金黄，期间可加盖焖一会儿帮助内部解冻。",
+      "两面金黄、外皮酥脆即可出锅。"
+    ],
+    "remark": "菜盒可以用平底锅煎制，比油炸更健康。冷冻品直接下锅，无需解冻。"
+  },
+  {
+    "id": "zc028",
+    "name": "麻团",
+    "alias": ["麻球", "煎堆"],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["麻团", "芝麻", "油炸"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 280,
+      "protein": 4,
+      "fat": 15,
+      "carbs": 32,
+      "dietary_fiber": 1,
+      "sodium": 50
+    },
+    "ingredients": [
+      { "name": "速冻麻团", "amount": "6个", "note": "超市购买" },
+      { "name": "食用油", "amount": "500ml", "note": "实际消耗约50ml" }
+    ],
+    "steps": [
+      "速冻麻团从冰箱取出，无需解冻。",
+      "锅中倒入足量食用油，中火烧至150-160℃（油温不宜过高）。",
+      "放入麻团，用中小火慢炸。",
+      "炸的过程中用筷子不断翻动，麻团会逐渐浮起、膨胀。",
+      "炸至表面金黄、体积变大（约3-4分钟），捞出沥油。"
+    ],
+    "remark": "麻团一定要用中小火慢炸，火太大容易外焦里不熟。油温过高麻团会爆开。"
+  },
+  {
+    "id": "zc029",
+    "name": "煎饺",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["煎饺", "速冻", "早餐"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 200,
+      "protein": 7,
+      "fat": 10,
+      "carbs": 20,
+      "dietary_fiber": 0.5,
+      "sodium": 350
+    },
+    "ingredients": [
+      { "name": "速冻饺子", "amount": "10个", "note": "任何馅料均可" },
+      { "name": "食用油", "amount": "10ml", "note": "" },
+      { "name": "清水", "amount": "80ml", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切芝麻，可选" },
+      { "name": "黑芝麻", "amount": "2g", "note": "可选" }
+    ],
+    "steps": [
+      "平底锅倒入食用油，中火烧热。",
+      "将速冻饺子直接摆入锅中（无需解冻），中火煎1-2分钟至底部微黄。",
+      "倒入80ml清水，盖上锅盖，转中小火焖煮5-6分钟。",
+      "待水分基本收干、饺子皮变透明时，打开锅盖。",
+      "转中火再煎1-2分钟，让底部变得金黄酥脆。",
+      "关火，撒上葱花和黑芝麻即可出锅。"
+    ],
+    "remark": "速冻饺子可以直接下锅，不需要解冻。水量约到饺子高度的1/3处。这是经典的冰花煎饺做法。"
+  },
+  {
+    "id": "zc030",
+    "name": "蒸饺",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["蒸饺", "速冻", "早餐"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 180,
+      "protein": 6,
+      "fat": 6,
+      "carbs": 25,
+      "dietary_fiber": 0.5,
+      "sodium": 320
+    },
+    "ingredients": [
+      { "name": "速冻饺子", "amount": "10个", "note": "任何馅料均可" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" },
+      { "name": "醋", "amount": "10ml", "note": "蘸料" }
+    ],
+    "steps": [
+      "蒸锅中加入足量清水，大火烧开。",
+      "蒸屉上铺蒸笼布或刷一层薄油防粘。",
+      "将速冻饺子直接摆入蒸屉中（无需解冻），饺子之间留一点空隙。",
+      "水开后放入蒸屉，盖上锅盖，大火蒸8-10分钟。",
+      "蒸至饺子皮变透明、馅料熟透即可。",
+      "取出装盘，蘸醋食用。"
+    ],
+    "remark": "速冻饺子无需解冻直接蒸。蒸的时间根据饺子大小调整，肉馅的需要多蒸2分钟。"
+  },
+  {
+    "id": "zc031",
+    "name": "水饺",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["水饺", "速冻", "早餐"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 190,
+      "protein": 7,
+      "fat": 7,
+      "carbs": 25,
+      "dietary_fiber": 0.5,
+      "sodium": 340
+    },
+    "ingredients": [
+      { "name": "速冻水饺", "amount": "10个", "note": "任何馅料均可" },
+      { "name": "清水", "amount": "1500ml", "note": "煮饺子用" },
+      { "name": "盐", "amount": "2g", "note": "" }
+    ],
+    "steps": [
+      "锅中加入足量清水（约1500ml），大火烧开。",
+      "水开后加入2g盐（防止饺子粘连）。",
+      "将速冻水饺直接下入锅中（无需解冻），用勺子轻轻推散防止粘底。",
+      "保持大火煮至水再次沸腾，饺子浮起。",
+      "加入半碗凉水（约100ml），等水再次沸腾。",
+      "重复“点水”2-3次，直到饺子全部浮起、皮变透明。",
+      "捞出沥干水分即可。"
+    ],
+    "remark": "水饺煮3次点水是经典方法，能确保皮熟馅透。速冻水饺不需解冻直接下锅。"
+  },
+  {
+    "id": "zc032",
+    "name": "小笼包",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["小笼包", "速冻", "早餐"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 210,
+      "protein": 8,
+      "fat": 8,
+      "carbs": 25,
+      "dietary_fiber": 0.5,
+      "sodium": 400
+    },
+    "ingredients": [
+      { "name": "速冻小笼包", "amount": "6个", "note": "超市购买" },
+      { "name": "姜丝", "amount": "10g", "note": "蘸料用" },
+      { "name": "醋", "amount": "15ml", "note": "蘸料用" }
+    ],
+    "steps": [
+      "蒸锅中加入足量清水，大火烧开。",
+      "蒸屉上铺蒸笼布或刷油防粘。",
+      "将速冻小笼包直接摆入蒸屉（无需解冻），包子之间留空隙。",
+      "水开后放入蒸屉，盖上锅盖，大火蒸8-10分钟。",
+      "蒸至包子皮透明、鼓起即可。",
+      "取出搭配姜丝和醋食用。"
+    ],
+    "remark": "小笼包蒸的时间不可过长，否则皮会破、汤汁会流失。趁热吃才有汤汁。"
+  },
+  {
+    "id": "zc033",
+    "name": "鲜肉包",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["鲜肉包", "速冻", "早餐"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 220,
+      "protein": 9,
+      "fat": 8,
+      "carbs": 28,
+      "dietary_fiber": 0.5,
+      "sodium": 420
+    },
+    "ingredients": [
+      { "name": "速冻鲜肉包", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅中加入足量清水，大火烧开。",
+      "蒸屉上铺蒸笼布或刷油防粘。",
+      "将速冻鲜肉包直接摆入蒸屉（无需解冻）。",
+      "水开后放入蒸屉，盖上锅盖，大火蒸10-12分钟。",
+      "蒸至包子体积明显膨胀、按压迅速回弹即可。"
+    ],
+    "remark": "肉包比小笼包大，需要多蒸几分钟。冷冻品直接蒸，不要解冻。"
+  },
+  {
+    "id": "zc034",
+    "name": "青菜包",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["青菜包", "速冻", "素包"],
+    "suitable_for": ["素食者"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 170,
+      "protein": 5,
+      "fat": 3,
+      "carbs": 30,
+      "dietary_fiber": 1,
+      "sodium": 380
+    },
+    "ingredients": [
+      { "name": "速冻青菜包", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。蒸屉刷油防粘。",
+      "将速冻青菜包直接摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟。",
+      "蒸至包子皮变软、馅料熟透即可。"
+    ],
+    "remark": "青菜包蒸的时间不宜过长，否则馅料会发黄。"
+  },
+  {
+    "id": "zc035",
+    "name": "豆沙包",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["豆沙包", "速冻", "甜包"],
+    "suitable_for": ["儿童", "一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 200,
+      "protein": 4,
+      "fat": 2,
+      "carbs": 42,
+      "dietary_fiber": 1.5,
+      "sodium": 50
+    },
+    "ingredients": [
+      { "name": "速冻豆沙包", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。蒸屉刷油防粘。",
+      "将速冻豆沙包摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟。",
+      "蒸至包子蓬松即可。"
+    ],
+    "remark": "豆沙包是甜口早餐，很受孩子欢迎。"
+  },
+  {
+    "id": "zc036",
+    "name": "奶黄包",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["奶黄包", "速冻", "甜点"],
+    "suitable_for": ["儿童", "一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 230,
+      "protein": 5,
+      "fat": 8,
+      "carbs": 35,
+      "dietary_fiber": 0.5,
+      "sodium": 120
+    },
+    "ingredients": [
+      { "name": "速冻奶黄包", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。蒸屉刷油防粘。",
+      "将速冻奶黄包摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟。",
+      "蒸至包子蓬松、奶香四溢即可。"
+    ],
+    "remark": "奶黄包是广式早茶经典点心，奶香浓郁。"
+  },
+  {
+    "id": "zc037",
+    "name": "烧麦",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["烧麦", "速冻", "早餐"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 200,
+      "protein": 6,
+      "fat": 7,
+      "carbs": 28,
+      "dietary_fiber": 0.5,
+      "sodium": 380
+    },
+    "ingredients": [
+      { "name": "速冻烧麦", "amount": "6个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" },
+      { "name": "醋", "amount": "10ml", "note": "蘸料可选" }
+    ],
+    "steps": [
+      "蒸锅烧开水。蒸屉刷油或铺蒸笼布。",
+      "将速冻烧麦直接摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸8-10分钟。",
+      "蒸至烧麦皮变透明、糯米馅熟透即可。"
+    ],
+    "remark": "速冻烧麦非常方便，蒸制时间短，早餐首选。"
+  },
+  {
+    "id": "zc038",
+    "name": "糯米烧麦",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["糯米烧麦", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 220,
+      "protein": 6,
+      "fat": 7,
+      "carbs": 32,
+      "dietary_fiber": 0.5,
+      "sodium": 390
+    },
+    "ingredients": [
+      { "name": "速冻糯米烧麦", "amount": "6个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。",
+      "将速冻糯米烧麦摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸8-10分钟。",
+      "蒸至糯米馅软糯即可。"
+    ],
+    "remark": "糯米烧麦比普通烧麦更顶饱，糯米制品需要彻底蒸透。"
+  },
+  {
+    "id": "zc039",
+    "name": "叉烧包",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["叉烧包", "速冻", "广式"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 230,
+      "protein": 8,
+      "fat": 6,
+      "carbs": 35,
+      "dietary_fiber": 0.5,
+      "sodium": 450
+    },
+    "ingredients": [
+      { "name": "速冻叉烧包", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。蒸屉刷油防粘。",
+      "将速冻叉烧包摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟。",
+      "蒸至包子蓬松、开口笑即可。"
+    ],
+    "remark": "叉烧包是广式茶点经典，特点是顶部自然裂开，露出叉烧馅。"
+  },
+  {
+    "id": "zc040",
+    "name": "流沙包",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["流沙包", "速冻", "甜点"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 250,
+      "protein": 5,
+      "fat": 10,
+      "carbs": 35,
+      "dietary_fiber": 0.5,
+      "sodium": 150
+    },
+    "ingredients": [
+      { "name": "速冻流沙包", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。蒸屉刷油防粘。",
+      "将速冻流沙包摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸8-10分钟即可（不要蒸太久，否则流沙凝固）。"
+    ],
+    "remark": "流沙包蒸的时间很关键，太久内馅不流动。趁热掰开，馅料才会流动。"
+  },
+  {
+    "id": "zc041",
+    "name": "花卷",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["花卷", "速冻", "面食"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 150,
+      "protein": 4,
+      "fat": 2,
+      "carbs": 28,
+      "dietary_fiber": 0.5,
+      "sodium": 250
+    },
+    "ingredients": [
+      { "name": "速冻花卷", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。蒸屉刷油防粘。",
+      "将速冻花卷摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟。",
+      "蒸至花卷蓬松即可。"
+    ],
+    "remark": "花卷是死面发酵面食，蒸好后蓬松柔软。"
+  },
+  {
+    "id": "zc042",
+    "name": "葱油花卷",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["葱油花卷", "速冻", "咸味"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 160,
+      "protein": 4,
+      "fat": 4,
+      "carbs": 27,
+      "dietary_fiber": 0.5,
+      "sodium": 300
+    },
+    "ingredients": [
+      { "name": "速冻葱油花卷", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。蒸屉刷油防粘。",
+      "将速冻葱油花卷摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟。",
+      "蒸出葱香即可。"
+    ],
+    "remark": "葱油花卷有咸香味，比白花卷更受欢迎。"
+  },
+  {
+    "id": "zc043",
+    "name": "馒头",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["馒头", "速冻", "主食"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 140,
+      "protein": 4,
+      "fat": 0.5,
+      "carbs": 28,
+      "dietary_fiber": 1,
+      "sodium": 200
+    },
+    "ingredients": [
+      { "name": "速冻馒头", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。蒸屉刷油或铺蒸笼布。",
+      "将速冻馒头摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟。",
+      "蒸至馒头蓬松柔软即可。"
+    ],
+    "remark": "馒头是中式早餐主食，可以夹菜、抹酱食用。"
+  },
+  {
+    "id": "zc044",
+    "name": "全麦馒头",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["全麦馒头", "健康", "粗粮"],
+    "suitable_for": ["健身人群", "三高人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 130,
+      "protein": 5,
+      "fat": 1,
+      "carbs": 25,
+      "dietary_fiber": 3,
+      "sodium": 180
+    },
+    "ingredients": [
+      { "name": "速冻全麦馒头", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。",
+      "将速冻全麦馒头摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟即可。"
+    ],
+    "remark": "全麦馒头比白馒头更健康，膳食纤维更丰富。"
+  },
+  {
+    "id": "zc045",
+    "name": "红糖馒头",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["红糖馒头", "甜味", "早餐"],
+    "suitable_for": ["一般人群", "女性"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 170,
+      "protein": 4,
+      "fat": 0.5,
+      "carbs": 38,
+      "dietary_fiber": 0.5,
+      "sodium": 100
+    },
+    "ingredients": [
+      { "name": "速冻红糖馒头", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。",
+      "将速冻红糖馒头摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟即可。"
+    ],
+    "remark": "红糖馒头颜色诱人，甜而不腻。"
+  },
+  {
+    "id": "zc046",
+    "name": "紫薯馒头",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["紫薯馒头", "粗粮"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 150,
+      "protein": 4,
+      "fat": 0.5,
+      "carbs": 32,
+      "dietary_fiber": 2,
+      "sodium": 150
+    },
+    "ingredients": [
+      { "name": "速冻紫薯馒头", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。",
+      "将速冻紫薯馒头摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟即可。"
+    ],
+    "remark": "紫薯馒头颜色漂亮，富含花青素。"
+  },
+  {
+    "id": "zc047",
+    "name": "包子",
+    "alias": ["肉包子"],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["包子", "速冻", "早餐"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 220,
+      "protein": 9,
+      "fat": 8,
+      "carbs": 28,
+      "dietary_fiber": 0.5,
+      "sodium": 400
+    },
+    "ingredients": [
+      { "name": "速冻包子", "amount": "3个", "note": "超市购买，肉馅或素馅" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。蒸屉刷油防粘。",
+      "将速冻包子摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟。",
+      "蒸至包子蓬松即可。"
+    ],
+    "remark": "包子泛指各种馅料的包子，方便快捷。"
+  },
+  {
+    "id": "zc048",
+    "name": "肉包子",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["肉包子", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 230,
+      "protein": 10,
+      "fat": 9,
+      "carbs": 26,
+      "dietary_fiber": 0.5,
+      "sodium": 430
+    },
+    "ingredients": [
+      {
+        "name": "速冻肉包子",
+        "amount": "3个",
+        "note": "超市购买（猪肉大葱等）"
+      },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。蒸屉刷油防粘。",
+      "将速冻肉包子摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸12-15分钟（肉馅需要多蒸一会儿）。",
+      "蒸至包子蓬松、肉香四溢即可。"
+    ],
+    "remark": "肉包子比素包子多蒸3分钟，确保肉馅熟透。"
+  },
+  {
+    "id": "zc049",
+    "name": "素包子",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["素包子", "速冻"],
+    "suitable_for": ["素食者"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 170,
+      "protein": 5,
+      "fat": 3,
+      "carbs": 30,
+      "dietary_fiber": 1,
+      "sodium": 380
+    },
+    "ingredients": [
+      {
+        "name": "速冻素包子",
+        "amount": "3个",
+        "note": "超市购买（青菜香菇等）"
+      },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。",
+      "将速冻素包子摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟即可。"
+    ],
+    "remark": "素包子蒸的时间比肉包子短，馅料容易熟。"
+  },
+  {
+    "id": "zc050",
+    "name": "荠菜包",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["荠菜包", "速冻", "野菜"],
+    "suitable_for": ["素食者"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 160,
+      "protein": 5,
+      "fat": 2.5,
+      "carbs": 29,
+      "dietary_fiber": 1.2,
+      "sodium": 370
+    },
+    "ingredients": [
+      { "name": "速冻荠菜包", "amount": "3个", "note": "超市购买（荠菜馅）" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。",
+      "将速冻荠菜包摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟即可。"
+    ],
+    "remark": "荠菜包有独特的野菜清香，春季尤为受欢迎。"
+  },
+  {
+    "id": "zc051",
+    "name": "萝卜丝包",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["萝卜丝包", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 165,
+      "protein": 4,
+      "fat": 3,
+      "carbs": 30,
+      "dietary_fiber": 1,
+      "sodium": 390
+    },
+    "ingredients": [
+      { "name": "速冻萝卜丝包", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。",
+      "将速冻萝卜丝包摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟即可。"
+    ],
+    "remark": "萝卜丝包口感清爽，是江南常见的早点。"
+  },
+  {
+    "id": "zc052",
+    "name": "粉丝包",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["粉丝包", "速冻"],
+    "suitable_for": ["素食者"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 180,
+      "protein": 4,
+      "fat": 4,
+      "carbs": 31,
+      "dietary_fiber": 0.5,
+      "sodium": 410
+    },
+    "ingredients": [
+      { "name": "速冻粉丝包", "amount": "3个", "note": "超市购买" },
+      { "name": "蒸锅水", "amount": "适量", "note": "" }
+    ],
+    "steps": [
+      "蒸锅烧开水。",
+      "将速冻粉丝包摆入蒸屉（无需解冻）。",
+      "水开后上锅，大火蒸10-12分钟即可。"
+    ],
+    "remark": "粉丝包通常加入豆干、香菇等，口感丰富。"
+  },
+  {
+    "id": "zc053",
+    "name": "鸡蛋灌饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["鸡蛋灌饼", "速冻", "街头早餐"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 280,
+      "protein": 9,
+      "fat": 14,
+      "carbs": 28,
+      "dietary_fiber": 0.5,
+      "sodium": 450
+    },
+    "ingredients": [
+      { "name": "速冻鸡蛋灌饼胚", "amount": "1张", "note": "超市购买" },
+      { "name": "鸡蛋", "amount": "1个", "note": "" },
+      { "name": "生菜", "amount": "2片", "note": "" },
+      { "name": "甜面酱", "amount": "5ml", "note": "" },
+      { "name": "辣椒酱", "amount": "3ml", "note": "可选" },
+      { "name": "食用油", "amount": "10ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，中火烧热。",
+      "放入速冻饼胚（无需解冻），中小火煎。",
+      "当饼胚鼓起大泡时，用筷子戳一个小口。",
+      "将鸡蛋打散，从小口灌入饼内。",
+      "翻面煎至两面金黄、鸡蛋凝固。",
+      "刷上甜面酱和辣椒酱，放上生菜。",
+      "卷起即可食用。"
+    ],
+    "remark": "速冻鸡蛋灌饼胚非常方便，灌蛋是关键步骤。自己在家做比外面干净。"
+  },
+  {
+    "id": "zc054",
+    "name": "手抓饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["手抓饼", "速冻", "街头早餐"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 320,
+      "protein": 6,
+      "fat": 18,
+      "carbs": 34,
+      "dietary_fiber": 0.5,
+      "sodium": 480
+    },
+    "ingredients": [
+      { "name": "速冻手抓饼胚", "amount": "1张", "note": "超市购买" },
+      { "name": "鸡蛋", "amount": "1个", "note": "可选" },
+      { "name": "火腿肠", "amount": "1根", "note": "可选" },
+      { "name": "生菜", "amount": "2片", "note": "可选" },
+      { "name": "番茄酱或沙拉酱", "amount": "5ml", "note": "" },
+      { "name": "食用油", "amount": "5ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油（手抓饼本身有油，可少放或不放），中小火烧热。",
+      "放入速冻手抓饼胚（无需解冻），中小火煎。",
+      "煎至底面金黄后翻面，用铲子压一压，让饼层次分明。",
+      "另一面也煎至金黄即可（约3-4分钟）。",
+      "喜欢加鸡蛋的，可以在煎的同时在旁边打一颗鸡蛋。",
+      "出锅后刷酱，加生菜、火腿等配料，卷起即可。"
+    ],
+    "remark": "手抓饼层次丰富、酥脆可口。煎的时候不要频繁翻动，否则层次不明显。"
+  },
+  {
+    "id": "zc055",
+    "name": "酱香饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["酱香饼", "速冻", "街头早餐"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 280,
+      "protein": 5,
+      "fat": 12,
+      "carbs": 36,
+      "dietary_fiber": 0.5,
+      "sodium": 520
+    },
+    "ingredients": [
+      { "name": "速冻手抓饼胚或葱油饼胚", "amount": "1张", "note": "超市购买" },
+      { "name": "蒜蓉辣酱", "amount": "10ml", "note": "" },
+      { "name": "甜面酱", "amount": "10ml", "note": "" },
+      { "name": "白糖", "amount": "2g", "note": "" },
+      { "name": "五香粉", "amount": "1g", "note": "" },
+      { "name": "熟白芝麻", "amount": "2g", "note": "" },
+      { "name": "葱花", "amount": "5g", "note": "" },
+      { "name": "食用油", "amount": "5ml", "note": "" }
+    ],
+    "steps": [
+      "小碗中加入蒜蓉辣酱、甜面酱、白糖、五香粉、30ml清水调匀成酱汁。",
+      "平底锅倒油，中小火烧热，放入饼胚煎至两面金黄酥脆。",
+      "将调好的酱汁刷在饼面上。",
+      "撒上熟白芝麻和葱花。",
+      "切块装盘即可。"
+    ],
+    "remark": "酱香饼的灵魂是酱汁，蒜蓉辣酱和甜面酱的比例可以按个人喜好调整。"
+  },
+  {
+    "id": "zc056",
+    "name": "葱油饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["葱油饼", "速冻", "经典"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 250,
+      "protein": 5,
+      "fat": 12,
+      "carbs": 30,
+      "dietary_fiber": 0.5,
+      "sodium": 350
+    },
+    "ingredients": [
+      { "name": "速冻葱油饼胚", "amount": "1张", "note": "超市购买" },
+      { "name": "食用油", "amount": "5ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，中小火烧热。",
+      "放入速冻葱油饼胚（无需解冻）。",
+      "煎至底面金黄后翻面。",
+      "两面煎至金黄酥脆（约3-4分钟），出锅即可。"
+    ],
+    "remark": "葱油饼有浓郁的葱香，外酥里软。速冻品非常方便，几分钟就好。"
+  },
+  {
+    "id": "zc057",
+    "name": "千层饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["千层饼", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 260,
+      "protein": 5,
+      "fat": 12,
+      "carbs": 33,
+      "dietary_fiber": 0.5,
+      "sodium": 360
+    },
+    "ingredients": [
+      { "name": "速冻千层饼胚", "amount": "1张", "note": "超市购买" },
+      { "name": "食用油", "amount": "5ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，中小火烧热。",
+      "放入速冻千层饼胚（无需解冻）。",
+      "煎至底面金黄后翻面。",
+      "两面煎至金黄酥脆（约3-4分钟），出锅即可。"
+    ],
+    "remark": "千层饼层次丰富，口感酥脆。"
+  },
+  {
+    "id": "zc058",
+    "name": "酥饼",
+    "alias": ["老婆饼"],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["酥饼", "速冻", "甜点"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 320,
+      "protein": 4,
+      "fat": 16,
+      "carbs": 40,
+      "dietary_fiber": 0.5,
+      "sodium": 120
+    },
+    "ingredients": [
+      { "name": "速冻酥饼胚", "amount": "2个", "note": "超市购买（豆沙馅等）" },
+      { "name": "鸡蛋液", "amount": "适量", "note": "刷表面用" },
+      { "name": "白芝麻", "amount": "2g", "note": "" }
+    ],
+    "steps": [
+      "烤箱预热180℃（或空气炸锅预热160℃）。",
+      "速冻酥饼胚从冰箱取出，无需解冻。",
+      "表面刷一层蛋液，撒上白芝麻。",
+      "放入烤箱中层，180℃烤12-15分钟，至表面金黄。",
+      "取出稍晾凉即可食用。"
+    ],
+    "remark": "酥饼可以用烤箱或空气炸锅制作，比油炸更健康。空气炸锅160℃烤8-10分钟。"
+  },
+  {
+    "id": "zc059",
+    "name": "老婆饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["老婆饼", "甜点", "酥皮"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 300,
+      "protein": 4,
+      "fat": 15,
+      "carbs": 38,
+      "dietary_fiber": 0.5,
+      "sodium": 100
+    },
+    "ingredients": [
+      { "name": "速冻老婆饼胚", "amount": "2个", "note": "超市购买" },
+      { "name": "鸡蛋液", "amount": "适量", "note": "刷表面" }
+    ],
+    "steps": [
+      "烤箱预热180℃。",
+      "将速冻老婆饼胚放入烤盘（无需解冻）。",
+      "表面刷蛋液。",
+      "放入烤箱中层，180℃烤12-15分钟至金黄。",
+      "取出晾凉即可。"
+    ],
+    "remark": "老婆饼外皮酥脆、内馅软糯，是经典的中式点心。"
+  },
+  {
+    "id": "zc060",
+    "name": "绿豆饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["绿豆饼", "甜点", "酥皮"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 280,
+      "protein": 5,
+      "fat": 12,
+      "carbs": 38,
+      "dietary_fiber": 1.5,
+      "sodium": 80
+    },
+    "ingredients": [
+      { "name": "速冻绿豆饼胚", "amount": "2个", "note": "超市购买" },
+      { "name": "鸡蛋液", "amount": "适量", "note": "刷表面" }
+    ],
+    "steps": [
+      "烤箱预热180℃。",
+      "将速冻绿豆饼胚放入烤盘（无需解冻）。",
+      "表面刷蛋液。",
+      "放入烤箱中层，180℃烤12-15分钟至金黄。",
+      "取出晾凉即可。"
+    ],
+    "remark": "绿豆饼是苏式糕点的代表，清甜不腻。"
+  },
+  {
+    "id": "zc061",
+    "name": "红豆饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["红豆饼", "甜点", "酥皮"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 285,
+      "protein": 5,
+      "fat": 12,
+      "carbs": 39,
+      "dietary_fiber": 1.5,
+      "sodium": 80
+    },
+    "ingredients": [
+      { "name": "速冻红豆饼胚", "amount": "2个", "note": "超市购买" },
+      { "name": "鸡蛋液", "amount": "适量", "note": "刷表面" }
+    ],
+    "steps": [
+      "烤箱预热180℃。",
+      "将速冻红豆饼胚放入烤盘（无需解冻）。",
+      "表面刷蛋液。",
+      "放入烤箱中层，180℃烤12-15分钟至金黄。",
+      "取出晾凉即可。"
+    ],
+    "remark": "红豆饼和绿豆饼类似，红豆沙馅更香甜。"
+  },
+  {
+    "id": "zc062",
+    "name": "土豆饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["土豆饼", "速冻", "咸味"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 180,
+      "protein": 4,
+      "fat": 8,
+      "carbs": 24,
+      "dietary_fiber": 1.5,
+      "sodium": 350
+    },
+    "ingredients": [
+      { "name": "速冻土豆饼", "amount": "3个", "note": "超市购买" },
+      { "name": "食用油", "amount": "10ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒入食用油，中火烧热。",
+      "放入速冻土豆饼（无需解冻），中小火煎。",
+      "煎约2-3分钟至底面金黄，翻面。",
+      "另一面也煎2-3分钟至金黄酥脆即可。"
+    ],
+    "remark": "速冻土豆饼非常方便，外酥里软，可直接当早餐。"
+  },
+  {
+    "id": "zc063",
+    "name": "南瓜饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["南瓜饼", "速冻", "甜味"],
+    "suitable_for": ["儿童", "一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 190,
+      "protein": 3,
+      "fat": 7,
+      "carbs": 30,
+      "dietary_fiber": 1,
+      "sodium": 80
+    },
+    "ingredients": [
+      { "name": "速冻南瓜饼", "amount": "3个", "note": "超市购买" },
+      { "name": "食用油", "amount": "10ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒入食用油，中火烧热。",
+      "放入速冻南瓜饼（无需解冻），中小火煎。",
+      "煎约2-3分钟至底面金黄，翻面。",
+      "另一面也煎2-3分钟至金黄软糯即可。"
+    ],
+    "remark": "南瓜饼香甜软糯，是孩子喜欢的早餐甜点。"
+  },
+  {
+    "id": "zc064",
+    "name": "韭菜饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["韭菜饼", "速冻", "咸味"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["胃热重者少食"],
+    "nutrition": {
+      "calories": 160,
+      "protein": 5,
+      "fat": 7,
+      "carbs": 20,
+      "dietary_fiber": 1,
+      "sodium": 380
+    },
+    "ingredients": [
+      { "name": "速冻韭菜饼", "amount": "2个", "note": "超市购买" },
+      { "name": "食用油", "amount": "10ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒入食用油，中火烧热。",
+      "放入速冻韭菜饼（无需解冻），中小火煎。",
+      "煎约2-3分钟至底面金黄，翻面。",
+      "另一面也煎2-3分钟至金黄即可。"
+    ],
+    "remark": "韭菜饼有独特的韭菜香，是北方常见早餐。"
+  },
+  {
+    "id": "zc065",
+    "name": "鸡蛋饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["鸡蛋饼", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 200,
+      "protein": 7,
+      "fat": 10,
+      "carbs": 20,
+      "dietary_fiber": 0.5,
+      "sodium": 400
+    },
+    "ingredients": [
+      { "name": "速冻鸡蛋饼胚", "amount": "1张", "note": "超市购买" },
+      { "name": "食用油", "amount": "5ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，中火烧热。",
+      "放入速冻鸡蛋饼胚（无需解冻）。",
+      "煎约1分钟至底面定型，翻面。",
+      "两面煎至金黄（约2-3分钟）即可。"
+    ],
+    "remark": "速冻鸡蛋饼已经含有鸡蛋成分，加热即食，非常方便。"
+  },
+  {
+    "id": "zc066",
+    "name": "葱花饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["葱花饼", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 240,
+      "protein": 5,
+      "fat": 11,
+      "carbs": 30,
+      "dietary_fiber": 0.5,
+      "sodium": 360
+    },
+    "ingredients": [
+      { "name": "速冻葱花饼胚", "amount": "1张", "note": "超市购买" },
+      { "name": "食用油", "amount": "5ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，中火烧热。",
+      "放入速冻葱花饼胚（无需解冻）。",
+      "煎至底面金黄后翻面。",
+      "两面煎至金黄酥脆（约3-4分钟）即可。"
+    ],
+    "remark": "葱花饼比普通葱油饼更薄更脆，葱香浓郁。"
+  },
+  {
+    "id": "zc067",
+    "name": "芝麻饼",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["芝麻饼", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 260,
+      "protein": 6,
+      "fat": 13,
+      "carbs": 30,
+      "dietary_fiber": 1,
+      "sodium": 280
+    },
+    "ingredients": [
+      { "name": "速冻芝麻饼胚", "amount": "1张", "note": "超市购买" },
+      { "name": "食用油", "amount": "5ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，中火烧热。",
+      "放入速冻芝麻饼胚（无需解冻）。",
+      "煎至底面金黄后翻面。",
+      "两面煎至金黄酥脆（约3-4分钟）即可。"
+    ],
+    "remark": "芝麻饼外皮裹满芝麻，香脆可口。"
+  },
+  {
+    "id": "zc068",
+    "name": "锅盔",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["锅盔", "速冻", "陕西"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 280,
+      "protein": 8,
+      "fat": 10,
+      "carbs": 38,
+      "dietary_fiber": 1,
+      "sodium": 450
+    },
+    "ingredients": [
+      { "name": "速冻锅盔", "amount": "1个", "note": "超市购买" },
+      { "name": "食用油", "amount": "5ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，中小火烧热。",
+      "放入速冻锅盔（无需解冻）。",
+      "盖上锅盖，中小火煎3-4分钟。",
+      "翻面，再煎3-4分钟至两面金黄、外酥里软。"
+    ],
+    "remark": "锅盔是陕西特色面食，外酥里软，可以夹菜或抹酱食用。"
+  },
+  {
+    "id": "zc069",
+    "name": "肉夹馍",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["肉夹馍", "速冻", "陕西"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 350,
+      "protein": 12,
+      "fat": 15,
+      "carbs": 42,
+      "dietary_fiber": 1,
+      "sodium": 520
+    },
+    "ingredients": [
+      { "name": "速冻白吉馍", "amount": "1个", "note": "超市购买" },
+      { "name": "速冻卤肉", "amount": "50g", "note": "超市购买或自制" },
+      { "name": "青椒", "amount": "20g", "note": "切碎，可选" }
+    ],
+    "steps": [
+      "平底锅中小火烧热，放入速冻白吉馍（无需解冻）。",
+      "两面各煎2-3分钟至外皮酥脆、内部松软。",
+      "速冻卤肉按包装说明加热（可微波或蒸）。",
+      "将热好的卤肉剁碎，可加入青椒碎。",
+      "用刀将白吉馍从中间切开（不要切断），夹入剁好的肉馅即可。"
+    ],
+    "remark": "肉夹馍的白吉馍外酥里软，卤肉肥瘦相间才香。"
+  },
+  {
+    "id": "zc070",
+    "name": "腊汁肉夹馍",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["腊汁肉夹馍", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 360,
+      "protein": 13,
+      "fat": 16,
+      "carbs": 42,
+      "dietary_fiber": 1,
+      "sodium": 540
+    },
+    "ingredients": [
+      { "name": "速冻白吉馍", "amount": "1个", "note": "超市购买" },
+      { "name": "速冻腊汁肉", "amount": "50g", "note": "超市购买" }
+    ],
+    "steps": [
+      "白吉馍用平底锅两面煎热（各2-3分钟）。",
+      "腊汁肉按说明加热，剁碎。",
+      "将白吉馍剖开，夹入腊汁肉即可。"
+    ],
+    "remark": "腊汁肉是肉夹馍的正宗馅料，肥而不腻。"
+  },
+  {
+    "id": "zc071",
+    "name": "菜夹馍",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["菜夹馍", "速冻", "素食"],
+    "suitable_for": ["素食者"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 250,
+      "protein": 6,
+      "fat": 8,
+      "carbs": 38,
+      "dietary_fiber": 2,
+      "sodium": 480
+    },
+    "ingredients": [
+      { "name": "速冻白吉馍", "amount": "1个", "note": "超市购买" },
+      { "name": "土豆丝", "amount": "30g", "note": "炒熟" },
+      { "name": "胡萝卜丝", "amount": "20g", "note": "炒熟" },
+      { "name": "海带丝", "amount": "20g", "note": "煮熟" },
+      { "name": "辣椒油", "amount": "5ml", "note": "可选" }
+    ],
+    "steps": [
+      "白吉馍用平底锅两面煎热。",
+      "将白吉馍剖开。",
+      "夹入炒好的土豆丝、胡萝卜丝、海带丝等配菜。",
+      "淋上辣椒油即可。"
+    ],
+    "remark": "菜夹馍是素食版的肉夹馍，配菜丰富，营养均衡。"
+  },
+  {
+    "id": "zc072",
+    "name": "馄饨",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["馄饨", "速冻", "汤食"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 200,
+      "protein": 9,
+      "fat": 5,
+      "carbs": 30,
+      "dietary_fiber": 0.5,
+      "sodium": 450
+    },
+    "ingredients": [
+      { "name": "速冻馄饨", "amount": "10个", "note": "超市购买" },
+      { "name": "紫菜", "amount": "2g", "note": "" },
+      { "name": "虾皮", "amount": "3g", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" },
+      { "name": "盐", "amount": "2g", "note": "" },
+      { "name": "生抽", "amount": "5ml", "note": "" },
+      { "name": "香油", "amount": "2ml", "note": "" }
+    ],
+    "steps": [
+      "锅中加入800ml清水，大火烧开。",
+      "放入速冻馄饨（无需解冻），用勺子轻轻推散。",
+      "煮至馄饨浮起、皮变透明（约3-4分钟）。",
+      "碗中放入紫菜、虾皮、葱花、盐、生抽、香油。",
+      "将煮馄饨的汤冲入碗中，再捞出馄饨放入即可。"
+    ],
+    "remark": "速冻馄饨非常方便，几分钟就能吃上一碗热腾腾的馄饨。"
+  },
+  {
+    "id": "zc073",
+    "name": "鲜肉馄饨",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["鲜肉馄饨", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 210,
+      "protein": 10,
+      "fat": 6,
+      "carbs": 28,
+      "dietary_fiber": 0.5,
+      "sodium": 480
+    },
+    "ingredients": [
+      { "name": "速冻鲜肉馄饨", "amount": "10个", "note": "超市购买" },
+      { "name": "紫菜", "amount": "2g", "note": "" },
+      { "name": "虾皮", "amount": "3g", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" },
+      { "name": "盐", "amount": "2g", "note": "" },
+      { "name": "生抽", "amount": "5ml", "note": "" },
+      { "name": "香油", "amount": "2ml", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻鲜肉馄饨，煮至浮起（约3-4分钟）。",
+      "碗中放紫菜、虾皮、葱花、盐、生抽、香油。",
+      "冲入热汤，捞出馄饨放入即可。"
+    ],
+    "remark": "鲜肉馄饨是最经典的馄饨品种，汤鲜味美。"
+  },
+  {
+    "id": "zc074",
+    "name": "虾仁馄饨",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["虾仁馄饨", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["海鲜过敏者"],
+    "nutrition": {
+      "calories": 190,
+      "protein": 11,
+      "fat": 4,
+      "carbs": 27,
+      "dietary_fiber": 0.5,
+      "sodium": 460
+    },
+    "ingredients": [
+      { "name": "速冻虾仁馄饨", "amount": "10个", "note": "超市购买" },
+      { "name": "紫菜", "amount": "2g", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" },
+      { "name": "盐", "amount": "2g", "note": "" },
+      { "name": "香油", "amount": "2ml", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻虾仁馄饨，煮至浮起（约3-4分钟）。",
+      "碗中放紫菜、葱花、盐、香油。",
+      "冲入热汤，捞出馄饨放入即可。"
+    ],
+    "remark": "虾仁馄饨鲜上加鲜，虾仁弹牙。"
+  },
+  {
+    "id": "zc075",
+    "name": "荠菜馄饨",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["荠菜馄饨", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 180,
+      "protein": 8,
+      "fat": 4,
+      "carbs": 28,
+      "dietary_fiber": 1,
+      "sodium": 440
+    },
+    "ingredients": [
+      { "name": "速冻荠菜馄饨", "amount": "10个", "note": "超市购买" },
+      { "name": "紫菜", "amount": "2g", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" },
+      { "name": "盐", "amount": "2g", "note": "" },
+      { "name": "香油", "amount": "2ml", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻荠菜馄饨，煮至浮起。",
+      "碗中放紫菜、葱花、盐、香油。",
+      "冲入热汤，捞出馄饨即可。"
+    ],
+    "remark": "荠菜馄饨有野菜的清香，是春季限定美味。"
+  },
+  {
+    "id": "zc076",
+    "name": "云吞",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["云吞", "速冻", "广式"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 195,
+      "protein": 9,
+      "fat": 5,
+      "carbs": 29,
+      "dietary_fiber": 0.5,
+      "sodium": 470
+    },
+    "ingredients": [
+      { "name": "速冻云吞", "amount": "10个", "note": "超市购买" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" },
+      { "name": "盐", "amount": "2g", "note": "" },
+      { "name": "香油", "amount": "2ml", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻云吞，煮至浮起。",
+      "碗中放葱花、盐、香油。",
+      "冲入热汤，捞出云吞即可。"
+    ],
+    "remark": "云吞是广东叫法，和馄饨类似但皮更薄。"
+  },
+  {
+    "id": "zc077",
+    "name": "抄手",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "中辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["抄手", "速冻", "川味"],
+    "suitable_for": ["辣味爱好者"],
+    "avoid_for": ["肠胃敏感者"],
+    "nutrition": {
+      "calories": 220,
+      "protein": 9,
+      "fat": 8,
+      "carbs": 28,
+      "dietary_fiber": 0.5,
+      "sodium": 520
+    },
+    "ingredients": [
+      { "name": "速冻抄手", "amount": "10个", "note": "超市购买" },
+      { "name": "生抽", "amount": "5ml", "note": "" },
+      { "name": "陈醋", "amount": "5ml", "note": "" },
+      { "name": "辣椒油", "amount": "10ml", "note": "" },
+      { "name": "花椒粉", "amount": "1g", "note": "" },
+      { "name": "蒜蓉", "amount": "5g", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻抄手，煮至浮起。",
+      "碗中放入生抽、陈醋、辣椒油、花椒粉、蒜蓉、葱花。",
+      "冲入适量煮抄手的汤，捞出抄手放入即可。"
+    ],
+    "remark": "抄手是四川叫法，特点是红油汤底，麻辣鲜香。"
+  },
+  {
+    "id": "zc078",
+    "name": "红油抄手",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "特辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["红油抄手", "速冻", "川味"],
+    "suitable_for": ["嗜辣者"],
+    "avoid_for": ["肠胃敏感者"],
+    "nutrition": {
+      "calories": 240,
+      "protein": 9,
+      "fat": 11,
+      "carbs": 27,
+      "dietary_fiber": 0.5,
+      "sodium": 580
+    },
+    "ingredients": [
+      { "name": "速冻抄手", "amount": "10个", "note": "超市购买" },
+      { "name": "红油辣椒", "amount": "15ml", "note": "" },
+      { "name": "生抽", "amount": "5ml", "note": "" },
+      { "name": "陈醋", "amount": "5ml", "note": "" },
+      { "name": "花椒粉", "amount": "1g", "note": "" },
+      { "name": "蒜蓉", "amount": "5g", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻抄手，煮至浮起。",
+      "碗中放入红油辣椒、生抽、陈醋、花椒粉、蒜蓉、葱花。",
+      "冲入少许热汤，捞出抄手放入，拌匀即可。"
+    ],
+    "remark": "红油抄手是重庆小面的经典搭配，红油越多越香。"
+  },
+  {
+    "id": "zc079",
+    "name": "清汤抄手",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["清汤抄手", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 195,
+      "protein": 9,
+      "fat": 4,
+      "carbs": 29,
+      "dietary_fiber": 0.5,
+      "sodium": 460
+    },
+    "ingredients": [
+      { "name": "速冻抄手", "amount": "10个", "note": "超市购买" },
+      { "name": "紫菜", "amount": "2g", "note": "" },
+      { "name": "虾皮", "amount": "3g", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" },
+      { "name": "盐", "amount": "2g", "note": "" },
+      { "name": "香油", "amount": "2ml", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻抄手，煮至浮起。",
+      "碗中放紫菜、虾皮、葱花、盐、香油。",
+      "冲入热汤，捞出抄手即可。"
+    ],
+    "remark": "清汤抄手不辣，适合不吃辣的人群，汤鲜味美。"
+  },
+  {
+    "id": "zc080",
+    "name": "面条",
+    "alias": ["清汤面"],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["面条", "速冻", "主食"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 220,
+      "protein": 7,
+      "fat": 1.5,
+      "carbs": 44,
+      "dietary_fiber": 1.5,
+      "sodium": 350
+    },
+    "ingredients": [
+      { "name": "速冻面条或挂面", "amount": "100g", "note": "" },
+      { "name": "盐", "amount": "2g", "note": "" },
+      { "name": "生抽", "amount": "5ml", "note": "" },
+      { "name": "香油", "amount": "2ml", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" }
+    ],
+    "steps": [
+      "锅中加入800ml清水，大火烧开。",
+      "下入面条，用筷子搅拌防止粘连。",
+      "煮3-5分钟（根据面条粗细调整），煮至无硬心。",
+      "碗中放盐、生抽、香油、葱花。",
+      "舀入适量面汤，捞出面条放入即可。"
+    ],
+    "remark": "清汤面是最简单的面条做法，早上吃一碗暖心暖胃。"
+  },
+  {
+    "id": "zc081",
+    "name": "清汤面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["清汤面", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 215,
+      "protein": 7,
+      "fat": 1.5,
+      "carbs": 43,
+      "dietary_fiber": 1.5,
+      "sodium": 340
+    },
+    "ingredients": [
+      { "name": "挂面", "amount": "100g", "note": "" },
+      { "name": "盐", "amount": "2g", "note": "" },
+      { "name": "生抽", "amount": "5ml", "note": "" },
+      { "name": "香油", "amount": "2ml", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" }
+    ],
+    "steps": [
+      "锅中烧开水，下入挂面煮3-5分钟至无硬心。",
+      "碗中放盐、生抽、香油、葱花。",
+      "舀入面汤，捞出面条放入即可。"
+    ],
+    "remark": "清汤面做法简单，可以加个荷包蛋更营养。"
+  },
+  {
+    "id": "zc082",
+    "name": "阳春面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["阳春面", "经典"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 240,
+      "protein": 7,
+      "fat": 5,
+      "carbs": 42,
+      "dietary_fiber": 1.5,
+      "sodium": 400
+    },
+    "ingredients": [
+      { "name": "挂面", "amount": "100g", "note": "" },
+      { "name": "猪油", "amount": "5g", "note": "阳春面的灵魂" },
+      { "name": "生抽", "amount": "10ml", "note": "" },
+      { "name": "盐", "amount": "1g", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" }
+    ],
+    "steps": [
+      "碗中放入猪油、生抽、盐、葱花。",
+      "锅中烧开水，下入挂面煮3-5分钟。",
+      "舀入滚烫的面汤冲开碗底调料。",
+      "捞出面条放入碗中即可。"
+    ],
+    "remark": "阳春面的精髓是猪油和葱花，看似简单但味道鲜美。"
+  },
+  {
+    "id": "zc083",
+    "name": "葱油面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "中等",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["葱油面", "葱油"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 350,
+      "protein": 8,
+      "fat": 18,
+      "carbs": 42,
+      "dietary_fiber": 1.5,
+      "sodium": 450
+    },
+    "ingredients": [
+      { "name": "挂面", "amount": "100g", "note": "" },
+      { "name": "小葱", "amount": "50g", "note": "切段" },
+      { "name": "食用油", "amount": "50ml", "note": "实际消耗约10ml" },
+      { "name": "生抽", "amount": "15ml", "note": "" },
+      { "name": "老抽", "amount": "5ml", "note": "" },
+      { "name": "白糖", "amount": "5g", "note": "" }
+    ],
+    "steps": [
+      "锅中倒入食用油，放入葱段，小火慢炸至葱段焦黄发黑（约5-8分钟），捞出葱段留油。",
+      "碗中放入生抽、老抽、白糖，倒入热葱油搅拌均匀成葱油酱汁。",
+      "锅中烧开水煮面，煮熟后捞出。",
+      "将葱油酱汁淋在面条上，拌匀即可。"
+    ],
+    "remark": "葱油面可以一次多做些葱油酱，冷藏保存，早上煮面直接拌。"
+  },
+  {
+    "id": "zc084",
+    "name": "酱油面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["酱油面"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 230,
+      "protein": 7,
+      "fat": 3,
+      "carbs": 43,
+      "dietary_fiber": 1.5,
+      "sodium": 520
+    },
+    "ingredients": [
+      { "name": "挂面", "amount": "100g", "note": "" },
+      { "name": "生抽", "amount": "15ml", "note": "" },
+      { "name": "老抽", "amount": "3ml", "note": "" },
+      { "name": "猪油", "amount": "5g", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" }
+    ],
+    "steps": [
+      "碗中放生抽、老抽、猪油、葱花。",
+      "锅中烧开水煮面，煮熟后捞出。",
+      "舀入面汤冲开调料，放入面条即可。"
+    ],
+    "remark": "酱油面就是升级版的清汤面，酱油味更浓。"
+  },
+  {
+    "id": "zc085",
+    "name": "番茄鸡蛋面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["番茄鸡蛋", "面条"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 310,
+      "protein": 11,
+      "fat": 8,
+      "carbs": 48,
+      "dietary_fiber": 2,
+      "sodium": 480
+    },
+    "ingredients": [
+      { "name": "挂面", "amount": "100g", "note": "" },
+      { "name": "番茄", "amount": "1个", "note": "切块" },
+      { "name": "鸡蛋", "amount": "1个", "note": "打散" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" },
+      { "name": "盐", "amount": "3g", "note": "" },
+      { "name": "食用油", "amount": "10ml", "note": "" }
+    ],
+    "steps": [
+      "热锅倒油，下番茄块中火炒软出汁。",
+      "加入500ml清水，大火烧开。",
+      "下入挂面煮3分钟。",
+      "淋入打散的蛋液，形成蛋花。",
+      "加入盐调味，撒上葱花即可。"
+    ],
+    "remark": "番茄鸡蛋面是经典家常面，酸甜开胃。"
+  },
+  {
+    "id": "zc086",
+    "name": "青菜面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["青菜面", "清淡"],
+    "suitable_for": ["减肥人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 240,
+      "protein": 8,
+      "fat": 2,
+      "carbs": 46,
+      "dietary_fiber": 2,
+      "sodium": 380
+    },
+    "ingredients": [
+      { "name": "挂面", "amount": "100g", "note": "" },
+      { "name": "小白菜", "amount": "50g", "note": "洗净" },
+      { "name": "盐", "amount": "2g", "note": "" },
+      { "name": "香油", "amount": "2ml", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，下入挂面煮2分钟。",
+      "放入小白菜，继续煮1分钟。",
+      "加入盐调味，淋入香油即可。"
+    ],
+    "remark": "青菜面清淡健康，早餐来一碗很舒服。"
+  },
+  {
+    "id": "zc087",
+    "name": "肉丝面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["肉丝面", "早餐"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 350,
+      "protein": 15,
+      "fat": 10,
+      "carbs": 48,
+      "dietary_fiber": 1.5,
+      "sodium": 520
+    },
+    "ingredients": [
+      { "name": "挂面", "amount": "100g", "note": "" },
+      { "name": "瘦肉", "amount": "50g", "note": "切丝" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" },
+      { "name": "生抽", "amount": "10ml", "note": "" },
+      { "name": "盐", "amount": "2g", "note": "" },
+      { "name": "料酒", "amount": "3ml", "note": "" },
+      { "name": "食用油", "amount": "8ml", "note": "" }
+    ],
+    "steps": [
+      "瘦肉切丝，加料酒和1g盐腌制5分钟。",
+      "热锅倒油，下肉丝炒至变色。",
+      "加入500ml清水，大火烧开。",
+      "下入挂面煮3-4分钟。",
+      "加入生抽和盐调味，撒上葱花即可。"
+    ],
+    "remark": "肉丝面比清汤面更营养，有肉有面。"
+  },
+  {
+    "id": "zc088",
+    "name": "牛肉面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "中等",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["牛肉面", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 420,
+      "protein": 18,
+      "fat": 12,
+      "carbs": 55,
+      "dietary_fiber": 1.5,
+      "sodium": 680
+    },
+    "ingredients": [
+      { "name": "挂面", "amount": "100g", "note": "" },
+      { "name": "速冻红烧牛肉", "amount": "100g", "note": "超市购买" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" },
+      { "name": "香菜", "amount": "2根", "note": "切段" }
+    ],
+    "steps": [
+      "速冻红烧牛肉按包装说明加热（微波或蒸）。",
+      "锅中烧开水，下入挂面煮3-4分钟。",
+      "将热好的牛肉连汤倒入碗中。",
+      "捞出面条放入碗中，撒上葱花和香菜即可。"
+    ],
+    "remark": "速冻牛肉面非常方便，几分钟就能吃上一碗正宗的牛肉面。"
+  },
+  {
+    "id": "zc089",
+    "name": "杂酱面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "中等",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["杂酱面", "炸酱面"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 480,
+      "protein": 15,
+      "fat": 18,
+      "carbs": 60,
+      "dietary_fiber": 2,
+      "sodium": 750
+    },
+    "ingredients": [
+      { "name": "挂面", "amount": "100g", "note": "" },
+      { "name": "速冻杂酱", "amount": "80g", "note": "超市购买" },
+      { "name": "黄瓜", "amount": "30g", "note": "切丝" },
+      { "name": "豆芽", "amount": "30g", "note": "焯熟" }
+    ],
+    "steps": [
+      "杂酱按说明加热。",
+      "锅中烧开水煮面，煮熟后捞出。",
+      "将热好的杂酱浇在面上。",
+      "放上黄瓜丝、豆芽，拌匀即可。"
+    ],
+    "remark": "杂酱面是北方经典面食，速冻杂酱让做法更简单。"
+  },
+  {
+    "id": "zc090",
+    "name": "热干面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "微辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["热干面", "武汉", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 420,
+      "protein": 12,
+      "fat": 16,
+      "carbs": 55,
+      "dietary_fiber": 2,
+      "sodium": 680
+    },
+    "ingredients": [
+      { "name": "速冻热干面", "amount": "1份", "note": "超市购买，含芝麻酱包" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻热干面煮1-2分钟（按包装说明）。",
+      "捞出沥干水分，放入碗中。",
+      "加入芝麻酱包和调料包，充分搅拌均匀。",
+      "撒上葱花即可。"
+    ],
+    "remark": "速冻热干面保留了武汉热干面的风味，碱水面配芝麻酱是灵魂。"
+  },
+  {
+    "id": "zc091",
+    "name": "担担面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "中辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["担担面", "四川", "速冻"],
+    "suitable_for": ["辣味爱好者"],
+    "avoid_for": ["肠胃敏感者"],
+    "nutrition": {
+      "calories": 450,
+      "protein": 14,
+      "fat": 18,
+      "carbs": 55,
+      "dietary_fiber": 2,
+      "sodium": 720
+    },
+    "ingredients": [
+      { "name": "速冻担担面", "amount": "1份", "note": "超市购买" },
+      { "name": "花生碎", "amount": "5g", "note": "" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻担担面煮1-2分钟（按包装说明）。",
+      "捞出沥干，放入碗中。",
+      "加入调料包（通常包含红油、芝麻酱、芽菜等），拌匀。",
+      "撒上花生碎和葱花即可。"
+    ],
+    "remark": "担担面是四川名小吃，麻辣鲜香。"
+  },
+  {
+    "id": "zc092",
+    "name": "臊子面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["臊子面", "陕西", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 400,
+      "protein": 14,
+      "fat": 14,
+      "carbs": 55,
+      "dietary_fiber": 2,
+      "sodium": 680
+    },
+    "ingredients": [
+      { "name": "速冻臊子面", "amount": "1份", "note": "超市购买" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻臊子面煮1-2分钟。",
+      "同时将臊子料包加热（微波或隔水加热）。",
+      "面条捞出放入碗中，浇上热好的臊子。",
+      "撒上葱花即可。"
+    ],
+    "remark": "臊子面是陕西特色，酸辣开胃。"
+  },
+  {
+    "id": "zc093",
+    "name": "油泼面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "中辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["油泼面", "陕西", "速冻"],
+    "suitable_for": ["辣味爱好者"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 480,
+      "protein": 12,
+      "fat": 20,
+      "carbs": 60,
+      "dietary_fiber": 2,
+      "sodium": 520
+    },
+    "ingredients": [
+      { "name": "速冻裤带面", "amount": "1份", "note": "超市购买" },
+      { "name": "辣椒面", "amount": "5g", "note": "" },
+      { "name": "大蒜", "amount": "5g", "note": "切末" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" },
+      { "name": "生抽", "amount": "10ml", "note": "" },
+      { "name": "陈醋", "amount": "5ml", "note": "" },
+      { "name": "食用油", "amount": "20ml", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻裤带面煮至浮起（约2-3分钟）。",
+      "捞出放入大碗中，面上放辣椒面、蒜末、葱花。",
+      "小锅烧热食用油，烧至冒烟。",
+      "将热油泼在辣椒面和蒜末上，激出香味。",
+      "淋入生抽和陈醋，拌匀即可。"
+    ],
+    "remark": "油泼面的灵魂是最后泼热油，辣椒面被热油激发出香味。"
+  },
+  {
+    "id": "zc094",
+    "name": "刀削面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["刀削面", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 380,
+      "protein": 12,
+      "fat": 8,
+      "carbs": 65,
+      "dietary_fiber": 2,
+      "sodium": 580
+    },
+    "ingredients": [
+      { "name": "速冻刀削面", "amount": "1份", "note": "超市购买" },
+      { "name": "速冻红烧牛肉", "amount": "80g", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻刀削面煮3-4分钟。",
+      "速冻红烧牛肉加热好。",
+      "面条捞出放入碗中，浇上红烧牛肉即可。"
+    ],
+    "remark": "刀削面口感筋道，速冻品保留了手工削面的质感。"
+  },
+  {
+    "id": "zc095",
+    "name": "拉面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["拉面", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 360,
+      "protein": 12,
+      "fat": 8,
+      "carbs": 60,
+      "dietary_fiber": 1.5,
+      "sodium": 550
+    },
+    "ingredients": [
+      { "name": "速冻拉面", "amount": "1份", "note": "超市购买" },
+      { "name": "速冻汤料", "amount": "1包", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻拉面煮1-2分钟。",
+      "汤料包用开水冲泡或加热。",
+      "面条捞出放入汤中即可。"
+    ],
+    "remark": "速冻拉面保留了拉面的筋道口感，非常方便。"
+  },
+  {
+    "id": "zc096",
+    "name": "烩面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["烩面", "河南", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 420,
+      "protein": 14,
+      "fat": 10,
+      "carbs": 65,
+      "dietary_fiber": 2,
+      "sodium": 620
+    },
+    "ingredients": [
+      { "name": "速冻烩面", "amount": "1份", "note": "超市购买" },
+      { "name": "羊肉汤料", "amount": "1包", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻烩面煮2-3分钟。",
+      "羊肉汤料加热好。",
+      "面条捞出放入汤中即可。"
+    ],
+    "remark": "烩面是河南特色，面片宽大，汤鲜味美。"
+  },
+  {
+    "id": "zc097",
+    "name": "焖面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "中等",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["焖面", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 450,
+      "protein": 15,
+      "fat": 14,
+      "carbs": 60,
+      "dietary_fiber": 2,
+      "sodium": 680
+    },
+    "ingredients": [
+      { "name": "速冻焖面", "amount": "1份", "note": "超市购买" },
+      { "name": "豆角", "amount": "50g", "note": "切段，可选" }
+    ],
+    "steps": [
+      "平底锅或炒锅中倒入速冻焖面（无需解冻）。",
+      "加入包装配带的料包和少量清水。",
+      "盖上锅盖，中小火焖5-6分钟。",
+      "开盖翻炒均匀即可。"
+    ],
+    "remark": "焖面是北方特色，面条用焖的方式吸收汤汁，非常入味。"
+  },
+  {
+    "id": "zc098",
+    "name": "炒面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["炒面", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 450,
+      "protein": 12,
+      "fat": 16,
+      "carbs": 60,
+      "dietary_fiber": 2,
+      "sodium": 650
+    },
+    "ingredients": [
+      { "name": "速冻炒面", "amount": "1份", "note": "超市购买" },
+      { "name": "食用油", "amount": "10ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，中火烧热。",
+      "放入速冻炒面（无需解冻），用铲子打散。",
+      "中火翻炒3-4分钟，至面条热透、表面微焦。",
+      "加入料包，翻炒均匀即可。"
+    ],
+    "remark": "速冻炒面非常方便，几分钟就能搞定一份早餐。"
+  },
+  {
+    "id": "zc099",
+    "name": "拌面",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["拌面", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 380,
+      "protein": 10,
+      "fat": 12,
+      "carbs": 55,
+      "dietary_fiber": 2,
+      "sodium": 620
+    },
+    "ingredients": [
+      { "name": "速冻拌面", "amount": "1份", "note": "超市购买" },
+      { "name": "黄瓜丝", "amount": "20g", "note": "可选" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻拌面煮1-2分钟。",
+      "捞出沥干水分，放入碗中。",
+      "加入料包，充分拌匀。",
+      "放上黄瓜丝即可。"
+    ],
+    "remark": "拌面不需要汤，干拌的方式更入味。"
+  },
+  {
+    "id": "zc100",
+    "name": "米线",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["米线", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 350,
+      "protein": 8,
+      "fat": 6,
+      "carbs": 65,
+      "dietary_fiber": 1,
+      "sodium": 580
+    },
+    "ingredients": [
+      { "name": "速冻米线", "amount": "1份", "note": "超市购买" },
+      { "name": "小葱", "amount": "1根", "note": "切葱花" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻米线煮1-2分钟（按包装说明）。",
+      "汤料包用开水冲泡或加热。",
+      "米线捞出放入汤中，撒上葱花即可。"
+    ],
+    "remark": "速冻米线保留了云南米线的爽滑口感，几分钟就能吃上。"
+  },
+  {
+    "id": "zc101",
+    "name": "鸡汤米线",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["鸡汤米线", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 340,
+      "protein": 10,
+      "fat": 5,
+      "carbs": 62,
+      "dietary_fiber": 1,
+      "sodium": 520
+    },
+    "ingredients": [
+      { "name": "速冻米线", "amount": "1份", "note": "超市购买" },
+      { "name": "鸡汤料包", "amount": "1包", "note": "" },
+      { "name": "鸡肉丝", "amount": "30g", "note": "可选" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻米线煮1-2分钟。",
+      "将鸡汤料包用300ml开水冲泡开。",
+      "米线捞出放入鸡汤中，撒上鸡肉丝即可。"
+    ],
+    "remark": "鸡汤米线汤鲜味美，清淡营养。"
+  },
+  {
+    "id": "zc102",
+    "name": "酸辣米线",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "中辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["酸辣米线", "速冻"],
+    "suitable_for": ["辣味爱好者"],
+    "avoid_for": ["肠胃敏感者"],
+    "nutrition": {
+      "calories": 380,
+      "protein": 7,
+      "fat": 10,
+      "carbs": 64,
+      "dietary_fiber": 1.5,
+      "sodium": 680
+    },
+    "ingredients": [
+      { "name": "速冻米线", "amount": "1份", "note": "超市购买" },
+      { "name": "酸辣料包", "amount": "1包", "note": "" },
+      { "name": "花生碎", "amount": "5g", "note": "" },
+      { "name": "香菜", "amount": "2根", "note": "切段" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻米线煮1-2分钟。",
+      "放入酸辣料包，搅拌均匀。",
+      "装碗后撒上花生碎和香菜即可。"
+    ],
+    "remark": "酸辣米线酸爽开胃，特别适合没有食欲的早晨。"
+  },
+  {
+    "id": "zc103",
+    "name": "过桥米线",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "中等",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["过桥米线", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 420,
+      "protein": 15,
+      "fat": 8,
+      "carbs": 68,
+      "dietary_fiber": 1.5,
+      "sodium": 620
+    },
+    "ingredients": [
+      { "name": "速冻过桥米线", "amount": "1份", "note": "超市购买" },
+      { "name": "鹌鹑蛋", "amount": "2个", "note": "" },
+      { "name": "豆芽", "amount": "20g", "note": "" },
+      { "name": "韭菜", "amount": "10g", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻米线煮1分钟。",
+      "将鸡汤料包用400ml开水冲泡。",
+      "将鹌鹑蛋打入汤中烫熟。",
+      "放入米线、豆芽、韭菜，即可食用。"
+    ],
+    "remark": "过桥米线汤底是关键，配料丰富，仪式感强。"
+  },
+  {
+    "id": "zc104",
+    "name": "米粉",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["米粉", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 320,
+      "protein": 7,
+      "fat": 3,
+      "carbs": 64,
+      "dietary_fiber": 1,
+      "sodium": 500
+    },
+    "ingredients": [
+      { "name": "速冻米粉", "amount": "1份", "note": "超市购买" },
+      { "name": "肉末", "amount": "30g", "note": "可选" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻米粉煮1-2分钟至散开。",
+      "同时加热汤料包。",
+      "米粉捞出放入汤中，加入炒好的肉末即可。"
+    ],
+    "remark": "米粉比米线更细更软，口感不同。"
+  },
+  {
+    "id": "zc105",
+    "name": "汤米粉",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["汤米粉", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 310,
+      "protein": 7,
+      "fat": 3,
+      "carbs": 62,
+      "dietary_fiber": 1,
+      "sodium": 480
+    },
+    "ingredients": [
+      { "name": "速冻米粉", "amount": "1份", "note": "超市购买" },
+      { "name": "骨汤料包", "amount": "1包", "note": "" },
+      { "name": "青菜", "amount": "2棵", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻米粉煮1分钟。",
+      "放入青菜烫熟。",
+      "加入骨汤料包，搅拌均匀即可。"
+    ],
+    "remark": "汤米粉做法简单，汤鲜味美。"
+  },
+  {
+    "id": "zc106",
+    "name": "炒米粉",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["炒米粉", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 420,
+      "protein": 10,
+      "fat": 14,
+      "carbs": 62,
+      "dietary_fiber": 1.5,
+      "sodium": 680
+    },
+    "ingredients": [
+      { "name": "速冻米粉", "amount": "1份", "note": "超市购买" },
+      { "name": "鸡蛋", "amount": "1个", "note": "" },
+      { "name": "豆芽", "amount": "30g", "note": "" },
+      { "name": "食用油", "amount": "10ml", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻米粉煮1分钟，捞出沥干。",
+      "热锅倒油，炒散鸡蛋盛出。",
+      "锅中放米粉、豆芽翻炒2分钟。",
+      "加入料包和炒好的鸡蛋，翻炒均匀即可。"
+    ],
+    "remark": "炒米粉是广东特色，干香有嚼劲。"
+  },
+  {
+    "id": "zc107",
+    "name": "螺蛳粉",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "中等",
+    "type": "mixed",
+    "spicy_level": "特辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["螺蛳粉", "速冻", "柳州"],
+    "suitable_for": ["强烈爱好者"],
+    "avoid_for": ["不习惯酸笋味者"],
+    "nutrition": {
+      "calories": 520,
+      "protein": 15,
+      "fat": 18,
+      "carbs": 72,
+      "dietary_fiber": 3,
+      "sodium": 980
+    },
+    "ingredients": [
+      { "name": "速冻螺蛳粉", "amount": "1份", "note": "超市购买，含所有料包" },
+      { "name": "腐竹", "amount": "10g", "note": "可选" },
+      { "name": "花生", "amount": "5g", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入米粉煮8-10分钟至软，捞出。",
+      "锅中重新加400ml水烧开，放入汤料包。",
+      "加入煮好的米粉、酸笋、酸豆角等料包。",
+      "煮2分钟后加入腐竹、花生，淋入辣椒油即可。"
+    ],
+    "remark": "螺蛳粉的灵魂是酸笋，初次尝试可能不习惯，但越吃越上瘾。"
+  },
+  {
+    "id": "zc108",
+    "name": "桂林米粉",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["桂林米粉", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 380,
+      "protein": 12,
+      "fat": 8,
+      "carbs": 64,
+      "dietary_fiber": 1.5,
+      "sodium": 620
+    },
+    "ingredients": [
+      { "name": "速冻桂林米粉", "amount": "1份", "note": "超市购买" },
+      { "name": "卤肉", "amount": "40g", "note": "可选" },
+      { "name": "花生", "amount": "5g", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入米粉煮2-3分钟。",
+      "捞出沥干，放入碗中。",
+      "加入卤水料包、卤肉、花生，拌匀即可。"
+    ],
+    "remark": "桂林米粉拌着吃最正宗，卤水是灵魂。"
+  },
+  {
+    "id": "zc109",
+    "name": "南昌拌粉",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "中辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["南昌拌粉", "速冻"],
+    "suitable_for": ["辣味爱好者"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 360,
+      "protein": 8,
+      "fat": 10,
+      "carbs": 58,
+      "dietary_fiber": 1.5,
+      "sodium": 650
+    },
+    "ingredients": [
+      { "name": "速冻南昌拌粉", "amount": "1份", "note": "超市购买" },
+      { "name": "花生米", "amount": "5g", "note": "" },
+      { "name": "葱花", "amount": "5g", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入米粉煮1-2分钟。",
+      "捞出沥干，放入碗中。",
+      "加入料包、花生米、葱花，拌匀即可。"
+    ],
+    "remark": "南昌拌粉是江西特色，酱香浓郁，酸辣开胃。"
+  },
+  {
+    "id": "zc110",
+    "name": "粉丝汤",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["粉丝汤", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 220,
+      "protein": 5,
+      "fat": 3,
+      "carbs": 42,
+      "dietary_fiber": 1,
+      "sodium": 480
+    },
+    "ingredients": [
+      { "name": "速冻粉丝", "amount": "1份", "note": "超市购买" },
+      { "name": "紫菜", "amount": "2g", "note": "" },
+      { "name": "虾皮", "amount": "3g", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻粉丝煮2-3分钟。",
+      "加入紫菜、虾皮。",
+      "加入料包调味即可。"
+    ],
+    "remark": "粉丝汤清淡爽口，适合不爱吃辣的人。"
+  },
+  {
+    "id": "zc111",
+    "name": "鸭血粉丝汤",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["鸭血粉丝汤", "速冻", "南京"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 280,
+      "protein": 10,
+      "fat": 6,
+      "carbs": 45,
+      "dietary_fiber": 1,
+      "sodium": 650
+    },
+    "ingredients": [
+      { "name": "速冻鸭血粉丝汤", "amount": "1份", "note": "超市购买" },
+      { "name": "鸭血", "amount": "50g", "note": "" },
+      { "name": "豆腐泡", "amount": "3个", "note": "" },
+      { "name": "香菜", "amount": "2根", "note": "切段" }
+    ],
+    "steps": [
+      "锅中烧开水，放入鸭血、豆腐泡煮2分钟。",
+      "放入粉丝煮2分钟。",
+      "加入料包调味，撒上香菜即可。"
+    ],
+    "remark": "鸭血粉丝汤是南京特色，鸭血嫩滑，汤鲜味美。"
+  },
+  {
+    "id": "zc112",
+    "name": "酸辣粉",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "特辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["酸辣粉", "速冻", "重庆"],
+    "suitable_for": ["辣味爱好者"],
+    "avoid_for": ["肠胃敏感者"],
+    "nutrition": {
+      "calories": 390,
+      "protein": 6,
+      "fat": 14,
+      "carbs": 58,
+      "dietary_fiber": 2,
+      "sodium": 750
+    },
+    "ingredients": [
+      { "name": "速冻酸辣粉", "amount": "1份", "note": "超市购买" },
+      { "name": "花生碎", "amount": "5g", "note": "" },
+      { "name": "榨菜末", "amount": "5g", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入红薯粉条煮3-4分钟。",
+      "捞出放入碗中。",
+      "加入料包、花生碎、榨菜末，冲入开水拌匀。"
+    ],
+    "remark": "酸辣粉麻辣酸爽，粉条Q弹有嚼劲。"
+  },
+  {
+    "id": "zc113",
+    "name": "土豆粉",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "中辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["土豆粉", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 350,
+      "protein": 5,
+      "fat": 8,
+      "carbs": 64,
+      "dietary_fiber": 1.5,
+      "sodium": 580
+    },
+    "ingredients": [
+      { "name": "速冻土豆粉", "amount": "1份", "note": "超市购买" },
+      { "name": "鹌鹑蛋", "amount": "2个", "note": "" },
+      { "name": "青菜", "amount": "2棵", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入土豆粉煮2-3分钟。",
+      "放入青菜烫熟。",
+      "加入料包和鹌鹑蛋即可。"
+    ],
+    "remark": "土豆粉比红薯粉更粗更韧，口感爽滑。"
+  },
+  {
+    "id": "zc114",
+    "name": "宽粉",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "中辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["宽粉", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 340,
+      "protein": 5,
+      "fat": 7,
+      "carbs": 62,
+      "dietary_fiber": 1.5,
+      "sodium": 560
+    },
+    "ingredients": [
+      { "name": "速冻宽粉", "amount": "1份", "note": "超市购买" },
+      { "name": "火锅料", "amount": "10g", "note": "可选" }
+    ],
+    "steps": [
+      "锅中烧开水，放入宽粉煮4-5分钟至软。",
+      "加入料包和火锅料。",
+      "煮1分钟后即可。"
+    ],
+    "remark": "宽粉宽大厚实，口感软糯有嚼劲。"
+  },
+  {
+    "id": "zc115",
+    "name": "薯粉",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "微辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["薯粉", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 310,
+      "protein": 4,
+      "fat": 4,
+      "carbs": 64,
+      "dietary_fiber": 1,
+      "sodium": 520
+    },
+    "ingredients": [
+      { "name": "速冻薯粉", "amount": "1份", "note": "超市购买" },
+      { "name": "青菜", "amount": "2棵", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入薯粉煮3-4分钟。",
+      "放入青菜烫熟。",
+      "加入料包调味即可。"
+    ],
+    "remark": "薯粉是用红薯或马铃薯淀粉做的，口感滑嫩。"
+  },
+  {
+    "id": "zc116",
+    "name": "豆腐脑",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["豆腐脑", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 120,
+      "protein": 5,
+      "fat": 5,
+      "carbs": 12,
+      "dietary_fiber": 0.5,
+      "sodium": 450
+    },
+    "ingredients": [
+      { "name": "速冻豆腐脑", "amount": "1碗", "note": "超市购买" },
+      { "name": "卤汁包", "amount": "1包", "note": "咸味" }
+    ],
+    "steps": [
+      "速冻豆腐脑按说明加热（微波或蒸）。",
+      "卤汁包加热后浇在豆腐脑上。",
+      "可根据喜好加入香菜、辣椒油。"
+    ],
+    "remark": "豆腐脑有甜咸之争，速冻的通常是北方咸卤口味。"
+  },
+  {
+    "id": "zc117",
+    "name": "甜豆腐脑",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 5,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["甜豆腐脑", "速冻"],
+    "suitable_for": ["南方口味"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 140,
+      "protein": 4,
+      "fat": 3,
+      "carbs": 24,
+      "dietary_fiber": 0.5,
+      "sodium": 80
+    },
+    "ingredients": [
+      { "name": "速冻豆腐脑", "amount": "1碗", "note": "超市购买" },
+      { "name": "白糖", "amount": "10g", "note": "" },
+      { "name": "红豆", "amount": "10g", "note": "可选" }
+    ],
+    "steps": ["速冻豆腐脑加热好。", "撒上白糖即可。", "可加入蜜红豆增加风味。"],
+    "remark": "甜豆腐脑是南方吃法，简单加糖就很好吃。"
+  },
+  {
+    "id": "zc118",
+    "name": "咸豆腐脑",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["咸豆腐脑", "速冻"],
+    "suitable_for": ["北方口味"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 130,
+      "protein": 5,
+      "fat": 6,
+      "carbs": 14,
+      "dietary_fiber": 0.5,
+      "sodium": 520
+    },
+    "ingredients": [
+      { "name": "速冻豆腐脑", "amount": "1碗", "note": "超市购买" },
+      { "name": "卤汁包", "amount": "1包", "note": "" },
+      { "name": "香菜", "amount": "2根", "note": "" },
+      { "name": "辣椒油", "amount": "3ml", "note": "可选" }
+    ],
+    "steps": ["豆腐脑加热。", "卤汁加热后浇上。", "撒上香菜，淋辣椒油即可。"],
+    "remark": "咸豆腐脑是北方经典早餐，卤汁是关键。"
+  },
+  {
+    "id": "zc119",
+    "name": "豆花",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "微辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["豆花", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 115,
+      "protein": 5,
+      "fat": 5,
+      "carbs": 12,
+      "dietary_fiber": 0.5,
+      "sodium": 480
+    },
+    "ingredients": [
+      { "name": "速冻豆花", "amount": "1碗", "note": "超市购买" },
+      { "name": "酱油", "amount": "3ml", "note": "" },
+      { "name": "虾皮", "amount": "3g", "note": "" },
+      { "name": "榨菜末", "amount": "5g", "note": "" }
+    ],
+    "steps": ["豆花加热。", "加入酱油、虾皮、榨菜末。", "拌匀即可。"],
+    "remark": "豆花和豆腐脑类似，但口感更嫩滑。"
+  },
+  {
+    "id": "zc120",
+    "name": "豆浆豆花",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["豆浆豆花", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 130,
+      "protein": 6,
+      "fat": 4,
+      "carbs": 18,
+      "dietary_fiber": 0.5,
+      "sodium": 100
+    },
+    "ingredients": [
+      { "name": "速冻豆花", "amount": "1碗", "note": "超市购买" },
+      { "name": "豆浆", "amount": "200ml", "note": "" },
+      { "name": "白糖", "amount": "10g", "note": "" }
+    ],
+    "steps": [
+      "豆浆加热至温热。",
+      "速冻豆花加热好。",
+      "将豆花放入碗中，倒入热豆浆，撒上白糖。"
+    ],
+    "remark": "豆浆豆花是豆花的另一种吃法，比普通豆花更香浓。"
+  },
+  {
+    "id": "zc121",
+    "name": "茶叶蛋",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 30,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["茶叶蛋", "蛋", "卤味"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 80,
+      "protein": 6,
+      "fat": 5,
+      "carbs": 2,
+      "dietary_fiber": 0,
+      "sodium": 350
+    },
+    "ingredients": [
+      { "name": "鸡蛋", "amount": "6个", "note": "" },
+      { "name": "红茶", "amount": "10g", "note": "" },
+      { "name": "八角", "amount": "2个", "note": "" },
+      { "name": "桂皮", "amount": "1段", "note": "" },
+      { "name": "香叶", "amount": "2片", "note": "" },
+      { "name": "生抽", "amount": "30ml", "note": "" },
+      { "name": "老抽", "amount": "15ml", "note": "" },
+      { "name": "盐", "amount": "10g", "note": "" },
+      { "name": "冰糖", "amount": "10g", "note": "" }
+    ],
+    "steps": [
+      "鸡蛋洗净，冷水下锅煮8分钟，捞出过凉。",
+      "用勺子将蛋壳轻轻敲出裂纹（不要剥壳）。",
+      "锅中加水1000ml，放入红茶、八角、桂皮、香叶、生抽、老抽、盐、冰糖。",
+      "大火烧开后放入鸡蛋，转小火煮20分钟。",
+      "关火浸泡2小时以上（过夜更入味）。"
+    ],
+    "remark": "茶叶蛋的关键是敲裂纹和浸泡时间，泡得越久越入味。"
+  },
+  {
+    "id": "zc122",
+    "name": "水煮蛋",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["水煮蛋", "蛋", "快手"],
+    "suitable_for": ["健身人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 70,
+      "protein": 6,
+      "fat": 4.5,
+      "carbs": 1,
+      "dietary_fiber": 0,
+      "sodium": 65
+    },
+    "ingredients": [{ "name": "鸡蛋", "amount": "2个", "note": "" }],
+    "steps": [
+      "锅中加冷水，放入鸡蛋（水量没过鸡蛋）。",
+      "大火烧开后转中火。",
+      "煮6分钟（溏心蛋）、8分钟（全熟蛋）。",
+      "捞出放入冷水中浸泡1分钟，更容易剥壳。"
+    ],
+    "remark": "水煮蛋是最简单的蛋类做法，营养保留最完全。"
+  },
+  {
+    "id": "zc123",
+    "name": "煎蛋",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 5,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["煎蛋", "蛋", "快手"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 90,
+      "protein": 6,
+      "fat": 7,
+      "carbs": 1,
+      "dietary_fiber": 0,
+      "sodium": 80
+    },
+    "ingredients": [
+      { "name": "鸡蛋", "amount": "2个", "note": "" },
+      { "name": "食用油", "amount": "5ml", "note": "" },
+      { "name": "盐", "amount": "1g", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，中火烧热。",
+      "打入鸡蛋，撒少许盐。",
+      "煎至底面金黄后翻面（单面煎则不需要翻）。",
+      "另一面煎30秒即可。"
+    ],
+    "remark": "煎蛋的蛋黄可以按喜好煎至溏心或全熟。"
+  },
+  {
+    "id": "zc124",
+    "name": "荷包蛋",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 5,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["荷包蛋", "蛋"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 90,
+      "protein": 6,
+      "fat": 7,
+      "carbs": 1,
+      "dietary_fiber": 0,
+      "sodium": 80
+    },
+    "ingredients": [
+      { "name": "鸡蛋", "amount": "2个", "note": "" },
+      { "name": "食用油", "amount": "5ml", "note": "" }
+    ],
+    "steps": [
+      "锅中倒油烧热。",
+      "打入鸡蛋，保持完整形状。",
+      "煎至蛋白凝固、蛋黄半熟。",
+      "盛出即可。"
+    ],
+    "remark": "荷包蛋和煎蛋类似，但通常只煎一面，蛋黄保持完整。"
+  },
+  {
+    "id": "zc125",
+    "name": "卤蛋",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 20,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["卤蛋", "蛋", "卤味"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 85,
+      "protein": 6,
+      "fat": 5,
+      "carbs": 2,
+      "dietary_fiber": 0,
+      "sodium": 400
+    },
+    "ingredients": [
+      { "name": "鸡蛋", "amount": "6个", "note": "" },
+      { "name": "生抽", "amount": "30ml", "note": "" },
+      { "name": "老抽", "amount": "15ml", "note": "" },
+      { "name": "八角", "amount": "2个", "note": "" },
+      { "name": "冰糖", "amount": "10g", "note": "" },
+      { "name": "盐", "amount": "5g", "note": "" }
+    ],
+    "steps": [
+      "鸡蛋煮熟剥壳。",
+      "锅中加水500ml，放入生抽、老抽、八角、冰糖、盐。",
+      "放入剥好的鸡蛋，大火烧开转小火煮15分钟。",
+      "关火浸泡1小时以上。"
+    ],
+    "remark": "卤蛋比茶叶蛋更简单，不需要茶叶，颜色更深。"
+  },
+  {
+    "id": "zc126",
+    "name": "乡巴佬卤蛋",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 25,
+    "difficulty": "中等",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["乡巴佬卤蛋", "蛋"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血压者少食"],
+    "nutrition": {
+      "calories": 120,
+      "protein": 6,
+      "fat": 8,
+      "carbs": 5,
+      "dietary_fiber": 0,
+      "sodium": 550
+    },
+    "ingredients": [
+      { "name": "鸡蛋", "amount": "6个", "note": "" },
+      { "name": "啤酒", "amount": "1罐", "note": "330ml" },
+      { "name": "生抽", "amount": "30ml", "note": "" },
+      { "name": "老抽", "amount": "15ml", "note": "" },
+      { "name": "冰糖", "amount": "15g", "note": "" },
+      { "name": "八角", "amount": "2个", "note": "" }
+    ],
+    "steps": [
+      "鸡蛋煮熟剥壳，用刀在蛋清上划几刀（便于入味）。",
+      "锅中倒入啤酒，加入生抽、老抽、冰糖、八角。",
+      "放入鸡蛋，大火烧开转小火煮20分钟。",
+      "汤汁收浓后关火，浸泡冷却即可。"
+    ],
+    "remark": "乡巴佬卤蛋用啤酒代替水，味道更浓郁，颜色更深。"
+  },
+  {
+    "id": "zc127",
+    "name": "鹌鹑蛋",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["鹌鹑蛋", "蛋", "小食"],
+    "suitable_for": ["儿童"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 30,
+      "protein": 2.5,
+      "fat": 2,
+      "carbs": 0.5,
+      "dietary_fiber": 0,
+      "sodium": 30
+    },
+    "ingredients": [
+      { "name": "鹌鹑蛋", "amount": "10个", "note": "" },
+      { "name": "盐", "amount": "2g", "note": "" }
+    ],
+    "steps": [
+      "鹌鹑蛋洗净，冷水下锅。",
+      "大火烧开后转中火煮5分钟。",
+      "捞出过凉水，剥壳即可。"
+    ],
+    "remark": "鹌鹑蛋比鸡蛋小很多，煮的时间也短，很适合做早餐配菜。"
+  },
+  {
+    "id": "zc128",
+    "name": "卤鹌鹑蛋",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 20,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["卤鹌鹑蛋", "蛋"],
+    "suitable_for": ["儿童"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 35,
+      "protein": 2.5,
+      "fat": 2,
+      "carbs": 1.5,
+      "dietary_fiber": 0,
+      "sodium": 280
+    },
+    "ingredients": [
+      { "name": "鹌鹑蛋", "amount": "15个", "note": "" },
+      { "name": "生抽", "amount": "20ml", "note": "" },
+      { "name": "老抽", "amount": "10ml", "note": "" },
+      { "name": "八角", "amount": "1个", "note": "" }
+    ],
+    "steps": [
+      "鹌鹑蛋煮熟剥壳。",
+      "锅中加水300ml，放入生抽、老抽、八角。",
+      "放入剥好的鹌鹑蛋，煮10分钟。",
+      "关火浸泡30分钟即可。"
+    ],
+    "remark": "卤鹌鹑蛋一口一个，非常受欢迎。"
+  },
+  {
+    "id": "zc129",
+    "name": "粽子",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 20,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["粽子", "速冻", "端午"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["消化不良者少食"],
+    "nutrition": {
+      "calories": 250,
+      "protein": 6,
+      "fat": 8,
+      "carbs": 38,
+      "dietary_fiber": 1,
+      "sodium": 350
+    },
+    "ingredients": [
+      { "name": "速冻粽子", "amount": "2个", "note": "超市购买" }
+    ],
+    "steps": [
+      "锅中加水烧开。",
+      "放入速冻粽子（无需解冻），水要没过粽子。",
+      "盖上锅盖，中火煮15-20分钟。",
+      "捞出沥干，剥开粽叶即可。"
+    ],
+    "remark": "速冻粽子非常方便，蒸或煮都可以，比自己做省时很多。"
+  },
+  {
+    "id": "zc130",
+    "name": "肉粽",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 20,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["肉粽", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["消化不良者少食"],
+    "nutrition": {
+      "calories": 280,
+      "protein": 8,
+      "fat": 10,
+      "carbs": 38,
+      "dietary_fiber": 1,
+      "sodium": 420
+    },
+    "ingredients": [
+      { "name": "速冻肉粽", "amount": "2个", "note": "超市购买" }
+    ],
+    "steps": [
+      "锅中加水烧开，放入速冻肉粽。",
+      "煮15-20分钟至熟透。",
+      "捞出剥叶即可。"
+    ],
+    "remark": "肉粽是咸味粽子的代表，里面有五花肉、蛋黄等。"
+  },
+  {
+    "id": "zc131",
+    "name": "甜粽",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 20,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["甜粽", "速冻"],
+    "suitable_for": ["甜食爱好者"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 230,
+      "protein": 4,
+      "fat": 3,
+      "carbs": 46,
+      "dietary_fiber": 1,
+      "sodium": 50
+    },
+    "ingredients": [
+      { "name": "速冻甜粽", "amount": "2个", "note": "超市购买（豆沙、枣等）" }
+    ],
+    "steps": [
+      "锅中加水烧开，放入速冻甜粽。",
+      "煮15-20分钟。",
+      "捞出剥叶，可蘸白糖食用。"
+    ],
+    "remark": "甜粽是北方常见的粽子口味，糯米本身就有甜味。"
+  },
+  {
+    "id": "zc132",
+    "name": "豆沙粽",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 20,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["豆沙粽", "速冻"],
+    "suitable_for": ["甜食爱好者"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 240,
+      "protein": 4,
+      "fat": 3,
+      "carbs": 48,
+      "dietary_fiber": 1.5,
+      "sodium": 40
+    },
+    "ingredients": [
+      { "name": "速冻豆沙粽", "amount": "2个", "note": "超市购买" }
+    ],
+    "steps": [
+      "锅中加水烧开，放入速冻豆沙粽。",
+      "煮15-20分钟。",
+      "捞出剥叶即可。"
+    ],
+    "remark": "豆沙粽是甜粽中最经典的，豆沙馅软糯香甜。"
+  },
+  {
+    "id": "zc133",
+    "name": "红枣粽",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 20,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["红枣粽", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 220,
+      "protein": 4,
+      "fat": 2,
+      "carbs": 47,
+      "dietary_fiber": 1,
+      "sodium": 40
+    },
+    "ingredients": [
+      { "name": "速冻红枣粽", "amount": "2个", "note": "超市购买" }
+    ],
+    "steps": [
+      "锅中加水烧开，放入速冻红枣粽。",
+      "煮15-20分钟。",
+      "捞出剥叶即可。"
+    ],
+    "remark": "红枣粽是北方最常见的甜粽，红枣的甜味渗入糯米中。"
+  },
+  {
+    "id": "zc134",
+    "name": "蛋黄粽",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 20,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["蛋黄粽", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["胆固醇高者少食"],
+    "nutrition": {
+      "calories": 290,
+      "protein": 9,
+      "fat": 11,
+      "carbs": 38,
+      "dietary_fiber": 1,
+      "sodium": 450
+    },
+    "ingredients": [
+      { "name": "速冻蛋黄粽", "amount": "2个", "note": "超市购买" }
+    ],
+    "steps": [
+      "锅中加水烧开，放入速冻蛋黄粽。",
+      "煮15-20分钟。",
+      "捞出剥叶即可。"
+    ],
+    "remark": "蛋黄粽是咸粽的一种，里面有一整颗咸蛋黄，非常香。"
+  },
+  {
+    "id": "zc135",
+    "name": "烧仙草",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 5,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["烧仙草", "甜品", "速冻"],
+    "suitable_for": ["夏季"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 120,
+      "protein": 1,
+      "fat": 2,
+      "carbs": 24,
+      "dietary_fiber": 0.5,
+      "sodium": 50
+    },
+    "ingredients": [
+      { "name": "速冻烧仙草", "amount": "1碗", "note": "超市购买" },
+      { "name": "奶茶或糖水", "amount": "100ml", "note": "" }
+    ],
+    "steps": [
+      "烧仙草按说明加热或解冻。",
+      "倒入奶茶或糖水。",
+      "可加入红豆、芋圆等配料。"
+    ],
+    "remark": "烧仙草是台湾特色甜品，清凉解暑。"
+  },
+  {
+    "id": "zc136",
+    "name": "八宝饭",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 20,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["八宝饭", "速冻", "甜饭"],
+    "suitable_for": ["过年"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 280,
+      "protein": 5,
+      "fat": 4,
+      "carbs": 55,
+      "dietary_fiber": 1.5,
+      "sodium": 60
+    },
+    "ingredients": [
+      { "name": "速冻八宝饭", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": [
+      "速冻八宝饭无需解冻，直接放入蒸锅。",
+      "大火蒸15-20分钟。",
+      "倒扣入盘中即可。"
+    ],
+    "remark": "八宝饭是传统甜点，寓意吉祥，过年时常见。"
+  },
+  {
+    "id": "zc137",
+    "name": "糯米饭",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 25,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["糯米饭", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["消化不良者少食"],
+    "nutrition": {
+      "calories": 220,
+      "protein": 4,
+      "fat": 1,
+      "carbs": 48,
+      "dietary_fiber": 1,
+      "sodium": 20
+    },
+    "ingredients": [
+      { "name": "速冻糯米饭", "amount": "1份", "note": "超市购买" }
+    ],
+    "steps": [
+      "速冻糯米饭无需解冻，放入蒸锅。",
+      "大火蒸15-20分钟。",
+      "取出即可食用。"
+    ],
+    "remark": "糯米饭软糯Q弹，可以配菜或直接吃。"
+  },
+  {
+    "id": "zc138",
+    "name": "咸糯米饭",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 20,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["咸糯米饭", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["消化不良者少食"],
+    "nutrition": {
+      "calories": 260,
+      "protein": 7,
+      "fat": 6,
+      "carbs": 44,
+      "dietary_fiber": 1,
+      "sodium": 450
+    },
+    "ingredients": [
+      {
+        "name": "速冻咸糯米饭",
+        "amount": "1份",
+        "note": "超市购买（含腊肠、香菇等）"
+      }
+    ],
+    "steps": ["速冻咸糯米饭放入蒸锅。", "大火蒸15-20分钟。", "取出拌匀即可。"],
+    "remark": "咸糯米饭加入了腊肠、香菇等配料，风味更丰富。"
+  },
+  {
+    "id": "zc139",
+    "name": "甜糯米饭",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 20,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["甜糯米饭", "速冻"],
+    "suitable_for": ["甜食爱好者"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 250,
+      "protein": 4,
+      "fat": 2,
+      "carbs": 55,
+      "dietary_fiber": 1,
+      "sodium": 30
+    },
+    "ingredients": [
+      {
+        "name": "速冻甜糯米饭",
+        "amount": "1份",
+        "note": "超市购买（含红枣、葡萄干等）"
+      }
+    ],
+    "steps": [
+      "速冻甜糯米饭放入蒸锅。",
+      "大火蒸15-20分钟。",
+      "取出可撒白糖食用。"
+    ],
+    "remark": "甜糯米饭是甜点类早餐，小朋友很喜欢。"
+  },
+  {
+    "id": "zc140",
+    "name": "饭团",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["饭团", "速冻", "日式"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 280,
+      "protein": 7,
+      "fat": 5,
+      "carbs": 50,
+      "dietary_fiber": 1,
+      "sodium": 420
+    },
+    "ingredients": [
+      { "name": "速冻饭团", "amount": "2个", "note": "超市购买" }
+    ],
+    "steps": [
+      "速冻饭团无需解冻，放入微波炉。",
+      "高火加热1-2分钟（按包装说明）。",
+      "取出即可食用。"
+    ],
+    "remark": "速冻饭团有各种馅料，非常方便，适合上班族。"
+  },
+  {
+    "id": "zc141",
+    "name": "粢饭团",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["粢饭团", "速冻", "上海"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 320,
+      "protein": 8,
+      "fat": 8,
+      "carbs": 54,
+      "dietary_fiber": 1,
+      "sodium": 480
+    },
+    "ingredients": [
+      { "name": "速冻粢饭团", "amount": "1个", "note": "超市购买" }
+    ],
+    "steps": ["速冻粢饭团放入微波炉。", "高火加热1-2分钟。", "取出即可。"],
+    "remark": "粢饭团是上海早餐四大金刚之一，内夹油条、肉松等。"
+  },
+  {
+    "id": "zc142",
+    "name": "油条包麻糍",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["油条包麻糍", "速冻", "江西"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 380,
+      "protein": 6,
+      "fat": 16,
+      "carbs": 52,
+      "dietary_fiber": 1,
+      "sodium": 320
+    },
+    "ingredients": [
+      { "name": "速冻油条包麻糍", "amount": "1份", "note": "超市购买" }
+    ],
+    "steps": [
+      "空气炸锅或烤箱预热180℃。",
+      "放入速冻油条包麻糍（无需解冻）。",
+      "加热6-8分钟至外酥里糯。"
+    ],
+    "remark": "油条包麻糍是江西特色，外酥里糯，香甜可口。"
+  },
+  {
+    "id": "zc143",
+    "name": "麻糍",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["麻糍", "速冻", "糯米"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 220,
+      "protein": 3,
+      "fat": 3,
+      "carbs": 46,
+      "dietary_fiber": 1,
+      "sodium": 30
+    },
+    "ingredients": [
+      { "name": "速冻麻糍", "amount": "2块", "note": "超市购买" },
+      { "name": "食用油", "amount": "5ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，中小火烧热。",
+      "放入速冻麻糍，煎至两面金黄。",
+      "淋上红糖浆或撒黄豆粉即可。"
+    ],
+    "remark": "麻糍是糯米制品，煎过后外脆里糯。"
+  },
+  {
+    "id": "zc144",
+    "name": "糍粑",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["糍粑", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 210,
+      "protein": 3,
+      "fat": 3,
+      "carbs": 44,
+      "dietary_fiber": 1,
+      "sodium": 25
+    },
+    "ingredients": [
+      { "name": "速冻糍粑", "amount": "2块", "note": "超市购买" },
+      { "name": "食用油", "amount": "5ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油烧热。",
+      "放入速冻糍粑，中小火煎至两面金黄。",
+      "撒上白糖或红糖即可。"
+    ],
+    "remark": "糍粑和麻糍类似，都是糯米制品，口感软糯。"
+  },
+  {
+    "id": "zc145",
+    "name": "红糖糍粑",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["红糖糍粑", "速冻", "川味"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 250,
+      "protein": 3,
+      "fat": 6,
+      "carbs": 48,
+      "dietary_fiber": 1,
+      "sodium": 40
+    },
+    "ingredients": [
+      { "name": "速冻糍粑", "amount": "2块", "note": "超市购买" },
+      { "name": "红糖", "amount": "15g", "note": "" },
+      { "name": "食用油", "amount": "8ml", "note": "" },
+      { "name": "黄豆粉", "amount": "5g", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油烧热，放入糍粑煎至两面金黄。",
+      "红糖加20ml水，小火熬成糖浆。",
+      "将糖浆淋在糍粑上，撒上黄豆粉。"
+    ],
+    "remark": "红糖糍粑是四川火锅店的常见甜品，外酥里软。"
+  },
+  {
+    "id": "zc146",
+    "name": "年糕",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["年糕", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["消化不良者少食"],
+    "nutrition": {
+      "calories": 190,
+      "protein": 3,
+      "fat": 1,
+      "carbs": 42,
+      "dietary_fiber": 1,
+      "sodium": 30
+    },
+    "ingredients": [
+      { "name": "速冻年糕", "amount": "150g", "note": "超市购买" },
+      { "name": "食用油", "amount": "5ml", "note": "" }
+    ],
+    "steps": [
+      "锅中烧开水，放入速冻年糕煮2-3分钟至软。",
+      "捞出沥干。",
+      "平底锅倒油，煎至表面微黄即可。"
+    ],
+    "remark": "年糕寓意“年年高”，既可以煮汤也可以煎炒。"
+  },
+  {
+    "id": "zc147",
+    "name": "炒年糕",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "微辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["炒年糕", "速冻", "韩式"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 320,
+      "protein": 6,
+      "fat": 10,
+      "carbs": 52,
+      "dietary_fiber": 1.5,
+      "sodium": 580
+    },
+    "ingredients": [
+      { "name": "速冻年糕", "amount": "200g", "note": "条状" },
+      { "name": "韩式辣酱", "amount": "15g", "note": "" },
+      { "name": "洋葱", "amount": "30g", "note": "切丝" },
+      { "name": "食用油", "amount": "10ml", "note": "" }
+    ],
+    "steps": [
+      "年糕煮2分钟至软，捞出。",
+      "热锅倒油，炒香洋葱。",
+      "加入韩式辣酱和200ml水，煮开。",
+      "放入年糕，煮至汤汁浓稠即可。"
+    ],
+    "remark": "炒年糕是韩式料理，甜辣口，非常受欢迎。"
+  },
+  {
+    "id": "zc148",
+    "name": "汤年糕",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["汤年糕", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 210,
+      "protein": 5,
+      "fat": 2,
+      "carbs": 44,
+      "dietary_fiber": 1,
+      "sodium": 450
+    },
+    "ingredients": [
+      { "name": "速冻年糕", "amount": "150g", "note": "片状" },
+      { "name": "青菜", "amount": "50g", "note": "" },
+      { "name": "盐", "amount": "2g", "note": "" }
+    ],
+    "steps": [
+      "锅中加水500ml烧开。",
+      "放入年糕煮3分钟至软。",
+      "放入青菜烫熟，加盐调味。"
+    ],
+    "remark": "汤年糕清淡暖胃，简单快手。"
+  },
+  {
+    "id": "zc149",
+    "name": "桂花年糕",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["桂花年糕", "速冻", "甜品"],
+    "suitable_for": ["甜食爱好者"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 230,
+      "protein": 3,
+      "fat": 1,
+      "carbs": 54,
+      "dietary_fiber": 1,
+      "sodium": 20
+    },
+    "ingredients": [
+      { "name": "速冻年糕", "amount": "150g", "note": "片状" },
+      { "name": "糖桂花", "amount": "15g", "note": "" },
+      { "name": "白糖", "amount": "10g", "note": "" }
+    ],
+    "steps": [
+      "年糕煮2分钟至软，捞出。",
+      "锅中加少许水，放入白糖和糖桂花煮开。",
+      "放入年糕煮1分钟即可。"
+    ],
+    "remark": "桂花年糕是江南甜品，浓浓的桂花香。"
+  },
+  {
+    "id": "zc150",
+    "name": "油条糍粑",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["油条糍粑", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 390,
+      "protein": 6,
+      "fat": 18,
+      "carbs": 52,
+      "dietary_fiber": 1,
+      "sodium": 340
+    },
+    "ingredients": [
+      { "name": "速冻油条糍粑", "amount": "1份", "note": "超市购买" },
+      { "name": "食用油", "amount": "10ml", "note": "可选" }
+    ],
+    "steps": [
+      "空气炸锅180℃加热6-8分钟。",
+      "或平底锅倒油，中小火煎至两面金黄。",
+      "趁热食用。"
+    ],
+    "remark": "油条糍粑是油条包麻糍的另一种叫法，外酥里糯。"
+  },
+  {
+    "id": "zc151",
+    "name": "春卷",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["春卷", "速冻", "油炸"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 220,
+      "protein": 5,
+      "fat": 12,
+      "carbs": 24,
+      "dietary_fiber": 1,
+      "sodium": 280
+    },
+    "ingredients": [
+      { "name": "速冻春卷", "amount": "4个", "note": "超市购买" },
+      { "name": "食用油", "amount": "300ml", "note": "实际消耗约30ml" }
+    ],
+    "steps": [
+      "锅中倒入食用油，中火烧至170-180℃（筷子插入冒密集小泡）。",
+      "放入速冻春卷（无需解冻），炸3-4分钟至金黄。",
+      "捞出沥油即可。"
+    ],
+    "remark": "速冻春卷也可以用空气炸锅，180℃烤8-10分钟，更少油。"
+  },
+  {
+    "id": "zc152",
+    "name": "炸春卷",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["炸春卷", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 225,
+      "protein": 5,
+      "fat": 12,
+      "carbs": 24,
+      "dietary_fiber": 1,
+      "sodium": 280
+    },
+    "ingredients": [
+      { "name": "速冻春卷", "amount": "4个", "note": "超市购买" },
+      { "name": "食用油", "amount": "300ml", "note": "" }
+    ],
+    "steps": [
+      "油温170-180℃，放入速冻春卷。",
+      "炸3-4分钟至表面金黄。",
+      "捞出沥油即可。"
+    ],
+    "remark": "炸春卷外皮酥脆，馅料丰富，是经典早点。"
+  },
+  {
+    "id": "zc153",
+    "name": "素春卷",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["素春卷", "速冻"],
+    "suitable_for": ["素食者"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 200,
+      "protein": 4,
+      "fat": 10,
+      "carbs": 24,
+      "dietary_fiber": 1.5,
+      "sodium": 260
+    },
+    "ingredients": [
+      { "name": "速冻素春卷", "amount": "4个", "note": "超市购买" },
+      { "name": "食用油", "amount": "300ml", "note": "" }
+    ],
+    "steps": [
+      "油温170-180℃，放入速冻素春卷。",
+      "炸3-4分钟至金黄。",
+      "捞出沥油即可。"
+    ],
+    "remark": "素春卷馅料通常是白菜、香菇、粉丝等，清淡可口。"
+  },
+  {
+    "id": "zc154",
+    "name": "肉春卷",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["肉春卷", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 240,
+      "protein": 7,
+      "fat": 13,
+      "carbs": 23,
+      "dietary_fiber": 0.5,
+      "sodium": 320
+    },
+    "ingredients": [
+      { "name": "速冻肉春卷", "amount": "4个", "note": "超市购买" },
+      { "name": "食用油", "amount": "300ml", "note": "" }
+    ],
+    "steps": [
+      "油温170-180℃，放入速冻肉春卷。",
+      "炸3-4分钟至金黄。",
+      "捞出沥油即可。"
+    ],
+    "remark": "肉春卷馅料通常是猪肉、白菜等，更香更饱腹。"
+  },
+  {
+    "id": "zc155",
+    "name": "锅贴",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["锅贴", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 210,
+      "protein": 8,
+      "fat": 10,
+      "carbs": 22,
+      "dietary_fiber": 0.5,
+      "sodium": 380
+    },
+    "ingredients": [
+      { "name": "速冻锅贴", "amount": "8个", "note": "超市购买" },
+      { "name": "食用油", "amount": "10ml", "note": "" },
+      { "name": "清水", "amount": "80ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，中火烧热。",
+      "放入速冻锅贴（无需解冻），中火煎1分钟至底部微黄。",
+      "倒入80ml清水，盖上锅盖，中小火焖5-6分钟。",
+      "开盖转中火煎1-2分钟至底部金黄酥脆即可。"
+    ],
+    "remark": "锅贴和煎饺的区别是锅贴两端开口，皮更薄。"
+  },
+  {
+    "id": "zc156",
+    "name": "生煎包",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["生煎包", "速冻", "上海"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 220,
+      "protein": 8,
+      "fat": 10,
+      "carbs": 24,
+      "dietary_fiber": 0.5,
+      "sodium": 400
+    },
+    "ingredients": [
+      { "name": "速冻生煎包", "amount": "6个", "note": "超市购买" },
+      { "name": "食用油", "amount": "10ml", "note": "" },
+      { "name": "清水", "amount": "80ml", "note": "" },
+      { "name": "黑芝麻", "amount": "2g", "note": "" },
+      { "name": "葱花", "amount": "5g", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，放入速冻生煎包（无需解冻）。",
+      "中火煎1分钟至底部微黄。",
+      "倒入80ml清水，盖上锅盖焖6分钟。",
+      "开盖撒上黑芝麻和葱花，再煎1分钟即可。"
+    ],
+    "remark": "生煎包是上海特色，底部酥脆，肉馅多汁。"
+  },
+  {
+    "id": "zc157",
+    "name": "水煎包",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 12,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["水煎包", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 210,
+      "protein": 7,
+      "fat": 9,
+      "carbs": 25,
+      "dietary_fiber": 0.5,
+      "sodium": 390
+    },
+    "ingredients": [
+      { "name": "速冻水煎包", "amount": "6个", "note": "超市购买" },
+      { "name": "食用油", "amount": "10ml", "note": "" },
+      { "name": "清水", "amount": "80ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，放入速冻水煎包。",
+      "中火煎1分钟至底部微黄。",
+      "倒入80ml清水，盖上锅盖焖6分钟。",
+      "开盖再煎1分钟即可。"
+    ],
+    "remark": "水煎包和生煎包类似，但皮更厚一些。"
+  },
+  {
+    "id": "zc158",
+    "name": "韭菜盒子",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["韭菜盒子", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["胃热重者少食"],
+    "nutrition": {
+      "calories": 190,
+      "protein": 6,
+      "fat": 8,
+      "carbs": 24,
+      "dietary_fiber": 1.5,
+      "sodium": 360
+    },
+    "ingredients": [
+      { "name": "速冻韭菜盒子", "amount": "2个", "note": "超市购买" },
+      { "name": "食用油", "amount": "10ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，中小火烧热。",
+      "放入速冻韭菜盒子（无需解冻）。",
+      "两面各煎3-4分钟至金黄酥脆即可。"
+    ],
+    "remark": "韭菜盒子外皮酥脆，韭菜鸡蛋馅鲜香，是北方经典早餐。"
+  },
+  {
+    "id": "zc159",
+    "name": "萝卜盒子",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["萝卜盒子", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 180,
+      "protein": 4,
+      "fat": 7,
+      "carbs": 25,
+      "dietary_fiber": 1.2,
+      "sodium": 350
+    },
+    "ingredients": [
+      { "name": "速冻萝卜盒子", "amount": "2个", "note": "超市购买" },
+      { "name": "食用油", "amount": "10ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油烧热。",
+      "放入速冻萝卜盒子，中小火两面各煎3-4分钟。",
+      "煎至金黄即可。"
+    ],
+    "remark": "萝卜盒子用白萝卜做馅，清爽不腻。"
+  },
+  {
+    "id": "zc160",
+    "name": "茄盒",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["茄盒", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 230,
+      "protein": 6,
+      "fat": 14,
+      "carbs": 20,
+      "dietary_fiber": 1,
+      "sodium": 350
+    },
+    "ingredients": [
+      { "name": "速冻茄盒", "amount": "4个", "note": "超市购买" },
+      { "name": "食用油", "amount": "200ml", "note": "实际消耗约20ml" }
+    ],
+    "steps": [
+      "锅中倒油，烧至170℃。",
+      "放入速冻茄盒，炸3-4分钟至金黄。",
+      "捞出沥油即可。"
+    ],
+    "remark": "茄盒是茄子夹肉馅，外裹面糊炸制，外酥里嫩。"
+  },
+  {
+    "id": "zc161",
+    "name": "藕盒",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["藕盒", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 220,
+      "protein": 5,
+      "fat": 12,
+      "carbs": 23,
+      "dietary_fiber": 1,
+      "sodium": 340
+    },
+    "ingredients": [
+      { "name": "速冻藕盒", "amount": "4个", "note": "超市购买" },
+      { "name": "食用油", "amount": "200ml", "note": "" }
+    ],
+    "steps": [
+      "油温170℃，放入速冻藕盒。",
+      "炸3-4分钟至金黄。",
+      "捞出沥油即可。"
+    ],
+    "remark": "藕盒是莲藕夹肉馅，口感脆嫩鲜美。"
+  },
+  {
+    "id": "zc162",
+    "name": "馓子",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 5,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["馓子", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 280,
+      "protein": 5,
+      "fat": 18,
+      "carbs": 26,
+      "dietary_fiber": 0.5,
+      "sodium": 120
+    },
+    "ingredients": [
+      { "name": "速冻馓子", "amount": "1把", "note": "超市购买" },
+      { "name": "食用油", "amount": "200ml", "note": "" }
+    ],
+    "steps": [
+      "油温170℃，放入速冻馓子。",
+      "炸30-60秒至金黄酥脆。",
+      "捞出沥油即可。"
+    ],
+    "remark": "馓子是油炸面食，细长酥脆，可以直接吃或泡豆浆。"
+  },
+  {
+    "id": "zc163",
+    "name": "麻花",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["麻花", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 300,
+      "protein": 6,
+      "fat": 18,
+      "carbs": 30,
+      "dietary_fiber": 0.5,
+      "sodium": 150
+    },
+    "ingredients": [
+      { "name": "速冻麻花", "amount": "2根", "note": "超市购买" },
+      { "name": "食用油", "amount": "300ml", "note": "" }
+    ],
+    "steps": [
+      "油温160-170℃，放入速冻麻花。",
+      "炸2-3分钟至金黄（火要小，否则外焦里生）。",
+      "捞出沥油即可。"
+    ],
+    "remark": "麻花比馓子粗大，需要低温慢炸才能炸透。"
+  },
+  {
+    "id": "zc164",
+    "name": "小麻花",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 6,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["小麻花", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 280,
+      "protein": 5,
+      "fat": 16,
+      "carbs": 30,
+      "dietary_fiber": 0.5,
+      "sodium": 130
+    },
+    "ingredients": [
+      { "name": "速冻小麻花", "amount": "5个", "note": "超市购买" },
+      { "name": "食用油", "amount": "300ml", "note": "" }
+    ],
+    "steps": [
+      "油温170℃，放入速冻小麻花。",
+      "炸1-2分钟至金黄。",
+      "捞出沥油即可。"
+    ],
+    "remark": "小麻花一口一个，更方便食用。"
+  },
+  {
+    "id": "zc165",
+    "name": "红糖麻花",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["红糖麻花", "速冻"],
+    "suitable_for": ["甜食爱好者"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 320,
+      "protein": 5,
+      "fat": 18,
+      "carbs": 36,
+      "dietary_fiber": 0.5,
+      "sodium": 100
+    },
+    "ingredients": [
+      { "name": "速冻红糖麻花", "amount": "2根", "note": "超市购买" },
+      { "name": "食用油", "amount": "300ml", "note": "" }
+    ],
+    "steps": [
+      "油温160℃，放入速冻红糖麻花。",
+      "小火慢炸2-3分钟。",
+      "捞出沥油，外裹红糖浆的麻花更甜。"
+    ],
+    "remark": "红糖麻花表面有红糖浆，香甜酥脆。"
+  },
+  {
+    "id": "zc166",
+    "name": "芝麻麻花",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 6,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["芝麻麻花", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 290,
+      "protein": 6,
+      "fat": 17,
+      "carbs": 29,
+      "dietary_fiber": 1,
+      "sodium": 120
+    },
+    "ingredients": [
+      { "name": "速冻芝麻麻花", "amount": "2根", "note": "超市购买" },
+      { "name": "食用油", "amount": "300ml", "note": "" }
+    ],
+    "steps": [
+      "油温170℃，放入速冻芝麻麻花。",
+      "炸1-2分钟至金黄。",
+      "捞出沥油即可。"
+    ],
+    "remark": "芝麻麻花表面裹满白芝麻，更香脆。"
+  },
+  {
+    "id": "zc167",
+    "name": "油香",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["油香", "速冻", "回族"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 260,
+      "protein": 5,
+      "fat": 14,
+      "carbs": 28,
+      "dietary_fiber": 0.5,
+      "sodium": 140
+    },
+    "ingredients": [
+      { "name": "速冻油香", "amount": "2个", "note": "超市购买" },
+      { "name": "食用油", "amount": "300ml", "note": "" }
+    ],
+    "steps": [
+      "油温170℃，放入速冻油香。",
+      "炸2-3分钟至金黄。",
+      "捞出沥油即可。"
+    ],
+    "remark": "油香是回族传统面食，外酥里软。"
+  },
+  {
+    "id": "zc168",
+    "name": "馕",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["馕", "速冻", "新疆"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 250,
+      "protein": 7,
+      "fat": 5,
+      "carbs": 45,
+      "dietary_fiber": 2,
+      "sodium": 280
+    },
+    "ingredients": [{ "name": "速冻馕", "amount": "1个", "note": "超市购买" }],
+    "steps": [
+      "烤箱预热180℃，放入速冻馕。",
+      "烤5-8分钟至热透。",
+      "或平底锅不加油，两面各煎2分钟。"
+    ],
+    "remark": "馕是新疆主食，可以配奶茶、羊肉汤吃。"
+  },
+  {
+    "id": "zc169",
+    "name": "烤馕",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["烤馕", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 250,
+      "protein": 7,
+      "fat": 5,
+      "carbs": 45,
+      "dietary_fiber": 2,
+      "sodium": 280
+    },
+    "ingredients": [{ "name": "速冻馕", "amount": "1个", "note": "超市购买" }],
+    "steps": ["烤箱180℃烤5-8分钟。", "取出刷一层油再烤2分钟更香。"],
+    "remark": "烤馕比普通馕更香脆。"
+  },
+  {
+    "id": "zc170",
+    "name": "油馕",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 6,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "高油盐",
+    "tags": ["油馕", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["高血脂者慎食"],
+    "nutrition": {
+      "calories": 300,
+      "protein": 6,
+      "fat": 14,
+      "carbs": 38,
+      "dietary_fiber": 1.5,
+      "sodium": 260
+    },
+    "ingredients": [
+      { "name": "速冻油馕", "amount": "1个", "note": "超市购买" },
+      { "name": "食用油", "amount": "10ml", "note": "" }
+    ],
+    "steps": [
+      "平底锅倒油，放入速冻油馕。",
+      "中小火两面各煎2-3分钟。",
+      "煎至金黄即可。"
+    ],
+    "remark": "油馕比普通馕更酥脆，油香浓郁。"
+  },
+  {
+    "id": "zc171",
+    "name": "葱花馕",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["葱花馕", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 260,
+      "protein": 7,
+      "fat": 6,
+      "carbs": 45,
+      "dietary_fiber": 2,
+      "sodium": 320
+    },
+    "ingredients": [
+      { "name": "速冻葱花馕", "amount": "1个", "note": "超市购买" }
+    ],
+    "steps": ["烤箱180℃烤5-8分钟。", "或平底锅两面各煎2分钟。"],
+    "remark": "葱花馕表面有葱花，葱香浓郁。"
+  },
+  {
+    "id": "zc172",
+    "name": "包子粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 15,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["包子粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 300,
+      "protein": 10,
+      "fat": 6,
+      "carbs": 52,
+      "dietary_fiber": 1,
+      "sodium": 550
+    },
+    "ingredients": [
+      { "name": "速冻包子", "amount": "2个", "note": "" },
+      { "name": "速冻白粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["包子蒸10分钟。", "白粥加热3分钟。", "搭配食用。"],
+    "remark": "包子粥是经典搭配，单独售卖的组合装。"
+  },
+  {
+    "id": "zc173",
+    "name": "杂粮粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["杂粮粥", "速冻"],
+    "suitable_for": ["三高人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 110,
+      "protein": 3.5,
+      "fat": 0.8,
+      "carbs": 22,
+      "dietary_fiber": 2.5,
+      "sodium": 30
+    },
+    "ingredients": [
+      { "name": "速冻杂粮粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": [
+      "速冻杂粮粥倒入锅中。",
+      "加适量水，中火煮5-8分钟。",
+      "或微波炉高火加热3分钟。"
+    ],
+    "remark": "杂粮粥营养丰富，适合需要控制血糖的人群。"
+  },
+  {
+    "id": "zc174",
+    "name": "玉米粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["玉米粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 80,
+      "protein": 2,
+      "fat": 0.5,
+      "carbs": 18,
+      "dietary_fiber": 1.5,
+      "sodium": 20
+    },
+    "ingredients": [
+      { "name": "速冻玉米粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["速冻玉米粥加热即可。"],
+    "remark": "玉米粥香甜顺滑。"
+  },
+  {
+    "id": "zc175",
+    "name": "荞麦粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["荞麦粥", "速冻"],
+    "suitable_for": ["三高人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 90,
+      "protein": 3,
+      "fat": 0.6,
+      "carbs": 19,
+      "dietary_fiber": 2,
+      "sodium": 25
+    },
+    "ingredients": [
+      { "name": "速冻荞麦粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "荞麦粥有特殊的谷物香气，荞麦可辅助降血糖。"
+  },
+  {
+    "id": "zc176",
+    "name": "薏仁粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["薏仁粥", "速冻"],
+    "suitable_for": ["祛湿"],
+    "avoid_for": ["孕妇慎食"],
+    "nutrition": {
+      "calories": 85,
+      "protein": 2.5,
+      "fat": 0.6,
+      "carbs": 17,
+      "dietary_fiber": 1.5,
+      "sodium": 20
+    },
+    "ingredients": [
+      { "name": "速冻薏仁粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "薏仁粥有祛湿功效，常加红豆同煮。"
+  },
+  {
+    "id": "zc177",
+    "name": "芡实粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["芡实粥", "速冻"],
+    "suitable_for": ["健脾"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 90,
+      "protein": 2,
+      "fat": 0.5,
+      "carbs": 19,
+      "dietary_fiber": 1.2,
+      "sodium": 20
+    },
+    "ingredients": [
+      { "name": "速冻芡实粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "芡实（鸡头米）粥健脾养胃。"
+  },
+  {
+    "id": "zc178",
+    "name": "桂圆粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["桂圆粥", "速冻"],
+    "suitable_for": ["女性"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 110,
+      "protein": 2,
+      "fat": 0.3,
+      "carbs": 25,
+      "dietary_fiber": 0.8,
+      "sodium": 15
+    },
+    "ingredients": [
+      { "name": "速冻桂圆粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "桂圆粥香甜滋补，适合女性食用。"
+  },
+  {
+    "id": "zc179",
+    "name": "枸杞粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["枸杞粥", "速冻"],
+    "suitable_for": ["护眼"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 85,
+      "protein": 2,
+      "fat": 0.3,
+      "carbs": 18,
+      "dietary_fiber": 1,
+      "sodium": 20
+    },
+    "ingredients": [
+      { "name": "速冻枸杞粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "枸杞明目，早餐喝一碗枸杞粥很养生。"
+  },
+  {
+    "id": "zc180",
+    "name": "银耳粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["银耳粥", "速冻"],
+    "suitable_for": ["滋阴"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 70,
+      "protein": 0.8,
+      "fat": 0.2,
+      "carbs": 17,
+      "dietary_fiber": 1.5,
+      "sodium": 15
+    },
+    "ingredients": [
+      { "name": "速冻银耳粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "银耳粥润肺养颜，是女性喜爱的早餐。"
+  },
+  {
+    "id": "zc181",
+    "name": "百合粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["百合粥", "速冻"],
+    "suitable_for": ["润肺"],
+    "avoid_for": ["风寒咳嗽者慎食"],
+    "nutrition": {
+      "calories": 80,
+      "protein": 1.5,
+      "fat": 0.2,
+      "carbs": 18,
+      "dietary_fiber": 1.2,
+      "sodium": 15
+    },
+    "ingredients": [
+      { "name": "速冻百合粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "百合粥润肺安神，适合秋季食用。"
+  },
+  {
+    "id": "zc182",
+    "name": "小米南瓜粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["小米南瓜粥", "速冻"],
+    "suitable_for": ["养胃"],
+    "avoid_for": ["糖尿病人适量"],
+    "nutrition": {
+      "calories": 85,
+      "protein": 2,
+      "fat": 0.5,
+      "carbs": 18,
+      "dietary_fiber": 1,
+      "sodium": 20
+    },
+    "ingredients": [
+      { "name": "速冻小米南瓜粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "小米南瓜粥是养胃佳品，口感香甜。"
+  },
+  {
+    "id": "zc183",
+    "name": "紫薯粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["紫薯粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人适量"],
+    "nutrition": {
+      "calories": 90,
+      "protein": 1.5,
+      "fat": 0.3,
+      "carbs": 20,
+      "dietary_fiber": 1.5,
+      "sodium": 20
+    },
+    "ingredients": [
+      { "name": "速冻紫薯粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "紫薯粥颜色漂亮，富含花青素。"
+  },
+  {
+    "id": "zc184",
+    "name": "芋头粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["芋头粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人适量"],
+    "nutrition": {
+      "calories": 85,
+      "protein": 1.5,
+      "fat": 0.3,
+      "carbs": 19,
+      "dietary_fiber": 1.2,
+      "sodium": 20
+    },
+    "ingredients": [
+      { "name": "速冻芋头粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "芋头粥软糯香甜。"
+  },
+  {
+    "id": "zc185",
+    "name": "红薯粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 10,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["红薯粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人适量"],
+    "nutrition": {
+      "calories": 90,
+      "protein": 1.5,
+      "fat": 0.3,
+      "carbs": 20,
+      "dietary_fiber": 1.5,
+      "sodium": 20
+    },
+    "ingredients": [
+      { "name": "速冻红薯粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "红薯粥清甜可口，膳食纤维丰富。"
+  },
+  {
+    "id": "zc186",
+    "name": "玉米糊",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 5,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["玉米糊", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 70,
+      "protein": 1.5,
+      "fat": 0.5,
+      "carbs": 15,
+      "dietary_fiber": 1,
+      "sodium": 15
+    },
+    "ingredients": [
+      { "name": "速冻玉米糊", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["玉米糊加热即可。"],
+    "remark": "玉米糊细腻顺滑，是北方常见早餐。"
+  },
+  {
+    "id": "zc187",
+    "name": "米糊",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 5,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["米糊", "速冻"],
+    "suitable_for": ["婴幼儿"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 60,
+      "protein": 1,
+      "fat": 0.2,
+      "carbs": 14,
+      "dietary_fiber": 0.3,
+      "sodium": 15
+    },
+    "ingredients": [
+      { "name": "速冻米糊", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "米糊口感顺滑，很适合宝宝和肠胃不好的人。"
+  },
+  {
+    "id": "zc188",
+    "name": "芝麻糊",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 5,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["芝麻糊", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["腹泻者少食"],
+    "nutrition": {
+      "calories": 150,
+      "protein": 3,
+      "fat": 8,
+      "carbs": 16,
+      "dietary_fiber": 2,
+      "sodium": 20
+    },
+    "ingredients": [
+      { "name": "速冻芝麻糊", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "芝麻糊富含钙和维生素E，乌发养颜。"
+  },
+  {
+    "id": "zc189",
+    "name": "核桃糊",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 5,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "中油盐",
+    "tags": ["核桃糊", "速冻"],
+    "suitable_for": ["补脑"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 160,
+      "protein": 4,
+      "fat": 9,
+      "carbs": 15,
+      "dietary_fiber": 1.5,
+      "sodium": 20
+    },
+    "ingredients": [
+      { "name": "速冻核桃糊", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "核桃糊坚果香浓，补脑益智。"
+  },
+  {
+    "id": "zc190",
+    "name": "藕粉",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 3,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["藕粉", "速溶"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 90,
+      "protein": 0.2,
+      "fat": 0,
+      "carbs": 22,
+      "dietary_fiber": 0.2,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "藕粉", "amount": "20g", "note": "粉末状" },
+      { "name": "开水", "amount": "200ml", "note": "" }
+    ],
+    "steps": [
+      "藕粉倒入碗中，加少量凉水调成糊状。",
+      "边搅拌边冲入刚烧开的沸水。",
+      "快速搅拌至透明糊状即可。"
+    ],
+    "remark": "藕粉冲泡水温必须够高，否则无法成糊。"
+  },
+  {
+    "id": "zc191",
+    "name": "桂花藕粉",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 3,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["桂花藕粉", "速溶"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["糖尿病人少食"],
+    "nutrition": {
+      "calories": 95,
+      "protein": 0.2,
+      "fat": 0,
+      "carbs": 23,
+      "dietary_fiber": 0.2,
+      "sodium": 5
+    },
+    "ingredients": [
+      { "name": "桂花藕粉", "amount": "20g", "note": "含桂花瓣" },
+      { "name": "开水", "amount": "200ml", "note": "" }
+    ],
+    "steps": ["藕粉加凉水调匀。", "冲入沸水，快速搅拌至透明。"],
+    "remark": "桂花藕粉有淡淡桂花香。"
+  },
+  {
+    "id": "zc192",
+    "name": "豆浆粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["豆浆粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 100,
+      "protein": 4,
+      "fat": 2,
+      "carbs": 17,
+      "dietary_fiber": 0.5,
+      "sodium": 50
+    },
+    "ingredients": [
+      { "name": "速冻豆浆粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "豆浆粥是豆浆和米粥的结合，豆香浓郁。"
+  },
+  {
+    "id": "zc193",
+    "name": "蛋花粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["蛋花粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 85,
+      "protein": 4,
+      "fat": 2,
+      "carbs": 13,
+      "dietary_fiber": 0.3,
+      "sodium": 250
+    },
+    "ingredients": [
+      { "name": "速冻蛋花粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "蛋花粥营养丰富，适合儿童。"
+  },
+  {
+    "id": "zc194",
+    "name": "菜粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "vegetarian",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["菜粥", "速冻"],
+    "suitable_for": ["减肥人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 65,
+      "protein": 2,
+      "fat": 0.5,
+      "carbs": 13,
+      "dietary_fiber": 0.8,
+      "sodium": 280
+    },
+    "ingredients": [
+      { "name": "速冻菜粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "菜粥清淡低卡，适合减肥早餐。"
+  },
+  {
+    "id": "zc195",
+    "name": "瘦肉粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["瘦肉粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 110,
+      "protein": 6,
+      "fat": 2.5,
+      "carbs": 16,
+      "dietary_fiber": 0.3,
+      "sodium": 380
+    },
+    "ingredients": [
+      { "name": "速冻瘦肉粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "瘦肉粥营养均衡，早餐首选。"
+  },
+  {
+    "id": "zc196",
+    "name": "鸡肉粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["鸡肉粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": [],
+    "nutrition": {
+      "calories": 105,
+      "protein": 6,
+      "fat": 2,
+      "carbs": 16,
+      "dietary_fiber": 0.3,
+      "sodium": 360
+    },
+    "ingredients": [
+      { "name": "速冻鸡肉粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "鸡肉粥清淡鲜美。"
+  },
+  {
+    "id": "zc197",
+    "name": "鱼肉粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["鱼肉粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["海鲜过敏者"],
+    "nutrition": {
+      "calories": 95,
+      "protein": 6,
+      "fat": 1.5,
+      "carbs": 15,
+      "dietary_fiber": 0.3,
+      "sodium": 340
+    },
+    "ingredients": [
+      { "name": "速冻鱼肉粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "鱼肉粥鲜美嫩滑。"
+  },
+  {
+    "id": "zc198",
+    "name": "海鲜粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["海鲜粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["海鲜过敏者"],
+    "nutrition": {
+      "calories": 110,
+      "protein": 7,
+      "fat": 2,
+      "carbs": 16,
+      "dietary_fiber": 0.3,
+      "sodium": 420
+    },
+    "ingredients": [
+      { "name": "速冻海鲜粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "海鲜粥用料丰富，鲜味十足。"
+  },
+  {
+    "id": "zc199",
+    "name": "蟹粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["蟹粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["海鲜过敏者"],
+    "nutrition": {
+      "calories": 105,
+      "protein": 6,
+      "fat": 1.8,
+      "carbs": 16,
+      "dietary_fiber": 0.3,
+      "sodium": 400
+    },
+    "ingredients": [
+      { "name": "速冻蟹粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "蟹粥有蟹黄的鲜香。"
+  },
+  {
+    "id": "zc200",
+    "name": "虾粥",
+    "alias": [],
+    "image": " ",
+    "cuisine_type": "早餐",
+    "cooking_time": 8,
+    "difficulty": "简单",
+    "type": "mixed",
+    "spicy_level": "无辣",
+    "oil_salt_level": "低油盐",
+    "tags": ["虾粥", "速冻"],
+    "suitable_for": ["一般人群"],
+    "avoid_for": ["海鲜过敏者"],
+    "nutrition": {
+      "calories": 100,
+      "protein": 6,
+      "fat": 1.5,
+      "carbs": 16,
+      "dietary_fiber": 0.3,
+      "sodium": 380
+    },
+    "ingredients": [
+      { "name": "速冻虾粥", "amount": "1碗", "note": "超市购买" }
+    ],
+    "steps": ["加热即可。"],
+    "remark": "虾粥鲜甜可口，虾仁弹牙。"
+  }
+]

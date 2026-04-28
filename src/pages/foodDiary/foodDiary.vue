@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import { markDirty } from '@/utils/cloud.js'
+import { markDirty } from '../../utils/cloud.js'
 export default {
   data() {
     return {

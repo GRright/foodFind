@@ -226,8 +226,8 @@
 </template>
 
 <script>
-import { ALL_RECIPES } from '@/utils/constants.js'
-import { getFamilyGroup, getCurrentUserId, getFamilyShoppingList, saveFamilyShoppingList, notifyShoppingChange } from '@/utils/family.js'
+import { ALL_RECIPES } from '../../utils/constants.js'
+import { getFamilyGroup, getCurrentUserId, getFamilyShoppingList, saveFamilyShoppingList, notifyShoppingChange } from '../../utils/family.js'
 
 const CATEGORY_MAP = {
   vegetable: { name: '蔬菜', icon: '🥬' },
@@ -239,7 +239,7 @@ const CATEGORY_MAP = {
 const CATEGORY_KEYWORDS = {
   vegetable: ['菜', '豆', '茄', '瓜', '菇', '笋', '藕', '椒', '蒜', '葱', '姜', '花', '叶', '生菜', '萝卜', '番茄', '西兰', '四季'],
   meat: ['肉', '鸡', '鸭', '鱼', '虾', '蛋', '排', '里脊', '牛肉', '猪肉', '鸡胸', '鸡翅', '鸭', '鲈', '皮蛋'],
-  seasoning: ['油', '盐', '酱', '醋', '糖', '料酒', '蚝油', '淀粉', '花椒', '八角', '桂皮', '豆瓣', '豉', '芝麻', '辣椒', '泡椒', '甜面', '豆鼓', '冰糖', '生抽', '老抽', '葱', '姜', '蒜'],
+  seasoning: ['油', '盐', '酱', '醋', '糖', '料酒', '蚝油', '淀粉', '花椒', '八角', '桂皮', '豆瓣', '豉', '芝麻', '辣椒', '泡椒', '甜面', '豆鼓', '冰糖', '生抽', '老抽', '葱', '姜', '蒜', '水', '清水', '温水', '开水'],
   staple: ['米', '面', '粉', '饼', '油条', '馒头', '粮', '麦', '豆', '黄豆']
 }
 

@@ -1,28 +1,191 @@
+import meanMealsData from './meanMeals.json'
+import breakfastData from './breakfast.json'
+
+// 直接使用 JSON 数据，不依赖 lowdb
+const recipes = meanMealsData || []
+const breakfastRecipes = breakfastData || []
+
+// 提供类似 lowdb 的查询方法
+export function getRecipeById(id) {
+  return recipes.find(r => r.id === id) || null
+}
+
+export function getRecipeByName(name) {
+  return recipes.find(r => r.name === name) || null
+}
+
+export function getRecipesByType(type) {
+  return recipes.filter(r => r.type === type)
+}
+
+export function getRecipesByCuisine(cuisine) {
+  return recipes.filter(r => r.cuisine_type === cuisine)
+}
+
+// 兼容 lowdb API
+const db = {
+  data: {
+    recipes: recipes
+  }
+}
+
+export { db }
+
+const EMOJI_MAP = {
+  '番茄炒蛋': '🍳', '宫保鸡丁': '🍗', '红烧肉': '🍖', '清蒸鲈鱼': '🐟',
+  '麻婆豆腐': '🥘', '糖醋排骨': '🍖', '蒜蓉西兰花': '🥦', '鱼香肉丝': '🥩',
+  '红烧茄子': '🍆', '干煸四季豆': '🫛', '可乐鸡翅': '🍗', '蒜蓉炒生菜': '🥬',
+  '回锅肉': '🥓', '清炒时蔬': '🥗', '啤酒鸭': '🦆', '水煮鱼': '🐟',
+  '水煮肉片': '🥩', '毛血旺': '🌶️', '辣子鸡': '🍗', '酸辣土豆丝': '🥔',
+  '可乐鸡翅': '🍗', '蚂蚁上树': '🍜', '地三鲜': '🥔', '干锅花菜': '🥦',
+  '酸菜鱼': '🐟', '口水鸡': '🍗', '蒜泥白肉': '🥓', '东坡肉': '🍖',
+  '糖醋里脊': '🥩', '油焖大虾': '🦐', '白切鸡': '🍗', '蒸蛋羹': '🥚',
+  '冬瓜排骨汤': '🍲', '紫菜蛋花汤': '🍲', '西红柿鸡蛋汤': '🍅', '玉米排骨汤': '🍲'
+}
+
+function getEmoji(name, type) {
+  if (EMOJI_MAP[name]) return EMOJI_MAP[name]
+  const typeEmojis = {
+    meat: ['🍖', '🍗', '🥩', '🦆', '🐟', '🦐'],
+    vegetarian: ['🥬', '🥦', '🍆', '🥔', '🫛', '🥗'],
+    mixed: ['🍜', '🥘', '🌶️', '🍲']
+  }
+  const emojis = typeEmojis[type] || ['🍽️']
+  return emojis[name.length % emojis.length]
+}
+
+function getImagePath(name, mealType = 'mainMeals') {
+  // 使用云存储中的图片
+  return `cloud://cloud1-d7gvzylmp17ed1957.636c-cloud1-d7gvzylmp17ed1957-1322628608/${mealType}/${name}.png`
+}
+
+function adaptRecipe(recipe, mealType = 'mainMeals') {
+  return {
+    ...recipe,
+    image: getImagePath(recipe.name, mealType),
+    calories: recipe.nutrition?.calories || 0
+  }
+}
+
+function classifyMeal(recipe) {
+  const tags = recipe.tags || []
+  const time = recipe.cooking_time || 0
+  const cal = recipe.nutrition?.calories || 0
+  
+  if (tags.includes('硬菜') || tags.includes('宴客菜') || cal > 400 || time > 45) {
+    return 'dinner'
+  }
+  if (tags.includes('快手菜') || time <= 15) {
+    return 'lunch'
+  }
+  return Math.random() > 0.5 ? 'lunch' : 'dinner'
+}
+
+const lunchRecipes = []
+const dinnerRecipes = []
+const adaptedBreakfastRecipes = []
+
+meanMealsData.forEach(recipe => {
+  const adapted = adaptRecipe(recipe)
+  const mealType = classifyMeal(recipe)
+  if (mealType === 'lunch') {
+    lunchRecipes.push(adapted)
+  } else {
+    dinnerRecipes.push(adapted)
+  }
+})
+
+breakfastRecipes.forEach(recipe => {
+  adaptedBreakfastRecipes.push(adaptRecipe(recipe, 'breakfast'))
+})
+
+lunchRecipes.forEach((r, i) => { r.id = 100 + i })
+dinnerRecipes.forEach((r, i) => { r.id = 200 + i })
+adaptedBreakfastRecipes.forEach((r, i) => { r.id = 1 + i })
+
+const HEALTH_TAG_TO_KEYWORDS = {
+  elderly: { avoid: [], extraCheck: (r) => false },
+  child: { avoid: [], extraCheck: (r) => false },
+  baby: { avoid: ['儿童'], extraCheck: (r) => {
+    const tags = r.tags || []
+    return tags.includes('辣') || tags.includes('麻辣') || tags.includes('特辣')
+  }},
+  pregnant: { avoid: [], extraCheck: (r) => {
+    const tags = r.tags || []
+    return tags.includes('特辣')
+  }},
+  nursing: { avoid: [], extraCheck: (r) => {
+    const tags = r.tags || []
+    return tags.includes('特辣')
+  }},
+  hypertension: { avoid: ['高血脂'], extraCheck: (r) => (r.oil_salt_level === '高油盐' || r.nutrition?.sodium > 600) },
+  diabetes: { avoid: ['糖尿病患者'], extraCheck: (r) => r.nutrition?.carbs > 30 },
+  hyperlipidemia: { avoid: ['高血脂', '肥胖人群'], extraCheck: (r) => (r.oil_salt_level === '高油盐' || r.nutrition?.fat > 30) },
+  gout: { avoid: ['痛风患者'], extraCheck: (r) => r.name.includes('啤酒') || r.name.includes('内脏') },
+  allergy_seafood: { avoid: [], extraCheck: (r) => {
+    const name = r.name || ''
+    const ingredients = (r.ingredients || []).map(i => i.name || '').join(',')
+    const text = name + ingredients
+    return ['虾', '蟹', '贝', '蛤', '牡蛎', '鲍鱼', '鱼', '鱿鱼', '章鱼'].some(w => text.includes(w))
+  }},
+  allergy_nut: { avoid: ['花生过敏者'], extraCheck: (r) => {
+    const ingredients = (r.ingredients || []).map(i => i.name || '').join(',')
+    return ['花生', '核桃', '杏仁', '腰果'].some(w => ingredients.includes(w))
+  }},
+  allergy_egg: { avoid: [], extraCheck: (r) => {
+    const ingredients = (r.ingredients || []).map(i => i.name || '').join(',')
+    return ingredients.includes('鸡蛋')
+  }},
+  allergy_dairy: { avoid: [], extraCheck: (r) => {
+    const ingredients = (r.ingredients || []).map(i => i.name || '').join(',')
+    return ['牛奶', '奶油', '芝士', '奶酪', '黄油', '酸奶'].some(w => ingredients.includes(w))
+  }},
+  vegetarian: { avoid: [], extraCheck: (r) => r.type === 'meat' },
+  low_sodium: { avoid: [], extraCheck: (r) => r.oil_salt_level === '高油盐' || r.nutrition?.sodium > 500 },
+  low_fat: { avoid: ['减肥人群', '高血脂', '肥胖人群'], extraCheck: (r) => r.nutrition?.fat > 25 },
+  low_sugar: { avoid: ['糖尿病患者'], extraCheck: (r) => r.tags?.includes('酸甜') }
+}
+
+export function filterByUserSuitability(recipes, healthTags) {
+  if (!healthTags || healthTags.length === 0) return recipes
+
+  return recipes.filter(recipe => {
+    for (const tag of healthTags) {
+      const rule = HEALTH_TAG_TO_KEYWORDS[tag]
+      if (!rule) continue
+
+      if (rule.avoid && rule.avoid.length > 0) {
+        const recipeAvoidList = recipe.avoid_for || []
+        for (const keyword of rule.avoid) {
+          if (recipeAvoidList.some(a => a.includes(keyword) || keyword.includes(a))) {
+            return false
+          }
+        }
+      }
+
+      if (rule.extraCheck && rule.extraCheck(recipe)) {
+        return false
+      }
+    }
+    return true
+  })
+}
+
+export function getFilteredRecipes(mealType, healthTags) {
+  let recipes = []
+  if (mealType === 'breakfast') recipes = [...ALL_RECIPES.breakfast]
+  else if (mealType === 'lunch') recipes = [...ALL_RECIPES.lunch]
+  else if (mealType === 'dinner') recipes = [...ALL_RECIPES.dinner]
+
+  if (healthTags && healthTags.length > 0) {
+    recipes = filterByUserSuitability(recipes, healthTags)
+  }
+
+  return recipes
+}
+
 export const ALL_RECIPES = {
-  breakfast: [
-    { id: 1, name: '白粥配小菜', image: '🥣', calories: 150, cuisine_type: '家常菜', type: 'vegetarian', cooking_time: 20, difficulty: '简单', tags: ['早餐', '养胃', '清淡'], nutrition: { calories: 150, protein: 5, fat: 3, carbs: 28 }, ingredients: [{ name: '大米', amount: '50g' }, { name: '萝卜干', amount: '20g' }, { name: '清水', amount: '500ml' }, { name: '盐', amount: '1g' }], steps: ['大米洗净加水煮粥', '萝卜干切碎备用', '粥煮好后配萝卜干食用'] },
-    { id: 2, name: '豆浆油条', image: '🥖', calories: 380, cuisine_type: '传统早餐', type: 'mixed', cooking_time: 15, difficulty: '简单', tags: ['早餐', '经典', '饱腹'], nutrition: { calories: 380, protein: 12, fat: 18, carbs: 42 }, ingredients: [{ name: '黄豆', amount: '30g' }, { name: '油条', amount: '2根(约80g)' }, { name: '清水', amount: '400ml' }, { name: '白糖', amount: '10g' }], steps: ['黄豆泡发后打豆浆', '油条加热或复炸', '配豆浆食用'] },
-    { id: 3, name: '包子', image: '🥟', calories: 280, cuisine_type: '面食', type: 'mixed', cooking_time: 30, difficulty: '中等', tags: ['早餐', '面食', '咸香'], nutrition: { calories: 280, protein: 15, fat: 10, carbs: 35 }, ingredients: [{ name: '中筋面粉', amount: '100g' }, { name: '猪肉馅', amount: '50g' }, { name: '酵母', amount: '2g' }, { name: '温水', amount: '50ml' }, { name: '葱姜', amount: '适量' }], steps: ['面粉加酵母温水揉成面团发酵', '猪肉馅加葱姜调味', '包成包子后蒸15分钟'] },
-    { id: 4, name: '鸡蛋灌饼', image: '🌯', calories: 320, cuisine_type: '面食', type: 'mixed', cooking_time: 10, difficulty: '简单', tags: ['早餐', '快手', '美味'], nutrition: { calories: 320, protein: 14, fat: 16, carbs: 32 }, ingredients: [{ name: '饼皮', amount: '1张' }, { name: '鸡蛋', amount: '1个约55g' }, { name: '甜面酱', amount: '1勺' }, { name: '生菜', amount: '1片' }], steps: ['饼皮加热至鼓起', '打鸡蛋灌进去摊平', '刷甜面酱放生菜卷起'] },
-    { id: 5, name: '皮蛋瘦肉粥', image: '🍚', calories: 220, cuisine_type: '粤菜', type: 'mixed', cooking_time: 40, difficulty: '中等', tags: ['早餐', '养胃', '咸香'], nutrition: { calories: 220, protein: 18, fat: 6, carbs: 25 }, ingredients: [{ name: '大米', amount: '50g' }, { name: '皮蛋', amount: '1个约40g' }, { name: '瘦肉', amount: '30g' }, { name: '姜丝', amount: '适量' }, { name: '葱花', amount: '适量' }, { name: '盐', amount: '2g' }], steps: ['大米煮成白粥底', '瘦肉切丝用淀粉腌制', '皮蛋切碎丁', '一起放入粥中煮熟加盐葱花'] }
-  ],
-  lunch: [
-    { id: 6, name: '番茄炒蛋', image: '🍳', calories: 180, cuisine_type: '家常菜', type: 'mixed', cooking_time: 15, difficulty: '简单', tags: ['快手', '下饭', '酸甜'], nutrition: { calories: 180, protein: 12, fat: 12, carbs: 8 }, ingredients: [{ name: '番茄', amount: '2个约200g' }, { name: '鸡蛋', amount: '3个约165g' }, { name: '白糖', amount: '8g' }, { name: '盐', amount: '2g' }, { name: '食用油', amount: '15ml' }], steps: ['番茄切块备用', '鸡蛋打散炒熟盛出', '锅中加油放入番茄翻炒出汁', '加入鸡蛋和糖盐调味即可'] },
-    { id: 7, name: '宫保鸡丁', image: '🍗', calories: 350, cuisine_type: '川菜', type: 'meat', cooking_time: 25, difficulty: '中等', tags: ['辣', '下饭', '经典'], nutrition: { calories: 350, protein: 28, fat: 20, carbs: 15 }, ingredients: [{ name: '鸡胸肉', amount: '200g' }, { name: '花生米', amount: '30g' }, { name: '干辣椒', amount: '6个' }, { name: '花椒', amount: '10粒' }, { name: '葱段', amount: '适量' }, { name: '生抽', amount: '1勺' }, { name: '料酒', amount: '1勺' }, { name: '食用油', amount: '20ml' }], steps: ['鸡胸肉切丁用料酒生抽腌制10分钟', '干辣椒花椒爆香', '放入鸡丁大火翻炒至变色', '加入花生米和调味汁翻炒均匀'] },
-    { id: 8, name: '红烧肉', image: '🍖', calories: 520, cuisine_type: '家常菜', type: 'meat', cooking_time: 60, difficulty: '中等', tags: ['下饭', '咸香', '经典'], nutrition: { calories: 520, protein: 25, fat: 42, carbs: 8 }, ingredients: [{ name: '五花肉', amount: '300g' }, { name: '冰糖', amount: '25g' }, { name: '生抽', amount: '2勺' }, { name: '老抽', amount: '1勺' }, { name: '八角', amount: '2个' }, { name: '桂皮', amount: '1小段' }, { name: '姜片', amount: '3片' }, { name: '料酒', amount: '2勺' }], steps: ['五花肉切块冷水焯水去血沫', '锅中少油小火炒冰糖至焦糖色', '放入五花肉翻炒上色', '加所有调料和开水没过肉炖1小时'] },
-    { id: 9, name: '清蒸鲈鱼', image: '🐟', calories: 200, cuisine_type: '粤菜', type: 'meat', cooking_time: 20, difficulty: '简单', tags: ['清淡', '健康', '鲜嫩'], nutrition: { calories: 200, protein: 35, fat: 6, carbs: 2 }, ingredients: [{ name: '鲈鱼', amount: '1条约500g' }, { name: '葱丝', amount: '适量' }, { name: '姜丝', amount: '适量' }, { name: '蒸鱼豉油', amount: '2勺' }, { name: '食用油', amount: '15ml' }, { name: '料酒', amount: '1勺' }], steps: ['鲈鱼处理干净两面划刀', '放上葱姜丝淋料酒腌10分钟', '水开后大火蒸8分钟', '倒掉蒸水淋上蒸鱼豉油，浇热油激香'] },
-    { id: 10, name: '麻婆豆腐', image: '🥘', calories: 280, cuisine_type: '川菜', type: 'mixed', cooking_time: 15, difficulty: '简单', tags: ['辣', '下饭', '豆腐'], nutrition: { calories: 280, protein: 18, fat: 20, carbs: 10 }, ingredients: [{ name: '嫩豆腐', amount: '1块约350g' }, { name: '牛肉末', amount: '50g' }, { name: '郫县豆瓣酱', amount: '1.5勺' }, { name: '花椒粉', amount: '3g' }, { name: '辣椒粉', amount: '2g' }, { name: '蒜末', amount: '适量' }, { name: '淀粉水', amount: '少许' }, { name: '食用油', amount: '15ml' }, { name: '青蒜苗', amount: '1根' }], steps: ['豆腐切小块盐水焯一下捞出', '牛肉末炒散出油', '加豆瓣酱蒜末炒出红油', '加水烧开放入豆腐煮3分钟勾芡撒花椒粉'] },
-    { id: 11, name: '糖醋排骨', image: '🍖', calories: 450, cuisine_type: '家常菜', type: 'meat', cooking_time: 45, difficulty: '中等', tags: ['酸甜', '下饭', '经典'], nutrition: { calories: 450, protein: 28, fat: 28, carbs: 25 }, ingredients: [{ name: '肋排', amount: '300g' }, { name: '白糖', amount: '30g' }, { name: '陈醋', amount: '2勺' }, { name: '生抽', amount: '1勺' }, { name: '番茄酱', amount: '1勺' }, { name: '料酒', amount: '1勺' }, { name: '熟芝麻', amount: '少许' }, { name: '食用油', amount: '15ml' }], steps: ['排骨冷水焯水后沥干', '调糖醋汁：糖+醋+生抽+番茄酱', '排骨煎至表面金黄', '倒入糖醋汁中小火焖煮至收干撒芝麻'] },
-    { id: 12, name: '蒜蓉西兰花', image: '🥦', calories: 120, cuisine_type: '家常菜', type: 'vegetarian', cooking_time: 10, difficulty: '简单', tags: ['清淡', '健康', '快手'], nutrition: { calories: 120, protein: 8, fat: 6, carbs: 10 }, ingredients: [{ name: '西兰花', amount: '250g' }, { name: '大蒜', amount: '4瓣' }, { name: '盐', amount: '2g' }, { name: '蚝油', amount: '1勺' }, { name: '食用油', amount: '10ml' }], steps: ['西兰花切小朵淡盐水浸泡10分钟', '开水焯烫1分钟捞出沥干', '蒜末爆香', '放入西兰花快炒加盐蚝油出锅'] },
-    { id: 13, name: '鱼香肉丝', image: '🥩', calories: 320, cuisine_type: '川菜', type: 'meat', cooking_time: 20, difficulty: '中等', tags: ['下饭', '酸甜', '经典'], nutrition: { calories: 320, protein: 25, fat: 18, carbs: 16 }, ingredients: [{ name: '猪里脊肉丝', amount: '150g' }, { name: '木耳', amount: '30g(泡发)' }, { name: '胡萝卜丝', amount: '50g' }, { name: '笋丝', amount: '30g' }, { name: '泡椒碎', amount: '1勺' }, { name: '郫县豆瓣酱', amount: '0.5勺' }, { name: '醋', amount: '2勺' }, { name: '白糖', amount: '15g' }, { name: '淀粉', amount: '少许' }, { name: '食用油', amount: '15ml' }], steps: ['肉丝用淀粉料酒腌制', '木耳胡萝卜笋切丝', '调鱼香汁：醋+糖+生抽+淀粉水', '泡椒豆瓣酱炒香，放入肉丝和配菜快炒加鱼香汁'] }
-  ],
-  dinner: [
-    { id: 14, name: '红烧茄子', image: '🍆', calories: 220, cuisine_type: '家常菜', type: 'vegetarian', cooking_time: 25, difficulty: '简单', tags: ['下饭', '咸香', '素食'], nutrition: { calories: 220, protein: 4, fat: 15, carbs: 18 }, ingredients: [{ name: '长茄子', amount: '2根约300g' }, { name: '大蒜', amount: '4瓣切末' }, { name: '生抽', amount: '2勺' }, { name: '老抽', amount: '0.5勺' }, { name: '白糖', amount: '5g' }, { name: '淀粉', amount: '少许' }, { name: '食用油', amount: '20ml' }, { name: '葱花', amount: '适量' }], steps: ['茄子切滚刀块撒淀粉拌匀', '油煎至表皮微黄变软', '留底油炒香蒜末', '放入茄块加生抽老抽糖翻炒均匀'] },
-    { id: 15, name: '干煸四季豆', image: '🫛', calories: 250, cuisine_type: '川菜', type: 'vegetarian', cooking_time: 20, difficulty: '中等', tags: ['辣', '下饭', '干香'], nutrition: { calories: 250, protein: 8, fat: 18, carbs: 15 }, ingredients: [{ name: '四季豆', amount: '250g' }, { name: '猪肉末', amount: '40g' }, { name: '干辣椒段', amount: '5个' }, { name: '花椒', amount: '10粒' }, { name: '蒜末', amount: '适量' }, { name: '生抽', amount: '1勺' }, { name: '盐', amount: '2g' }, { name: '食用油', amount: '20ml' }], steps: ['四季豆掐掉两头撕去老筋', '油炸至表皮起皱捞出', '锅留底油炒香干辣椒花椒肉末', '放入四季豆加生抽盐快速翻炒'] },
-    { id: 16, name: '可乐鸡翅', image: '🍗', calories: 380, cuisine_type: '家常菜', type: 'meat', cooking_time: 30, difficulty: '简单', tags: ['甜香', '下饭', '快手'], nutrition: { calories: 380, protein: 28, fat: 22, carbs: 18 }, ingredients: [{ name: '鸡翅中', amount: '8个约400g' }, { name: '可乐', amount: '1罐330ml' }, { name: '生抽', amount: '2勺' }, { name: '老抽', amount: '0.5勺' }, { name: '姜片', amount: '3片' }, { name: '料酒', amount: '1勺' }, { name: '食用油', amount: '10ml' }], steps: ['鸡翅两面划刀冷水焯水', '煎至两面金黄', '倒入可乐没过鸡翅加生抽老抽姜', '中火煮15分钟收浓汤汁'] },
-    { id: 17, name: '蒜蓉炒生菜', image: '🥬', calories: 80, cuisine_type: '家常菜', type: 'vegetarian', cooking_time: 5, difficulty: '简单', tags: ['清淡', '健康', '快手'], nutrition: { calories: 80, protein: 3, fat: 5, carbs: 6 }, ingredients: [{ name: '生菜', amount: '300g' }, { name: '大蒜', amount: '4瓣切末' }, { name: '盐', amount: '2g' }, { name: '蚝油', amount: '1勺' }, { name: '食用油', amount: '10ml' }], steps: ['生菜洗净沥干水分', '大火热油蒜末爆香', '放入生菜大火快炒30秒', '加盐蚝油翻匀立即出锅'] },
-    { id: 18, name: '回锅肉', image: '🥓', calories: 480, cuisine_type: '川菜', type: 'meat', cooking_time: 25, difficulty: '中等', tags: ['辣', '下饭', '经典'], nutrition: { calories: 480, protein: 22, fat: 40, carbs: 8 }, ingredients: [{ name: '五花肉', amount: '250g(带皮)' }, { name: '青蒜苗', amount: '2根' }, { name: '郫县豆瓣', amount: '1.5勺' }, { name: '甜面酱', amount: '0.5勺' }, { name: '豆豉', amount: '10粒' }, { name: '姜片', amount: '3片' }, { name: '料酒', amount: '1勺' }, { name: '食用油', amount: '10ml' }], steps: ['整块五花肉冷水下锅加姜料酒煮至筷子能插透', '取出晾凉切薄片', '肉片煸炒至微卷出油(灯盏窝)', '加豆瓣甜面酱豆豉炒香放入蒜苗段翻炒'] },
-    { id: 19, name: '清炒时蔬', image: '🥗', calories: 100, cuisine_type: '家常菜', type: 'vegetarian', cooking_time: 8, difficulty: '简单', tags: ['清淡', '健康', '时蔬'], nutrition: { calories: 100, protein: 5, fat: 6, carbs: 8 }, ingredients: [{ name: '时令蔬菜', amount: '250g' }, { name: '大蒜', amount: '3瓣切末' }, { name: '盐', amount: '2g' }, { name: '食用油', amount: '10ml' }], steps: ['蔬菜洗净切段或片', '热油蒜末爆香', '大火放入蔬菜快炒', '加盐调味即可出锅'] },
-    { id: 20, name: '啤酒鸭', image: '🦆', calories: 420, cuisine_type: '家常菜', type: 'meat', cooking_time: 50, difficulty: '中等', tags: ['酒香', '下饭', '浓郁'], nutrition: { calories: 420, protein: 32, fat: 28, carbs: 10 }, ingredients: [{ name: '半片鸭', amount: '600g' }, { name: '啤酒', amount: '1罐330ml' }, { name: '姜片', amount: '5片' }, { name: '干辣椒', amount: '4个' }, { name: '八角', amount: '2个' }, { name: '桂皮', amount: '1小段' }, { name: '生抽', amount: '2勺' }, { name: '老抽', amount: '1勺' }, { name: '冰糖', amount: '10g' }, { name: '食用油', amount: '15ml' }], steps: ['鸭子剁块冷水焯水去腥', '锅中少油煸炒至出油微黄', '加姜片干辣椒八角桂皮炒香', '倒入啤酒和调料炖40分钟至酥烂'] }
-  ]
+  breakfast: adaptedBreakfastRecipes,
+  lunch: lunchRecipes,
+  dinner: dinnerRecipes
 }
