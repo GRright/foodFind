@@ -54,15 +54,15 @@ function getEmoji(name, type) {
   return emojis[name.length % emojis.length]
 }
 
-function getImagePath(name, mealType = 'mainMeals') {
-  // 使用云存储中的图片
+function getCloudPath(name, mealType = 'mainMeals') {
   return `cloud://cloud1-d7gvzylmp17ed1957.636c-cloud1-d7gvzylmp17ed1957-1322628608/${mealType}/${name}.png`
 }
 
 function adaptRecipe(recipe, mealType = 'mainMeals') {
   return {
     ...recipe,
-    image: getImagePath(recipe.name, mealType),
+    cloudImage: getCloudPath(recipe.name, mealType),
+    image: '',
     calories: recipe.nutrition?.calories || 0
   }
 }

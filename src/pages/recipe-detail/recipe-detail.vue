@@ -1,9 +1,9 @@
 <template>
   <view class="page">
     <view class="recipe-hero">
-      <image class="hero-bg" :src="recipe.image" mode="aspectFill" v-if="recipe.image && recipe.image.startsWith('/')"></image>
-      <view class="hero-frosted" v-if="recipe.image && recipe.image.startsWith('/')"></view>
-      <image class="hero-dish scale-in" :src="recipe.image" mode="aspectFill" v-if="recipe.image && recipe.image.startsWith('/')"></image>
+      <image class="hero-bg" :src="recipe.image" mode="aspectFill" v-if="recipe.image && (recipe.image.startsWith('/') || recipe.image.startsWith('cloud://'))"></image>
+      <view class="hero-frosted" v-if="recipe.image && (recipe.image.startsWith('/') || recipe.image.startsWith('cloud://'))"></view>
+      <image class="hero-dish scale-in" :src="recipe.image" mode="aspectFill" v-if="recipe.image && (recipe.image.startsWith('/') || recipe.image.startsWith('cloud://'))"></image>
       <text class="hero-emoji scale-in" v-else>🍽️</text>
       <view class="hero-overlay">
         <text class="hero-title">{{ recipe.name }}</text>
@@ -115,6 +115,65 @@
 import { ALL_RECIPES } from '../../utils/constants.js'
 import { notifyRecipeLike } from '../../utils/family.js'
 
+const _IC_CACHE_PREFIX = 'img_cache_'
+const _IC_CACHE_EXPIRY = 7 * 24 * 60 * 60 * 1000
+
+function _icGetCacheKey(cloudPath) {
+  return _IC_CACHE_PREFIX + cloudPath.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_')
+}
+
+function _icGetLocalFilePath(cloudPath) {
+  const key = _icGetCacheKey(cloudPath)
+  return `${wx.env.USER_DATA_PATH}/${key}.png`
+}
+
+function _icIsCacheValid(localPath, cloudPath) {
+  try {
+    const cacheInfo = uni.getStorageSync(_icGetCacheKey(cloudPath))
+    if (!cacheInfo || !cacheInfo.timestamp) return false
+    if (Date.now() - cacheInfo.timestamp > _IC_CACHE_EXPIRY) return false
+    const fs = uni.getFileSystemManager()
+    try { fs.accessSync(localPath); return true }
+    catch (e) { return false }
+  } catch (e) { return false }
+}
+
+function _icGetCloudImage(cloudPath) {
+  return new Promise((resolve) => {
+    const localPath = _icGetLocalFilePath(cloudPath)
+    if (_icIsCacheValid(localPath, cloudPath)) {
+      resolve(localPath)
+      return
+    }
+    wx.cloud.getTempFileURL({
+      fileList: [cloudPath],
+      success: (res) => {
+        const tempUrl = res.fileList[0]?.tempFileURL
+        if (!tempUrl) { resolve(''); return }
+        uni.downloadFile({
+          url: tempUrl,
+          success: (downloadRes) => {
+            const fs = uni.getFileSystemManager()
+            try {
+              fs.saveFileSync(downloadRes.tempFilePath, localPath)
+              uni.setStorageSync(_icGetCacheKey(cloudPath), {
+                timestamp: Date.now(),
+                path: localPath,
+                size: downloadRes.header['Content-Length'] || 0
+              })
+              resolve(localPath)
+            } catch (e) {
+              resolve(downloadRes.tempFilePath)
+            }
+          },
+          fail: () => resolve('')
+        })
+      },
+      fail: () => resolve('')
+    })
+  })
+}
+
 export default {
   data() {
     return {
@@ -138,7 +197,7 @@ export default {
     this.checkUserReaction()
   },
   methods: {
-    loadRecipe() {
+    async loadRecipe() {
       const allRecipes = [
         ...ALL_RECIPES.breakfast,
         ...ALL_RECIPES.lunch,
@@ -147,6 +206,10 @@ export default {
       const found = allRecipes.find(r => r.id == this.recipeId)
       if (found) {
         this.recipe = found
+        if (found.cloudImage) {
+          const localPath = await _icGetCloudImage(found.cloudImage)
+          if (localPath) this.recipe.image = localPath
+        }
       }
     },
     checkUserReaction() {

@@ -162,8 +162,8 @@
             >
               <view class="fc-inner" :class="{ 'flip-out': flippingCardId === food.id, 'flip-in': newCardId === food.id }">
                 <view class="fc-icon-wrap">
-                  <image class="fc-img" :src="food.image" mode="aspectFill" @error="food._imgErr = true" v-if="food.image && food.image.startsWith('/') && !food._imgErr"></image>
-                  <text class="fc-icon" v-else>{{ (!food.image || food.image.startsWith('/')) ? '🍽️' : food.image }}</text>
+                  <image class="fc-img" :src="food.image" mode="aspectFill" @error="food._imgErr = true" v-if="food.image && (food.image.startsWith('/') || food.image.startsWith('cloud://')) && !food._imgErr"></image>
+                  <text class="fc-icon" v-else>{{ (!food.image || food.image.startsWith('/') || food.image.startsWith('cloud://')) ? '🍽️' : food.image }}</text>
                 </view>
                 <text class="fc-name">{{ food.name }}</text>
               </view>
@@ -247,8 +247,8 @@
                 </view>
                 <view class="ggdc-inner">
                   <view class="ggdc-icon-wrap">
-                    <image class="ggdc-img" :src="ggDemoFood.image" mode="aspectFill" @error="ggDemoFood._imgErr = true" v-if="ggDemoFood && ggDemoFood.image && ggDemoFood.image.startsWith('/') && !ggDemoFood._imgErr"></image>
-                    <text class="ggdc-icon" v-else>{{ (ggDemoFood && ggDemoFood.image && !ggDemoFood.image.startsWith('/')) ? ggDemoFood.image : '🍽️' }}</text>
+                    <image class="ggdc-img" :src="ggDemoFood.image" mode="aspectFill" @error="ggDemoFood._imgErr = true" v-if="ggDemoFood && ggDemoFood.image && (ggDemoFood.image.startsWith('/') || ggDemoFood.image.startsWith('cloud://')) && !ggDemoFood._imgErr"></image>
+                    <text class="ggdc-icon" v-else>{{ (ggDemoFood && ggDemoFood.image && !ggDemoFood.image.startsWith('/') && !ggDemoFood.image.startsWith('cloud://')) ? ggDemoFood.image : '🍽️' }}</text>
                   </view>
                   <text class="ggdc-name">{{ ggDemoFood?.name || '示例菜品' }}</text>
                 </view>
@@ -527,7 +527,104 @@ import { ALL_RECIPES } from '../../utils/constants.js'
 import { filterRecipesByHealthTags, filterRecipesByUserPrefs, getFamilyHealthTags, getLocalNotifications, markAllNotificationsRead, getUnreadNotificationCount, notifyCheckIn, getFamilyCheckInToday, getCurrentUserId, getFamilyGroup, getUserNickname, recordFamilyCheckIn } from '../../utils/family.js'
 import { getBirthdayMenuRecommendation, addSpecialDate, getFamilyMemberSpecialToday, getPersonalizedRecipes, getUpcomingSpecialDates, getCurrentSeason, SEASONAL_FOODS } from '../../utils/festival.js'
 import { callFunction, markDirty } from '../../utils/cloud.js'
-import { checkAndIncrement, getRemainingCount } from '../../utils/generation-limit.js'
+
+const _IC_CACHE_PREFIX = 'img_cache_'
+const _IC_CACHE_EXPIRY = 7 * 24 * 60 * 60 * 1000
+
+function _icGetCacheKey(cloudPath) {
+  return _IC_CACHE_PREFIX + cloudPath.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_')
+}
+
+function _icGetLocalFilePath(cloudPath) {
+  const key = _icGetCacheKey(cloudPath)
+  return `${wx.env.USER_DATA_PATH}/${key}.png`
+}
+
+function _icIsCacheValid(localPath, cloudPath) {
+  try {
+    const cacheInfo = uni.getStorageSync(_icGetCacheKey(cloudPath))
+    if (!cacheInfo || !cacheInfo.timestamp) return false
+    if (Date.now() - cacheInfo.timestamp > _IC_CACHE_EXPIRY) return false
+    const fs = uni.getFileSystemManager()
+    try { fs.accessSync(localPath); return true }
+    catch (e) { return false }
+  } catch (e) { return false }
+}
+
+function _icGetCloudImage(cloudPath) {
+  return new Promise((resolve) => {
+    const localPath = _icGetLocalFilePath(cloudPath)
+    if (_icIsCacheValid(localPath, cloudPath)) {
+      resolve(localPath)
+      return
+    }
+    wx.cloud.getTempFileURL({
+      fileList: [cloudPath],
+      success: (res) => {
+        const tempUrl = res.fileList[0]?.tempFileURL
+        if (!tempUrl) { resolve(''); return }
+        uni.downloadFile({
+          url: tempUrl,
+          success: (downloadRes) => {
+            const fs = uni.getFileSystemManager()
+            try {
+              fs.saveFileSync(downloadRes.tempFilePath, localPath)
+              uni.setStorageSync(_icGetCacheKey(cloudPath), {
+                timestamp: Date.now(),
+                path: localPath,
+                size: downloadRes.header['Content-Length'] || 0
+              })
+              resolve(localPath)
+            } catch (e) {
+              resolve(downloadRes.tempFilePath)
+            }
+          },
+          fail: () => resolve('')
+        })
+      },
+      fail: () => resolve('')
+    })
+  })
+}
+
+function _icPreloadCloudImages(cloudPaths) {
+  return new Promise((resolve) => {
+    const results = {}
+    let pending = cloudPaths.length
+    if (pending === 0) { resolve(results); return }
+    cloudPaths.forEach((path) => {
+      _icGetCloudImage(path).then((localPath) => {
+        if (localPath) results[path] = localPath
+        pending--
+        if (pending === 0) resolve(results)
+      })
+    })
+  })
+}
+
+const MAX_DAILY_GEN = 3
+const GEN_KEY = 'foodfind_gen_count_'
+
+function _genTodayKey() {
+  return new Date().toISOString().split('T')[0]
+}
+
+function _getGenCount() {
+  return parseInt(uni.getStorageSync(GEN_KEY + _genTodayKey()) || '0', 10)
+}
+
+function _checkAndIncrement() {
+  if (_getGenCount() >= MAX_DAILY_GEN) {
+    uni.showToast({ title: `今日已生成${MAX_DAILY_GEN}次，明天再来吧~`, icon: 'none', duration: 2000 })
+    return false
+  }
+  uni.setStorageSync(GEN_KEY + _genTodayKey(), (_getGenCount() + 1).toString())
+  return true
+}
+
+function _getRemaining() {
+  return Math.max(0, MAX_DAILY_GEN - _getGenCount())
+}
 
 export default {
   data() {
@@ -783,6 +880,17 @@ export default {
     }
   },
   methods: {
+    async loadFoodImages(foods) {
+      if (!foods || !foods.length) return
+      const cloudPaths = foods.filter(f => f.cloudImage).map(f => f.cloudImage)
+      if (!cloudPaths.length) return
+      const cached = await _icPreloadCloudImages(cloudPaths)
+      foods.forEach(food => {
+        if (food.cloudImage && cached[food.cloudImage]) {
+          food.image = cached[food.cloudImage]
+        }
+      })
+    },
     getSwipeOpacity() {
       if (!this.swipeCardId) return 1
       const absOffset = Math.abs(this.swipeOffset)
@@ -1245,6 +1353,7 @@ export default {
         dinner: this.balanced(dinnerPool, n)
       }
       this.dailyMeals = dailyMeals
+      this.loadFoodImages([...dailyMeals.breakfast, ...dailyMeals.lunch, ...dailyMeals.dinner])
       const todayStr = this.getTodayStr()
       uni.setStorageSync('foodfind_meals', dailyMeals)
       uni.setStorageSync('foodfind_meals_date', todayStr)
@@ -1276,7 +1385,7 @@ export default {
     },
     refreshMeal(mealKey) {
       if (this.isRefreshing) return
-      if (!checkAndIncrement()) return
+      if (!_checkAndIncrement()) return
       this.isRefreshing = mealKey
       setTimeout(() => {
         const currentRecipes = this.dailyMeals[mealKey] || []
@@ -1296,12 +1405,12 @@ export default {
         uni.setStorageSync('foodfind_weekly', wc)
         this.syncMealsToCloud(this.dailyMeals, this.getTodayStr())
         this.isRefreshing = ''
-        uni.showToast({ title: `已更换${mealKey==='breakfast'?'早餐':mealKey==='lunch'?'午餐':'晚餐'}（今日剩余${getRemainingCount()}次）`, icon: 'none' })
+        uni.showToast({ title: `已更换${mealKey==='breakfast'?'早餐':mealKey==='lunch'?'午餐':'晚餐'}（今日剩余${_getRemaining()}次）`, icon: 'none' })
       }, 400)
     },
     regenerateAll() {
-      if (!checkAndIncrement()) return
-      uni.showToast({ title: `已重新生成（今日剩余${getRemainingCount()}次）`, icon: 'success' })
+      if (!_checkAndIncrement()) return
+      uni.showToast({ title: `已重新生成（今日剩余${_getRemaining()}次）`, icon: 'success' })
       setTimeout(() => { this.generateDailyMeals() }, 300)
     },
     goToDetail(recipe) { uni.navigateTo({ url: `/pages/recipe-detail/recipe-detail?id=${recipe.id}` }) },

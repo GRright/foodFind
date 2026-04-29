@@ -213,8 +213,8 @@
             <view class="ams-list" v-if="adminTodayMeals[meal.key] && adminTodayMeals[meal.key].length > 0">
               <view class="ams-item" v-for="(food, idx) in adminTodayMeals[meal.key]" :key="idx">
                 <view class="ams-emoji-wrap">
-                  <image class="ams-img" :src="food.image" mode="aspectFill" @error="food._imgErr = true" v-if="food.image && food.image.startsWith('/') && !food._imgErr"></image>
-                  <text class="ams-emoji" v-else>{{ (!food.image || food.image.startsWith('/')) ? '🍽️' : food.image }}</text>
+                  <image class="ams-img" :src="food.image" mode="aspectFill" @error="food._imgErr = true" v-if="food.image && (food.image.startsWith('/') || food.image.startsWith('cloud://')) && !food._imgErr"></image>
+                  <text class="ams-emoji" v-else>{{ (!food.image || food.image.startsWith('/') || food.image.startsWith('cloud://')) ? '🍽️' : food.image }}</text>
                 </view>
                 <view class="ams-info">
                   <text class="ams-name">{{ food.name }}</text>
@@ -260,6 +260,80 @@ import {
   getHealthTagById
 } from '../../utils/family.js'
 import { markDirty } from '../../utils/cloud'
+
+const _IC_CACHE_PREFIX = 'img_cache_'
+const _IC_CACHE_EXPIRY = 7 * 24 * 60 * 60 * 1000
+
+function _icGetCacheKey(cloudPath) {
+  return _IC_CACHE_PREFIX + cloudPath.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_')
+}
+
+function _icGetLocalFilePath(cloudPath) {
+  const key = _icGetCacheKey(cloudPath)
+  return `${wx.env.USER_DATA_PATH}/${key}.png`
+}
+
+function _icIsCacheValid(localPath, cloudPath) {
+  try {
+    const cacheInfo = uni.getStorageSync(_icGetCacheKey(cloudPath))
+    if (!cacheInfo || !cacheInfo.timestamp) return false
+    if (Date.now() - cacheInfo.timestamp > _IC_CACHE_EXPIRY) return false
+    const fs = uni.getFileSystemManager()
+    try { fs.accessSync(localPath); return true }
+    catch (e) { return false }
+  } catch (e) { return false }
+}
+
+function _icGetCloudImage(cloudPath) {
+  return new Promise((resolve) => {
+    const localPath = _icGetLocalFilePath(cloudPath)
+    if (_icIsCacheValid(localPath, cloudPath)) {
+      resolve(localPath)
+      return
+    }
+    wx.cloud.getTempFileURL({
+      fileList: [cloudPath],
+      success: (res) => {
+        const tempUrl = res.fileList[0]?.tempFileURL
+        if (!tempUrl) { resolve(''); return }
+        uni.downloadFile({
+          url: tempUrl,
+          success: (downloadRes) => {
+            const fs = uni.getFileSystemManager()
+            try {
+              fs.saveFileSync(downloadRes.tempFilePath, localPath)
+              uni.setStorageSync(_icGetCacheKey(cloudPath), {
+                timestamp: Date.now(),
+                path: localPath,
+                size: downloadRes.header['Content-Length'] || 0
+              })
+              resolve(localPath)
+            } catch (e) {
+              resolve(downloadRes.tempFilePath)
+            }
+          },
+          fail: () => resolve('')
+        })
+      },
+      fail: () => resolve('')
+    })
+  })
+}
+
+function _icPreloadCloudImages(cloudPaths) {
+  return new Promise((resolve) => {
+    const results = {}
+    let pending = cloudPaths.length
+    if (pending === 0) { resolve(results); return }
+    cloudPaths.forEach((path) => {
+      _icGetCloudImage(path).then((localPath) => {
+        if (localPath) results[path] = localPath
+        pending--
+        if (pending === 0) resolve(results)
+      })
+    })
+  })
+}
 
 export default {
   data() {
@@ -319,6 +393,17 @@ export default {
     this.loadFamily()
   },
   methods: {
+    async loadFoodImages(foods) {
+      if (!foods || !foods.length) return
+      const cloudPaths = foods.filter(f => f.cloudImage).map(f => f.cloudImage)
+      if (!cloudPaths.length) return
+      const cached = await _icPreloadCloudImages(cloudPaths)
+      foods.forEach(food => {
+        if (food.cloudImage && cached[food.cloudImage]) {
+          food.image = cached[food.cloudImage]
+        }
+      })
+    },
     async loadFamily() {
       const group = getFamilyGroup()
       if (group) {
